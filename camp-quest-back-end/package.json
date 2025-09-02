@@ -1,0 +1,17 @@
+{
+  "name": "camp-quest-back-end",
+  "version": "1.0.0",
+  "description": "smart camping equipment rental and sales management system",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.18.0",
+    "nodemon": "^3.1.10"
+  }
+}
