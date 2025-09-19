@@ -1,0 +1,129 @@
+/* pages/Feedback.css */
+.feedback-page {
+  padding: 0;
+}
+
+.feedback-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.feedback-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.feedback-card {
+  background-color: #111827;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.feedback-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.feedback-subject {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.feedback-from {
+  font-size: 0.875rem;
+  color: #9CA3AF;
+  margin-top: 0.25rem;
+}
+
+.feedback-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.feedback-rating {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.feedback-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.feedback-status.new {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+}
+
+.feedback-status.urgent {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}
+
+.feedback-status.responded {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #22C55E;
+}
+
+.feedback-status.pending {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
+}
+
+.feedback-content {
+  color: #D1D5DB;
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.feedback-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.feedback-date {
+  color: #6B7280;
+}
+
+.feedback-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.feedback-action {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: #9AE01A;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-decoration: none;
+}
+
+.feedback-action:hover {
+  opacity: 0.8;
+}
+
+.feedback-action.resolve {
+  color: #22C55E;
+}
+
+.feedback-action.escalate {
+  color: #EF4444;
+}

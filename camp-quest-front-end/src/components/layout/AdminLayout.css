@@ -1,0 +1,21 @@
+/* components/layout/AdminLayout.css */
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  background-color: #111827;
+  color: #ffffff;
+}
+
+.admin-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.admin-main {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #1F2937;
+  padding: 1rem;
+}

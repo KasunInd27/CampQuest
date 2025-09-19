@@ -1,0 +1,190 @@
+/* pages/Dashboard.css */
+.dashboard {
+  padding: 0;
+}
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-card {
+  background-color: #111827;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-title {
+  font-size: 0.875rem;
+  color: #9CA3AF;
+}
+
+.card-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 0.25rem;
+}
+
+.card-icon {
+  width: 3rem;
+  height: 3rem;
+  background-color: #1F2937;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-blue {
+  color: #60A5FA;
+}
+
+.icon-red {
+  color: #F87171;
+}
+
+.icon-green {
+  color: #34D399;
+}
+
+.icon-purple {
+  color: #A78BFA;
+}
+
+.card-change {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.card-change.positive {
+  color: #34D399;
+}
+
+.card-change.negative {
+  color: #F87171;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dashboard-section {
+  background-color: #111827;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.inventory-list,
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inventory-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1F2937;
+  padding-bottom: 0.75rem;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.item-status {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.item-status.in-stock {
+  color: #34D399;
+}
+
+.item-status.low-stock {
+  color: #F87171;
+}
+
+.item-details {
+  text-align: right;
+}
+
+.item-quantity {
+  color: #D1D5DB;
+}
+
+.item-date {
+  font-size: 0.75rem;
+  color: #6B7280;
+  margin-top: 0.25rem;
+}
+
+.feedback-item {
+  border-bottom: 1px solid #1F2937;
+  padding-bottom: 0.75rem;
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feedback-name {
+  font-weight: 500;
+}
+
+.rating {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.star {
+  color: #4B5563;
+}
+
+.star.filled {
+  color: #9AE01A;
+}
+
+.feedback-message {
+  font-size: 0.875rem;
+  color: #D1D5DB;
+  margin: 0.25rem 0;
+}
+
+.feedback-date {
+  font-size: 0.75rem;
+  color: #6B7280;
+}
