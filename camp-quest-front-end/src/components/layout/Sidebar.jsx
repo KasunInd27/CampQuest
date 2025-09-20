@@ -50,9 +50,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
               Sales Orders
             </NavLink>
             <p className="sidebar-section-title">Inventory</p>
-            <NavLink to="/products" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <NavLink to="/rental-products" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <Package size={18} />
-              Products
+              Rental Products
+            </NavLink>
+            <NavLink to="/sales-products" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <ShoppingCart size={18} />
+              Sales Products
             </NavLink>
             <NavLink to="/categories" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <Tags size={18} />

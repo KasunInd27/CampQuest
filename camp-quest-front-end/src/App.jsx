@@ -3,7 +3,8 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { AdminDashboard } from './pages/AdminDashboard'
-import { Products } from './pages/Products'
+import { RentalProducts } from './pages/RentalProducts'
+import { SalesProducts } from './pages/SalesProducts'
 import { Categories } from './pages/Categories'
 import { Feedback } from './pages/Feedback'
 import { Users } from './pages/Users'
@@ -18,7 +19,8 @@ export function App() {
       <Routes>
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="products" element={<Products />} />
+          <Route path="rental-products" element={<RentalProducts />} />
+          <Route path="sales-products" element={<SalesProducts />} />
           <Route path="categories" element={<Categories />} />
           <Route path="feedback" element={<Feedback />} />
           <Route path="users" element={<Users />} />
