@@ -1,15 +1,20 @@
 // components/FeaturedProducts.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
+import { useRental } from '../../context/RentalContext';
 import './FeaturedProducts.css';
 
 export function FeaturedProducts() {
   const [activeTab, setActiveTab] = useState('rent');
+  const { addToCart } = useCart();
+  const { addRentalItem } = useRental();
 
   const products = [
     {
       name: '4-Person Camping Tent',
-      price: '$45.99',
-      rentalPrice: '$12.99/day',
+      price: 'Rs.45.99',
+      rentalPrice: 'Rs.12.99/day',
       rating: 4.8,
       reviewCount: 124,
       image:
@@ -18,8 +23,8 @@ export function FeaturedProducts() {
     },
     {
       name: 'Portable Camping Stove',
-      price: '$89.99',
-      rentalPrice: '$15.99/day',
+      price: 'Rs.89.99',
+      rentalPrice: 'Rs.15.99/day',
       rating: 4.7,
       reviewCount: 86,
       image:
@@ -28,8 +33,8 @@ export function FeaturedProducts() {
     },
     {
       name: 'Sleeping Bag',
-      price: '$65.99',
-      rentalPrice: '$8.99/day',
+      price: 'Rs.65.99',
+      rentalPrice: 'Rs.8.99/day',
       rating: 4.9,
       reviewCount: 215,
       image:
@@ -38,8 +43,8 @@ export function FeaturedProducts() {
     },
     {
       name: 'Hiking Backpack',
-      price: '$129.99',
-      rentalPrice: '$18.99/day',
+      price: 'Rs.129.99',
+      rentalPrice: 'Rs.18.99/day',
       rating: 4.6,
       reviewCount: 92,
       image:
@@ -69,6 +74,35 @@ export function FeaturedProducts() {
       </svg>
     ));
   };
+
+  const handleProductAction = (product) => {
+    if (product.category === 'rent') {
+      // Convert price string to number for rental items
+      const rentalPrice = parseFloat(product.rentalPrice.replace('Rs.', '').replace('/day', ''));
+      addRentalItem({
+        id: `rental-${Date.now()}`,
+        name: product.name,
+        price: rentalPrice,
+        image: product.image,
+        quantity: 1,
+        reviews: product.reviewCount,
+        rating: product.rating,
+      });
+    } else {
+      // Convert price string to number for sale items
+      const salePrice = parseFloat(product.price.replace('Rs.', ''));
+      addToCart({
+        id: `sale-${Date.now()}`,
+        name: product.name,
+        price: salePrice,
+        image: product.image,
+        quantity: 1,
+        reviews: product.reviewCount,
+        rating: product.rating,
+      });
+    }
+  };
+
 
   return (
     <section className="featured-products">
@@ -125,7 +159,10 @@ export function FeaturedProducts() {
                 <div className="product-price">
                   {product.category === 'rent' ? product.rentalPrice : product.price}
                 </div>
-                <button className="product-btn">
+                <button 
+                  className="product-btn"
+                  onClick={() => handleProductAction(product)}
+                >
                   {product.category === 'rent' ? 'Add to Rent' : 'Add to Cart'}
                 </button>
               </div>
@@ -133,9 +170,9 @@ export function FeaturedProducts() {
           ))}
         </div>
         <div className="products-footer">
-          <button className="view-all-btn">
+          <Link to="/shop" className="view-all-btn">
             View All Equipment
-          </button>
+          </Link>
         </div>
       </div>
     </section>

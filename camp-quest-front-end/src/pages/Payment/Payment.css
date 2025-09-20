@@ -1,0 +1,445 @@
+/* pages/Payment/Payment.css */
+
+.payment-page {
+  background-color: #faf6f1;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.payment-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.payment-content {
+  width: 100%;
+}
+
+.payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.payment-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.back-to-checkout-link {
+  color: #1a1a1a;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.back-to-checkout-link:hover {
+  color: #8ced38;
+}
+
+.back-to-checkout-link .icon {
+  margin-right: 4px;
+}
+
+.payment-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .payment-layout {
+    flex-direction: row;
+  }
+}
+
+/* Payment Form Section */
+.payment-form-section {
+  flex: 2;
+}
+
+.payment-form-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.form-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #1a1a1a;
+}
+
+/* Payment Methods */
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.payment-method-btn {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.payment-method-btn:hover {
+  border-color: #8ced38;
+}
+
+.payment-method-btn.active {
+  border-color: #8ced38;
+  background-color: rgba(140, 237, 56, 0.1);
+}
+
+.payment-icon {
+  margin-right: 8px;
+  color: #666;
+}
+
+.payment-method-btn.active .payment-icon {
+  color: #8ced38;
+}
+
+.payment-method-text {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.paypal-text {
+  font-weight: 600;
+}
+
+.paypal-pay {
+  color: #0070ba;
+}
+
+.paypal-pal {
+  color: #003087;
+}
+
+.check-icon {
+  margin-left: 8px;
+  color: #8ced38;
+}
+
+/* Credit Card Form */
+.credit-card-form {
+  margin-top: 24px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group.full-width {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #1a1a1a;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #8ced38;
+  box-shadow: 0 0 0 3px rgba(140, 237, 56, 0.1);
+}
+
+.form-input.error {
+  border-color: #dc2626;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+/* Alternative Payment Methods */
+.alternative-payment {
+  background-color: #f9fafb;
+  padding: 24px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.alternative-text {
+  margin-bottom: 16px;
+  color: #666;
+}
+
+.alternative-logo {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.paypal-logo {
+  background-color: white;
+  border: 1px solid #d1d5db;
+}
+
+.paypal-logo .paypal-pay {
+  color: #0070ba;
+}
+
+.paypal-logo .paypal-pal {
+  color: #003087;
+}
+
+.apple-logo {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+/* Pay Button */
+.pay-btn {
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-top: 32px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pay-btn:not(.processing) {
+  background-color: #8ced38;
+  color: #1a1a1a;
+}
+
+.pay-btn:not(.processing):hover {
+  background-color: rgba(140, 237, 56, 0.9);
+}
+
+.pay-btn.processing {
+  background-color: #9ca3af;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.payment-security {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.payment-security p {
+  margin-bottom: 4px;
+}
+
+/* Payment Summary Section */
+.payment-summary-section {
+  flex: 1;
+}
+
+.payment-summary-card {
+  background-color: #1A1A1A !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  position: sticky;
+  top: 24px;
+}
+
+/* Payment page specific - Order Summary title */
+.payment-summary-card .form-section-title {
+  color: white !important;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.order-items {
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 24px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.item-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  margin-left: 16px;
+  flex-grow: 1;
+}
+
+.item-name {
+  font-weight: 500;
+  color: white !important;
+  margin-bottom: 4px;
+}
+
+.item-quantity {
+  font-size: 0.875rem;
+  color: white !important;
+}
+
+.item-total {
+  font-weight: 500;
+  color: white !important;
+}
+
+/* Force white text for all order items */
+.payment-summary-card .item-name {
+  color: white !important;
+}
+
+.payment-summary-card .item-quantity {
+  color: white !important;
+}
+
+.payment-summary-card .item-total {
+  color: white !important;
+}
+
+/* Payment page specific - Order totals styling */
+.payment-summary-card .order-totals {
+  border-top: 1px solid #444 !important;
+  border-bottom: 1px solid #444 !important;
+  padding: 16px 0;
+  margin-bottom: 24px;
+  background-color: transparent !important;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.total-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Payment page specific - Final total row */
+.payment-summary-card .total-row.final-total {
+  border-top: 1px solid #444 !important;
+  padding-top: 12px;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.total-label {
+  color: white !important;
+}
+
+.total-value {
+  color: white !important;
+  font-weight: 500;
+}
+
+.final-total .total-label,
+.final-total .total-value {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: white !important;
+}
+
+/* Force white text for all order totals */
+.payment-summary-card .total-label {
+  color: white !important;
+}
+
+.payment-summary-card .total-value {
+  color: white !important;
+}
+
+.payment-summary-card .final-total .total-label,
+.payment-summary-card .final-total .total-value {
+  color: white !important;
+}
+
+/* Payment page specific - Delivery Address */
+.payment-summary-card .delivery-address {
+  border-top: 1px solid #444 !important;
+  padding-top: 24px;
+}
+
+.payment-summary-card .address-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: white !important;
+}
+
+.payment-summary-card .address-details {
+  color: white !important;
+  line-height: 1.5;
+}
+
+.payment-summary-card .address-details p {
+  color: white !important;
+  margin-bottom: 2px;
+}
+
+.address-details p {
+  margin-bottom: 2px;
+}
+
+.icon {
+  flex-shrink: 0;
+}

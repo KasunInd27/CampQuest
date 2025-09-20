@@ -87,7 +87,7 @@ export function RentalList() {
                         </div>
                         <div className="item-details">
                           <h3 className="item-name">{item.name}</h3>
-                          <p className="item-price">${item.price.toFixed(2)}/day</p>
+                          <p className="item-price">Rs.{item.price.toFixed(2)}/day</p>
                         </div>
                         <div className="quantity-controls">
                           <button
@@ -163,7 +163,7 @@ export function RentalList() {
                     </div>
                     <div className="summary-total">
                       <span className="total-label">Total:</span>
-                      <span className="total-value">${getTotalPrice().toFixed(2)}</span>
+                      <span className="total-value">Rs.{getTotalPrice().toFixed(2)}</span>
                     </div>
                   </div>
                   

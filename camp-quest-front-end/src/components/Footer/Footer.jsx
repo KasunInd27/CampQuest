@@ -55,7 +55,7 @@ export function Footer() {
             <h3 className="footer-section-title">Customer Service</h3>
             <ul className="footer-links">
               <li><a href="#" className="footer-link">FAQ</a></li>
-              <li><a href="#" className="footer-link">Shipping Policy</a></li>
+              <li><a href="#" className="footer-link">Delivery Policy</a></li>
               <li><a href="#" className="footer-link">Return Policy</a></li>
               <li><a href="#" className="footer-link">Rental Terms</a></li>
               <li><a href="#" className="footer-link">Privacy Policy</a></li>

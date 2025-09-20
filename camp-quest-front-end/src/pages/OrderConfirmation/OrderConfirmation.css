@@ -1,0 +1,389 @@
+/* pages/OrderConfirmation/OrderConfirmation.css */
+
+.order-confirmation-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.confirmation-container {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.confirmation-content {
+  width: 100%;
+}
+
+.not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+}
+
+.not-found-content {
+  text-align: center;
+}
+
+.not-found-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+.home-link {
+  color: #8ced38;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.home-link:hover {
+  text-decoration: underline;
+}
+
+/* Confirmation Card */
+.order-confirmation-page .confirmation-card {
+  background-color: white !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* Success Section */
+.success-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.success-icon {
+  background-color: rgba(140, 237, 56, 0.1);
+  padding: 12px;
+  border-radius: 50%;
+  margin-bottom: 16px;
+  color: #8ced38;
+}
+
+.order-confirmation-page .success-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page .success-message {
+  color: #1a1a1a !important;
+  margin-bottom: 4px;
+}
+
+.order-confirmation-page .email-message {
+  color: #1a1a1a !important;
+}
+
+/* Fix for email confirmation - correct class name */
+.order-confirmation-page .email-confirmation {
+  color: #1a1a1a !important;
+}
+
+/* Order Summary Section */
+.order-confirmation-page .order-summary-section {
+  border-top: 1px solid #e5e5e5 !important;
+  border-bottom: 1px solid #e5e5e5 !important;
+  padding: 16px 0;
+  margin-bottom: 24px;
+}
+
+.order-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .order-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .order-info-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.order-confirmation-page .info-label {
+  font-size: 0.875rem;
+  color: #1a1a1a !important;
+  margin-bottom: 4px;
+}
+
+.order-confirmation-page .info-value {
+  font-weight: 600;
+  color: #1a1a1a !important;
+}
+
+/* Order Details Section */
+.order-confirmation-page .order-details-section {
+  margin-bottom: 32px;
+}
+
+.order-confirmation-page .order-details-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1a1a1a !important;
+}
+
+/* Fix for section title - correct class name */
+.order-confirmation-page .section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1a1a1a !important;
+}
+
+.order-items {
+  margin-bottom: 24px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.item-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  margin-left: 16px;
+  flex-grow: 1;
+}
+
+.order-confirmation-page .item-name {
+  font-weight: 500;
+  color: #1a1a1a !important;
+  margin-bottom: 4px;
+}
+
+.order-confirmation-page .item-quantity {
+  font-size: 0.875rem;
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page .item-total {
+  font-weight: 500;
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page .order-totals {
+  background-color: #f9fafb !important;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5 !important;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.total-row:last-child {
+  margin-bottom: 0;
+}
+
+.order-confirmation-page .total-row.final-total {
+  border-top: 1px solid #e5e5e5 !important;
+  padding-top: 8px;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.order-confirmation-page .total-label {
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page .total-value {
+  color: #1a1a1a !important;
+  font-weight: 500;
+}
+
+.order-confirmation-page .final-total .total-label {
+  font-weight: 600;
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page .final-total .total-value {
+  font-weight: 600;
+  color: #1a1a1a !important;
+}
+
+/* Address and Delivery Section */
+.address-delivery-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .address-delivery-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.address-column,
+.delivery-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-confirmation-page .column-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page .address-details {
+  color: #1a1a1a !important;
+  line-height: 1.5;
+}
+
+.order-confirmation-page .address-details p {
+  margin-bottom: 2px;
+}
+
+.order-confirmation-page .delivery-date {
+  font-weight: 500;
+  color: #1a1a1a !important;
+  margin-bottom: 8px;
+}
+
+.order-confirmation-page .delivery-note {
+  font-size: 0.875rem;
+  color: #1a1a1a !important;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .action-buttons {
+    flex-direction: row;
+  }
+}
+
+.download-btn,
+.continue-shopping-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.order-confirmation-page .download-btn {
+  background-color: #1a1a1a !important;
+  color: white !important;
+  border: 2px solid #1a1a1a !important;
+}
+
+.order-confirmation-page .download-btn:hover:not(:disabled) {
+  background-color: #333 !important;
+  border-color: #333 !important;
+}
+
+.download-btn:disabled {
+  background-color: #9ca3af;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.continue-shopping-btn {
+  background-color: #8ced38;
+  color: #1a1a1a;
+}
+
+.continue-shopping-btn:hover {
+  background-color: rgba(140, 237, 56, 0.9);
+}
+
+.btn-icon {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Order History Link */
+.order-history-link {
+  text-align: center;
+}
+
+.history-link {
+  color: #8ced38;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.history-link:hover {
+  text-decoration: underline;
+}
+
+/* Force all text to be black - catch-all rules */
+.order-confirmation-page p {
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page h1,
+.order-confirmation-page h2,
+.order-confirmation-page h3 {
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page span {
+  color: #1a1a1a !important;
+}
+
+/* Very specific rules for missing text */
+.order-confirmation-page .confirmation-card p {
+  color: #1a1a1a !important;
+}
+
+.order-confirmation-page .confirmation-card h2 {
+  color: #1a1a1a !important;
+}

@@ -1,5 +1,6 @@
 // components/CallToAction.jsx
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './CallToAction.css';
 
 export function CallToAction() {
@@ -16,12 +17,12 @@ export function CallToAction() {
             covered.
           </p>
           <div className="cta-buttons">
-            <button className="cta-btn-primary">
+            <Link to="/rental-list" className="cta-btn-primary">
               Browse Rental Equipment
-            </button>
-            <button className="cta-btn-secondary">
+            </Link>
+            <Link to="/shop" className="cta-btn-secondary">
               Shop Our Collection
-            </button>
+            </Link>
           </div>
         </div>
       </div>

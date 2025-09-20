@@ -1,0 +1,395 @@
+/* pages/OrderHistory/OrderHistory.css */
+
+.order-history-page {
+  background-color: #FDF6EF;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-container {
+  max-width: 95%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 64px 32px;
+  flex: 1;
+}
+
+.history-content {
+  width: 100%;
+}
+
+.history-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 48px;
+  color: #2A2A2A;
+  text-align: left;
+}
+
+.history-card {
+  background-color: #242424;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 32px;
+  width: 100%;
+  min-width: 100%;
+}
+
+/* Filters Section */
+.filters-section {
+  padding: 32px;
+  border-bottom: 1px solid #374151;
+}
+
+.filters-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .filters-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+}
+
+.order-history-page .search-container {
+  flex-grow: 1;
+  max-width: 600px;
+  width: 100%;
+}
+
+.order-history-page .search-input-wrapper {
+  position: relative;
+}
+
+.order-history-page .search-input {
+  flex: 1;
+  padding: 12px 16px 12px 44px;
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #374151;
+  color: white;
+  width: 100%;
+}
+
+.order-history-page .search-input:focus {
+  outline: none;
+  border-color: #8ced38;
+}
+
+.order-history-page .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-icon {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.filter-label {
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 0.875rem;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #8ced38;
+}
+
+/* No Orders */
+.empty-history {
+  background-color: #242424;
+  border-radius: 12px;
+  text-align: center;
+  padding: 64px 32px;
+  color: #d1d5db;
+}
+
+.no-orders-text {
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.shop-link {
+  background-color: #8ced38;
+  color: #1a1a1a;
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.shop-link:hover {
+  background-color: rgba(140, 237, 56, 0.9);
+}
+
+/* Orders List */
+.orders-list {
+  border-top: 1px solid #4b5563;
+}
+
+.order-card {
+  border-bottom: 1px solid #4b5563;
+}
+
+.order-card:last-child {
+  border-bottom: none;
+}
+
+.order-header {
+  padding: 32px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.order-header:hover {
+  background-color: #374151;
+}
+
+@media (min-width: 768px) {
+  .order-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px;
+  }
+}
+
+.order-basic-info {
+  flex-grow: 1;
+}
+
+.order-id-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.order-id {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-processing {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+}
+
+.status-delivered {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.status-cancelled {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.status-default {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #374151;
+}
+
+.order-date {
+  color: #d1d5db;
+  font-size: 1.125rem;
+}
+
+.order-summary-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.order-total-info {
+  text-align: left;
+}
+
+.order-history-page .order-total {
+  font-weight: 500;
+  color: white;
+  margin: 0 0 4px 0;
+  font-size: 1.125rem;
+}
+
+.items-count {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+.expand-icon {
+  color: #666;
+  flex-shrink: 0;
+}
+
+/* Order Details */
+.order-details {
+  padding: 40px;
+  border-top: 1px solid #374151;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.address-section,
+.order-info-section {
+  padding-top: 24px;
+}
+
+.detail-title {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.address-text {
+  font-size: 0.875rem;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+
+.address-text p {
+  margin: 0 0 2px 0;
+}
+
+.order-info-text {
+  font-size: 0.875rem;
+}
+
+.order-info-text p {
+  margin: 0 0 4px 0;
+}
+
+.info-label {
+  color: #666;
+}
+
+.items-title {
+  margin-bottom: 12px;
+  padding-top: 24px;
+}
+
+.order-items {
+  margin-bottom: 24px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.item-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  margin-left: 16px;
+  flex-grow: 1;
+}
+
+.item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0 0 2px 0;
+}
+
+.item-quantity {
+  font-size: 0.875rem;
+  color: #d1d5db;
+  margin: 0;
+}
+
+.order-history-page .item-total {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  margin: 0;
+}
+
+.view-details-link {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.details-link {
+  color: #8ced38;
+  font-weight: 500;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.details-link:hover {
+  color: rgba(140, 237, 56, 0.8);
+}
+
+.external-link-icon {
+  margin-left: 4px;
+  flex-shrink: 0;
+}
