@@ -119,8 +119,9 @@ export function SalesOrders() {
               <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
-                <th>Date</th>
                 <th>Items</th>
+                <th>Date</th>
+                <th>Delivery Address</th>
                 <th>Total</th>
                 <th>Status</th>
                 <th>Payment</th>
@@ -134,8 +135,9 @@ export function SalesOrders() {
                     <button className="order-link">{order.id}</button>
                   </td>
                   <td>{order.customer}</td>
+                  <td>{order.itemName}</td>
                   <td>{order.orderDate}</td>
-                  <td>{order.totalItems} items</td>
+                  <td>{order.deliveryaddress}</td>
                   <td>${order.total.toFixed(2)}</td>
                   <td>
                     <span className={`status ${order.status.toLowerCase()}`}>

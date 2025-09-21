@@ -213,9 +213,11 @@ export function RentalOrders() {
                 <tr>
                   <th>Order ID</th>
                   <th>Customer</th>
+                  <th>Items</th>
                   <th>Start Date</th>
                   <th>End Date</th>
-                  <th>Items</th>
+                  <th>Rental Days</th>
+                  <th>Item Count</th>
                   <th>Total</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -233,8 +235,10 @@ export function RentalOrders() {
                       </button>
                     </td>
                     <td>{order.customer}</td>
+                    <td>{order.itemName}</td>
                     <td>{order.startDate}</td>
                     <td>{order.endDate}</td>
+                    <td>{order.RentalDays}</td>
                     <td>{order.totalItems} items</td>
                     <td>${order.total.toFixed(2)}</td>
                     <td>

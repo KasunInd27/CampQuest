@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   CalendarClock,
   Settings,
+  FileText,   
 } from 'lucide-react'
 import './Sidebar.css'
 
@@ -40,6 +41,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <LayoutDashboard size={18} />
               Dashboard
             </NavLink>
+
             <p className="sidebar-section-title">Orders</p>
             <NavLink to="/rental-orders" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <CalendarClock size={18} />
@@ -49,6 +51,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <ShoppingCart size={18} />
               Sales Orders
             </NavLink>
+
             <p className="sidebar-section-title">Inventory</p>
             <NavLink to="/rental-products" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <Package size={18} />
@@ -62,6 +65,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <Tags size={18} />
               Categories
             </NavLink>
+
             <p className="sidebar-section-title">Customer</p>
             <NavLink to="/feedback" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <MessageSquare size={18} />
@@ -71,6 +75,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <Users size={18} />
               Users
             </NavLink>
+
+            <p className="sidebar-section-title">Content Creator</p>
+            <NavLink to="/ContentCreator" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <FileText size={18} />   {/* ✅ Blog Post icon */}
+              Blog Post
+            </NavLink>
+
             <p className="sidebar-section-title">Admin</p>
             <NavLink to="/settings" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <Settings size={18} />
