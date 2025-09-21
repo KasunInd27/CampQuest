@@ -15,6 +15,7 @@ export function Register({ onRegister, onNavigate }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -77,8 +78,19 @@ export function Register({ onRegister, onNavigate }) {
     if (!validateForm()) return;
     
     setIsLoading(true);
+    setErrors({});
+    setSuccessMessage('');
+    
     try {
-      await onRegister(formData.name, formData.email, formData.password);
+      const result = await onRegister(formData.name, formData.email, formData.password, '+1234567890');
+      
+      if (result && result.success) {
+        setSuccessMessage(result.message);
+        // Optionally redirect to login after a delay
+        setTimeout(() => {
+          onNavigate('login');
+        }, 3000);
+      }
     } catch (error) {
       setErrors({ general: error.message || 'Registration failed' });
     } finally {
@@ -113,6 +125,16 @@ export function Register({ onRegister, onNavigate }) {
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
               {errors.general}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="success-alert">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+              </svg>
+              {successMessage}
             </div>
           )}
 

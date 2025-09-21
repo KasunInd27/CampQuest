@@ -1,14 +1,33 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 
-// Mock user for demonstration
-const MOCK_USER = {
-  id: '1',
-  email: 'demo@campquest.com',
-  name: 'Demo User',
-  role: 'customer',
-  profilePicture: 'https://i.pravatar.cc/150?u=demo@campquest.com',
-  createdAt: new Date(),
-  lastLogin: new Date(),
+// API Configuration
+const API_BASE_URL = 'http://localhost:5002/api';
+
+// Helper function to make API calls
+const apiCall = async (endpoint, options = {}) => {
+  const token = localStorage.getItem('authToken');
+  
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    credentials: 'include', // Include cookies for CORS
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...options.headers
+    },
+    ...options
+  });
+  
+  const data = await response.json();
+  
+  // Handle token expiration
+  if (response.status === 401 && data.message?.includes('expired')) {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('campquest_user');
+    throw new Error('Session expired. Please login again.');
+  }
+  
+  return { data, status: response.status, ok: response.ok };
 };
 
 const AuthContext = createContext(undefined);
@@ -17,63 +36,124 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Simulate checking for stored user session on load
+  // Check for stored user session on load
   useEffect(() => {
     const storedUser = localStorage.getItem('campquest_user');
-    if (storedUser) {
+    const token = localStorage.getItem('authToken');
+    
+    if (storedUser && token) {
       try {
         setCurrentUser(JSON.parse(storedUser));
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('campquest_user');
+        localStorage.removeItem('authToken');
       }
     }
     setLoading(false);
   }, []);
 
-  // Mock authentication functions
+  // Real authentication functions
   const login = async (email, password, remember = false) => {
     setLoading(true);
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // For demo purposes, we'll just set the mock user
-    if (email === 'demo@campquest.com' && password === 'password') {
-      setCurrentUser(MOCK_USER);
-      if (remember) {
-        localStorage.setItem('campquest_user', JSON.stringify(MOCK_USER));
+    try {
+      const response = await apiCall('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, rememberMe: remember })
+      });
+
+      if (response.data.success) {
+        const { user, token, refreshToken } = response.data.data;
+        
+        // Store tokens and user data
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('campquest_user', JSON.stringify(user));
+        
+        setCurrentUser(user);
+        return { success: true, message: response.data.message };
+      } else {
+        throw new Error(response.data.message);
       }
-    } else {
-      throw new Error('Invalid email or password');
+    } catch (error) {
+      throw new Error(error.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const register = async (email, password, name) => {
+  const register = async (name, email, password, phone = '+1234567890') => {
     setLoading(true);
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    const newUser = {
-      ...MOCK_USER,
-      email,
-      name,
-      id: Math.random().toString(36).substr(2, 9),
-    };
-    setCurrentUser(newUser);
-    localStorage.setItem('campquest_user', JSON.stringify(newUser));
-    setLoading(false);
+    try {
+      console.log('Registering user:', { name, email, phone }); // Debug log
+      
+      const response = await apiCall('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          password, 
+          phone,
+          address: {
+            country: 'USA'
+          }
+        })
+      });
+
+      console.log('Registration response:', response); // Debug log
+
+      if (response.data.success) {
+        // Registration successful - show success message but don't auto-login
+        return { 
+          success: true, 
+          message: response.data.message,
+          user: response.data.data.user 
+        };
+      } else {
+        console.error('Registration failed:', response.data);
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw new Error(error.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = async () => {
-    setCurrentUser(null);
-    localStorage.removeItem('campquest_user');
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    try {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        // Call backend logout to blacklist token
+        await apiCall('/auth/logout', { method: 'POST' });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Clear local storage regardless
+      setCurrentUser(null);
+      localStorage.removeItem('campquest_user');
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+    }
   };
 
   const forgotPassword = async (email) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // In a real app, this would trigger a password reset email
+    try {
+      const response = await apiCall('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      });
+
+      if (response.data.success) {
+        return { success: true, message: response.data.message };
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      throw new Error(error.message || 'Failed to send password reset email');
+    }
   };
 
   const resetPassword = async (token, newPassword) => {
@@ -102,8 +182,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = {
-    currentUser,
-    loading,
+    user: currentUser,
+    isAuthenticated: !!currentUser,
+    isLoading: loading,
     login,
     register,
     logout,
