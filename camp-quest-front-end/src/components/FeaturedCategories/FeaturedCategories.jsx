@@ -45,11 +45,11 @@ export function FeaturedCategories() {
 
   return (
     <section className="featured-categories">
-      <div className="categories-container">
-        <h2 className="categories-title">
+      <div className="featured-categories-container">
+        <h2 className="featured-categories-title">
           Explore Our Categories
         </h2>
-        <div className="categories-grid">
+        <div className="featured-categories-grid">
           {categories.map((category, index) => (
             <div key={index} className="category-card">
               <div className="category-icon">

@@ -8,6 +8,8 @@ import { Checkout } from './pages/Checkout/Checkout';
 import { Payment } from './pages/Payment/Payment';
 import { OrderConfirmation } from './pages/OrderConfirmation/OrderConfirmation';
 import { OrderHistory } from './pages/OrderHistory/OrderHistory';
+import { Rent } from './pages/Rent/Rent';
+import { RentalPolicies } from './pages/RentalPolicies/RentalPolicies';
 import { RentalList } from './pages/RentalList/RentalList';
 import { RentalProvider } from './context/RentalContext';
 import { CartProvider } from './context/CartContext';
@@ -28,6 +30,8 @@ function App() {
               <Route path="/payment" element={<Payment />} />
               <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
               <Route path="/order-history" element={<OrderHistory />} />
+              <Route path="/rent" element={<Rent />} />
+              <Route path="/rental-policies" element={<RentalPolicies />} />
               <Route path="/rental-list" element={<RentalList />} />
             </Routes>
           </Router>

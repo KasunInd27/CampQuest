@@ -1,0 +1,438 @@
+/* pages/RentalPolicies/RentalPolicies.css */
+
+.rental-policies-page {
+  background-color: #faf6f1;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Hero Section */
+.policies-hero-section {
+  height: 256px;
+  background-image: url('https://images.unsplash.com/photo-1571687949921-1306bfb24b72?q=80&w=1920&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.policies-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.policies-hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  padding: 0 16px;
+}
+
+.policies-hero-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+  .policies-hero-title {
+    font-size: 3rem;
+  }
+}
+
+.policies-hero-subtitle {
+  font-size: 1.125rem;
+  margin-bottom: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.policies-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 16px;
+}
+
+/* Back Link */
+.back-link-container {
+  margin-bottom: 32px;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  color: #374151;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #1a1a1a;
+}
+
+.back-icon {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Table of Contents */
+.toc-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.toc-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+.toc-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .toc-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .toc-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.toc-link {
+  display: flex;
+  align-items: center;
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.toc-link:hover {
+  text-decoration: underline;
+}
+
+.toc-icon {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Policy Sections */
+.policies-content {
+  margin-bottom: 48px;
+}
+
+.policy-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  margin-bottom: 40px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-icon {
+  color: #8ced38;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.section-content {
+  padding-left: 36px;
+}
+
+.section-text {
+  margin-bottom: 16px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.policy-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-bottom: 16px;
+  color: #374151;
+}
+
+.policy-list li {
+  margin-bottom: 4px;
+}
+
+/* Info Boxes */
+.info-box {
+  padding: 16px;
+  border-radius: 6px;
+  border-left: 4px solid;
+  margin-bottom: 16px;
+}
+
+.info-box.warning {
+  background-color: #fffbeb;
+  border-color: #f59e0b;
+}
+
+.info-box.tip {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.info-box.success {
+  background-color: #f0fdf4;
+  border-color: #22c55e;
+}
+
+.info-text {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.info-box.warning .info-text {
+  color: #92400e;
+}
+
+.info-box.tip .info-text {
+  color: #1e40af;
+}
+
+.info-box.success .info-text {
+  color: #166534;
+}
+
+/* Tables */
+.rental-periods-table,
+.hours-table,
+.cancellation-table {
+  margin-bottom: 24px;
+}
+
+.period-row,
+.hours-row,
+.cancellation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.period-row:last-child,
+.hours-row:last-child,
+.cancellation-row:last-child {
+  border-bottom: none;
+}
+
+.period-name,
+.day,
+.timing {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.period-duration,
+.hours {
+  color: #374151;
+}
+
+.refund {
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.refund.full {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.refund.partial {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.refund.minimal {
+  background-color: #fed7aa;
+  color: #c2410c;
+}
+
+.refund.none {
+  background-color: #fecaca;
+  color: #991b1b;
+}
+
+/* FAQ Section */
+.rental-policies-page .faq-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  margin-bottom: 48px;
+}
+
+.rental-policies-page .faq-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.rental-policies-page .faq-card {
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.rental-policies-page .faq-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rental-policies-page .faq-item {
+  background-color: white;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #8ced38;
+}
+
+.rental-policies-page .faq-question {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+  line-height: 1.4;
+}
+
+.rental-policies-page .faq-answer {
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Contact Section */
+.rental-policies-page .contact-section {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  margin-top: 24px;
+}
+
+.rental-policies-page .contact-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 32px;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.rental-policies-page .contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 768px) {
+  .rental-policies-page .contact-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+}
+
+.rental-policies-page .contact-item {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rental-policies-page .contact-icon {
+  width: 80px;
+  height: 80px;
+  background-color: #8ced38;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(140, 237, 56, 0.3);
+}
+
+.rental-policies-page .contact-icon svg {
+  width: 32px;
+  height: 32px;
+  color: #000000;
+  stroke: #000000;
+}
+
+.rental-policies-page .contact-method {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+  font-size: 1.125rem;
+}
+
+.rental-policies-page .contact-info {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.rental-policies-page .contact-button-container {
+  text-align: center;
+}
+
+.rental-policies-page .contact-button {
+  background-color: #8ced38;
+  color: #1a1a1a;
+  padding: 16px 40px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(140, 237, 56, 0.3);
+}
+
+.rental-policies-page .contact-button:hover {
+  background-color: rgba(140, 237, 56, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(140, 237, 56, 0.4);
+}

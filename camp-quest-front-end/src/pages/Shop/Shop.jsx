@@ -58,7 +58,7 @@ export function Shop() {
       .map((_, i) => (
         <svg
           key={i}
-          className={`star ${i < rating ? 'star-filled' : 'star-empty'}`}
+          className={`shop-star ${i < rating ? 'shop-star-filled' : 'shop-star-empty'}`}
           width="16"
           height="16"
           viewBox="0 0 24 24"
@@ -79,30 +79,30 @@ export function Shop() {
       <div className="shop-container">
         <div className="shop-content">
           {/* Hero Banner */}
-          <div className="hero-banner">
-            <div className="hero-content">
-              <h1 className="hero-title">
-                Shop Premium <span className="hero-highlight">Camping Gear</span>
+          <div className="shop-hero-banner">
+            <div className="shop-hero-content">
+              <h1 className="shop-hero-title">
+                Shop Premium <span className="shop-hero-highlight">Camping Gear</span>
               </h1>
-              <p className="hero-subtitle">
+              <p className="shop-hero-subtitle">
                 Find high-quality equipment for your next adventure
               </p>
             </div>
           </div>
 
           {/* Search and Filter */}
-          <div className="search-filter-section">
-            <div className="search-container">
-              <div className="search-input-wrapper">
+          <div className="shop-search-filter-section">
+            <div className="shop-search-container">
+              <div className="shop-search-input-wrapper">
                 <input
                   type="text"
                   placeholder="Search products..."
-                  className="search-input"
+                  className="shop-search-input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <svg
-                  className="search-icon"
+                  className="shop-search-icon"
                   width="20"
                   height="20"
                   viewBox="0 0 24 24"
@@ -118,11 +118,11 @@ export function Shop() {
               </div>
             </div>
             
-            <div className="categories-container">
+            <div className="shop-categories-container">
               {categories.map((category) => (
                 <button
                   key={category}
-                  className={`category-btn ${activeCategory === category ? 'category-btn-active' : ''}`}
+                  className={`shop-category-btn ${activeCategory === category ? 'shop-category-btn-active' : ''}`}
                   onClick={() => setActiveCategory(category)}
                 >
                   {category}
@@ -148,34 +148,34 @@ export function Shop() {
               </button>
             </div>
           ) : (
-            <div className="products-grid">
+            <div className="shop-products-grid">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="product-card">
-                  <div className="product-image-container">
+                <div key={product.id} className="shop-product-card">
+                  <div className="shop-product-image-container">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="product-image"
+                      className="shop-product-image"
                     />
-                    <span className="product-badge">FOR SALE</span>
+                    <span className="shop-product-badge">FOR SALE</span>
                   </div>
                   
-                  <div className="product-info">
-                    <div className="product-rating">
-                      <div className="stars-container">
+                  <div className="shop-product-info">
+                    <div className="shop-product-rating">
+                      <div className="shop-stars-container">
                         {renderStars(product.rating)}
                       </div>
-                      <span className="reviews-count">
+                      <span className="shop-reviews-count">
                         ({product.reviews} reviews)
                       </span>
                     </div>
                     
-                    <h3 className="product-name">{product.name}</h3>
-                    <p className="product-price">Rs.{product.price.toFixed(2)}</p>
+                    <h3 className="shop-product-name">{product.name}</h3>
+                    <p className="shop-product-price">Rs.{product.price.toFixed(2)}</p>
                     
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="add-to-cart-btn"
+                      className="shop-add-to-cart-btn"
                     >
                       Add to Cart
                     </button>

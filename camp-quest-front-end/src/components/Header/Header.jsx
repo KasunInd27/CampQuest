@@ -1,4 +1,4 @@
-// components/Header.jsx
+// components/Header/Header.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRental } from '../../context/RentalContext';
@@ -29,8 +29,8 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="desktop-nav">
-            <Link to="/" className="nav-link active">Home</Link>
-            <a href="#" className="nav-link">Rent</a>
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/rent" className="nav-link">Rent</Link>
             <Link to="/shop" className="nav-link">Shop</Link>
             <a href="#" className="nav-link">Blog</a>
             <a href="#" className="nav-link">About</a>
@@ -116,8 +116,8 @@ export function Header() {
       {isMenuOpen && (
         <div className="mobile-nav">
           <div className="mobile-nav-links">
-            <Link to="/" className="mobile-nav-link active">Home</Link>
-            <a href="#" className="mobile-nav-link">Rent</a>
+            <Link to="/" className="mobile-nav-link">Home</Link>
+            <Link to="/rent" className="mobile-nav-link">Rent</Link>
             <Link to="/shop" className="mobile-nav-link">Shop</Link>
             <a href="#" className="mobile-nav-link">Blog</a>
             <a href="#" className="mobile-nav-link">About</a>
