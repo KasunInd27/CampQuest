@@ -29,7 +29,6 @@ const UserSupport = () => {
   return (
     <div className="min-h-screen bg-neutral-700 py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white">Support & Feedback</h1>
