@@ -22,7 +22,6 @@ const Support = () => {
           </p>
         </div>
 
-        {/* Tab Navigation */}
         <div className="flex bg-neutral-800 rounded-lg p-1 mb-8">
           <button
             onClick={() => setActiveTab('ticket')}
