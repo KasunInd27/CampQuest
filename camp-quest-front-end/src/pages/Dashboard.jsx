@@ -3,7 +3,7 @@ import React from 'react';
 import './Dashboard.css';
 
 export function Dashboard({ user }) {
-  // Mock data
+  
   const stats = [
     {
       name: 'Active Rentals',
