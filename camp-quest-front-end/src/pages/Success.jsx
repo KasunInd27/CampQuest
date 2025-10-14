@@ -92,10 +92,10 @@ const Success = () => {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-      doc.text('123 Mathale Road', 20, yPos + 6);
-      doc.text('Dodamgaslanda, Katupilagolla', 20, yPos + 12);
-      doc.text('Phone: +94 74 124 5709', 20, yPos + 18);
-      doc.text('Email: campquest512@gmail.com', 20, yPos + 24);
+      doc.text('123 Adventure Road', 20, yPos + 6);
+      doc.text('Mountain View, CA 94043', 20, yPos + 12);
+      doc.text('Phone: (555) 123-4567', 20, yPos + 18);
+      doc.text('Email: support@campquest.com', 20, yPos + 24);
 
       // Right side - Invoice details
       doc.setFontSize(10);
@@ -153,11 +153,11 @@ const Success = () => {
       doc.text(order.customer?.email || 'N/A', 25, yPos + 14);
       doc.text(order.customer?.phone || 'N/A', 25, yPos + 20);
 
-      // Delivery address
+      // Shipping address
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-      doc.text('Deliver To:', pageWidth / 2 + 10, yPos);
+      doc.text('SHIP TO:', pageWidth / 2 + 10, yPos);
       
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
@@ -226,7 +226,7 @@ const Success = () => {
       const totalsX = pageWidth - 75;
 
       const subtotal = order.totalAmount || 0;
-      const delivery = 450;
+      const shipping = 450;
       const total = subtotal;
 
       doc.setFillColor(245, 245, 245);
@@ -236,10 +236,10 @@ const Success = () => {
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.text('Subtotal:', totalsX, finalY + 8);
-      doc.text(`LKR ${(subtotal - delivery).toFixed(2)}`, pageWidth - 25, finalY + 8, { align: 'right' });
+      doc.text(`LKR ${(subtotal - shipping).toFixed(2)}`, pageWidth - 25, finalY + 8, { align: 'right' });
 
-      doc.text('Delivery Fee:', totalsX, finalY + 16);
-      doc.text(`LKR ${delivery.toFixed(2)}`, pageWidth - 25, finalY + 16, { align: 'right' });
+      doc.text('Shipping:', totalsX, finalY + 16);
+      doc.text(`LKR ${shipping.toFixed(2)}`, pageWidth - 25, finalY + 16, { align: 'right' });
 
       doc.setLineWidth(0.5);
       doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
