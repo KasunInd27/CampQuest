@@ -4,18 +4,25 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight, Mountain, CheckCircle, AlertCircle
 import { useAuth } from '../context/AuthContext';
 import * as Yup from 'yup';
 
+import { GoogleLogin } from '@react-oauth/google';
+import toast from 'react-hot-toast';
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState('');
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [rememberMe, setRememberMe] = useState(false);
-  const { login } = useAuth();
+
+  // ✅ Use both login + googleLogin from AuthContext
+  const { login, googleLogin } = useAuth();
 
   // Yup validation schema
   const validationSchema = Yup.object().shape({
@@ -80,40 +87,60 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Mark all fields as touched
+
     setTouched({
       email: true,
       password: true
     });
 
     try {
-      // Validate entire form
       await validationSchema.validate(formData, { abortEarly: false });
-      
-      // Clear errors if validation passes
       setErrors({});
-      
-      // Proceed with login
       setLoading(true);
+
+      // ✅ AuthContext handles toast + navigation
       await login(formData.email, formData.password, rememberMe);
     } catch (error) {
       if (error.inner) {
-        // Yup validation errors
         const newErrors = {};
         error.inner.forEach(err => {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
       } else {
-        // Login error from API
         console.error('Login error:', error);
-        setErrors({ 
-          general: error.response?.data?.message || 'Invalid email or password. Please try again.' 
+        setErrors({
+          general: error.response?.data?.message || 'Invalid email or password. Please try again.'
         });
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ✅ Google login handler uses AuthContext (NO axios here)
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setGoogleLoading(true);
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.general;
+        return newErrors;
+      });
+
+      const googleIdToken = credentialResponse?.credential;
+      if (!googleIdToken) {
+        toast.error('Google login failed: missing token');
+        return;
+      }
+
+      // ✅ AuthContext handles toast + navigation + token storage
+      await googleLogin(googleIdToken);
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Google login failed';
+      setErrors({ general: msg });
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -143,7 +170,6 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Display general error (e.g., invalid credentials) */}
           {errors.general && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start">
               <AlertCircle className="w-4 h-4 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -157,11 +183,10 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Input */}
+            {/* Email */}
             <div className="relative">
-              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-                focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-400'
-              }`}>
+              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-400'
+                }`}>
                 <Mail className="w-4 h-4" />
               </div>
               <input
@@ -173,29 +198,26 @@ const Login = () => {
                 onChange={handleChange}
                 onFocus={() => setFocusedInput('email')}
                 onBlur={handleBlur}
-                className={`block w-full pl-10 pr-3 py-3 border-2 ${
-                  errors.email && touched.email 
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20' 
-                    : focusedInput === 'email' 
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500' 
+                className={`block w-full pl-10 pr-3 py-3 border-2 ${errors.email && touched.email
+                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                    : focusedInput === 'email'
+                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
                       : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
-                } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
+                  } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Enter your email address"
               />
-              <label htmlFor="email" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${
-                focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-600'
-              } transition-colors duration-200`}>
+              <label htmlFor="email" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-600'
+                } transition-colors duration-200`}>
                 Email Address
               </label>
               {errors.email && touched.email && (
                 <p className="mt-1 text-xs text-red-600 flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.email}
                 </p>
               )}
-              {/* Email format hint */}
               {focusedInput === 'email' && !errors.email && formData.email && (
                 <p className="mt-1 text-xs text-neutral-500 flex items-center">
                   <CheckCircle className="w-3 h-3 mr-1 text-lime-500" />
@@ -204,11 +226,10 @@ const Login = () => {
               )}
             </div>
 
-            {/* Password Input */}
+            {/* Password */}
             <div className="relative">
-              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-                focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-400'
-              }`}>
+              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-400'
+                }`}>
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -220,18 +241,16 @@ const Login = () => {
                 onChange={handleChange}
                 onFocus={() => setFocusedInput('password')}
                 onBlur={handleBlur}
-                className={`block w-full pl-10 pr-10 py-3 border-2 ${
-                  errors.password && touched.password 
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20' 
-                    : focusedInput === 'password' 
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500' 
+                className={`block w-full pl-10 pr-10 py-3 border-2 ${errors.password && touched.password
+                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                    : focusedInput === 'password'
+                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
                       : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
-                } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
+                  } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Enter your password"
               />
-              <label htmlFor="password" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${
-                focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-600'
-              } transition-colors duration-200`}>
+              <label htmlFor="password" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-600'
+                } transition-colors duration-200`}>
                 Password
               </label>
               <button
@@ -240,16 +259,12 @@ const Login = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
               {errors.password && touched.password && (
                 <p className="mt-1 text-xs text-red-600 flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.password}
                 </p>
@@ -271,8 +286,8 @@ const Login = () => {
                   Remember me for 30 days
                 </span>
               </label>
-              <Link 
-                to="/forgot-password" 
+              <Link
+                to="/forgot-password"
                 className="text-xs text-lime-500 hover:text-lime-500 font-semibold transition-colors duration-200 hover:underline decoration-lime-500/30"
               >
                 Forgot password?
@@ -282,7 +297,7 @@ const Login = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || googleLoading}
               className="group relative w-full flex items-center justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-neutral-900 bg-lime-500 hover:bg-lime-500 focus:outline-none focus:ring-2 focus:ring-lime-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.01] hover:shadow-md active:scale-[0.99]"
             >
               {loading ? (
@@ -309,6 +324,17 @@ const Login = () => {
               <div className="relative flex justify-center text-xs">
                 <span className="px-3 bg-white text-neutral-500 font-medium">Or continue with</span>
               </div>
+            </div>
+
+            {/* Google Login Button */}
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => {
+                  toast.error('Google login failed');
+                  setErrors({ general: 'Google login failed. Please try again.' });
+                }}
+              />
             </div>
           </form>
 

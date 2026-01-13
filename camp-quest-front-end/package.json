@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
+    "@react-oauth/google": "^0.13.4",
     "@tailwindcss/vite": "^4.1.12",
-    "axios": "^1.11.0",
+    "axios": "^1.13.2",
     "formik": "^2.4.6",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",

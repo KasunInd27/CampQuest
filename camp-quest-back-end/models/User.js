@@ -17,8 +17,13 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-    minlength: 6
+    minlength: 6,
+    select: false
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local'
   },
   role: {
     type: String,
@@ -41,7 +46,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  // Added fields for password reset
   resetPasswordOTP: {
     type: String,
     default: null
@@ -55,9 +59,9 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
+userSchema.pre('save', async function (next) {
+  if (!this.password || !this.isModified('password')) return next();
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -68,25 +72,24 @@ userSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(password) {
+userSchema.methods.comparePassword = async function (password) {
+  if (!this.password) return false;
   return await bcrypt.compare(password, this.password);
 };
 
-// Generate OTP method
-userSchema.methods.generateResetOTP = function() {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+// OTP methods remain unchanged
+userSchema.methods.generateResetOTP = function () {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
   this.resetPasswordOTP = otp;
-  this.resetPasswordOTPExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.resetPasswordOTPExpires = Date.now() + 10 * 60 * 1000;
   return otp;
 };
 
-// Verify OTP method
-userSchema.methods.verifyResetOTP = function(otp) {
+userSchema.methods.verifyResetOTP = function (otp) {
   return this.resetPasswordOTP === otp && this.resetPasswordOTPExpires > Date.now();
 };
 
-// Clear OTP method
-userSchema.methods.clearResetOTP = function() {
+userSchema.methods.clearResetOTP = function () {
   this.resetPasswordOTP = null;
   this.resetPasswordOTPExpires = null;
 };

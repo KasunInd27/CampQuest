@@ -144,7 +144,7 @@ const UserDashboard = () => {
             <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
               <Mountain className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-white">CampGear</h1>
+            <h1 className="text-xl font-bold text-white">CampQuest</h1>
           </div>
           
           <nav className="space-y-2">
