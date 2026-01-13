@@ -1,4 +1,3 @@
-// pages/Cart.jsx
 import React, {useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, Calendar, ArrowRight } from 'lucide-react';
