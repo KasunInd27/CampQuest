@@ -15,7 +15,7 @@ import OrderRoutes from './routes/orderRoutes.js'
 import BlogPostRoutes from './routes/blogPostRoutes.js'
 import DashboardRoutes from './routes/dashboardRoutes.js'
 import blogInteractionRoutes from './routes/blogInteractionRoutes.js';
-
+import googleLoginRoutes from './routes/googleLoginRoutes.js';
 
 
 dotenv.config();
@@ -43,6 +43,8 @@ app.use('/api/orders', OrderRoutes)
 app.use('/api/blog-posts', BlogPostRoutes)
 app.use('/api/dashboard', DashboardRoutes)
 app.use('/api/blog-interactions', blogInteractionRoutes);
+app.use('/api/auth/google', googleLoginRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
