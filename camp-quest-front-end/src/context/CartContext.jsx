@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
+import axios from 'axios';
 
 const CartContext = createContext();
 
@@ -18,29 +19,53 @@ export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { user } = useAuth();
 
-  // Load cart from localStorage when user changes
+  // Load cart from backend when user logs in
   useEffect(() => {
-    if (user && user._id) {
-      const savedCart = localStorage.getItem(`cart_${user._id}`);
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
+    const loadCart = async () => {
+      if (user && user._id) {
+        try {
+          const { data } = await axios.get('/cart');
+          if (data.success) {
+            setCartItems(data.data);
+          }
+        } catch (error) {
+          console.error("Failed to load cart", error);
+        }
       } else {
         setCartItems([]);
       }
-    } else {
-      // Clear cart if no user logged in
-      setCartItems([]);
-    }
+    };
+    loadCart();
   }, [user]);
 
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    if (user && user._id) {
-      localStorage.setItem(`cart_${user._id}`, JSON.stringify(cartItems));
-    }
-  }, [cartItems, user]);
+  // We no longer blindly save to localStorage on every change
+  // Backend is the source of truth for logged-in users.
 
-  const addToCart = (product, type = 'sale', rentalDays = 1) => {
+  const addToCart = async (product, type = 'sale', rentalDays = 1) => {
+    // 1. Authenticated User Flow (Server Authoritative)
+    if (user && user._id) {
+      try {
+        const { data } = await axios.post('/api/cart', {
+          productId: product._id,
+          type,
+          quantity: 1, // Controller logic handles increment
+          rentalDays,
+          productModel: type === 'rental' ? 'RentalProduct' : 'SalesProduct'
+        });
+
+        if (data.success) {
+          setCartItems(data.data); // Source of truth from backend
+          toast.success('Added to cart');
+        }
+      } catch (error) {
+        console.error("Failed to add to cart", error);
+        toast.error(error.response?.data?.message || 'Failed to add item to cart');
+      }
+      return;
+    }
+
+    // 2. Guest Flow (Local State Only)
+    // ... existing local logic for guests ...
     const existingItem = cartItems.find(
       item => item._id === product._id && item.type === type
     );
@@ -64,9 +89,27 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const updateQuantity = (productId, type, newQuantity) => {
+  const updateQuantity = async (productId, type, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(productId, type);
+      return;
+    }
+
+    if (user && user._id) {
+      try {
+        const { data } = await axios.post('/api/cart', {
+          productId,
+          type,
+          quantity: newQuantity,
+          productModel: type === 'rental' ? 'RentalProduct' : 'SalesProduct' // Ensure model is passed if needed, though controller infers
+        });
+        if (data.success) {
+          setCartItems(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to update quantity", error);
+        toast.error('Failed to update quantity');
+      }
       return;
     }
 
@@ -87,19 +130,40 @@ export const CartProvider = ({ children }) => {
           : item
       )
     );
+    // Note: Backend might not support updating rental days in current simple controller without full payload
+    // For now, we leave this optimistic.
   };
 
-  const removeFromCart = (productId, type) => {
+  const removeFromCart = async (productId, type) => {
+    if (user && user._id) {
+      try {
+        await axios.delete(`/api/cart/${productId}?type=${type}`);
+        // If success, update local state
+        setCartItems(items => items.filter(
+          item => !(item._id === productId && item.type === type)
+        ));
+        toast.success('Removed from cart');
+      } catch (error) {
+        console.error("Failed to remove item", error);
+        toast.error('Failed to remove item');
+      }
+      return;
+    }
+
     setCartItems(items => items.filter(
       item => !(item._id === productId && item.type === type)
     ));
     toast.success('Removed from cart');
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
     setCartItems([]);
     if (user && user._id) {
-      localStorage.removeItem(`cart_${user._id}`);
+      try {
+        await axios.delete('/api/cart');
+      } catch (error) {
+        console.error("Failed to clear cart", error);
+      }
     }
   };
 

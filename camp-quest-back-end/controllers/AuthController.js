@@ -2,7 +2,7 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
     expiresIn: '30d'
   });
 };
@@ -41,6 +41,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({
       success: true,
+      token, // ✅ Add token to response
       user: {
         _id: user._id,
         name: user.name,
@@ -78,6 +79,7 @@ export const login = async (req, res) => {
       });
     }
 
+
     // Generate token
     const token = generateToken(user._id);
 
@@ -91,6 +93,7 @@ export const login = async (req, res) => {
 
     res.json({
       success: true,
+      token, // ✅ Add token to response
       user: {
         _id: user._id,
         name: user.name,

@@ -27,12 +27,12 @@ const SupportTicketForm = ({ onSuccess }) => {
         Object.keys(values).forEach(key => {
           formData.append(key, values[key]);
         });
-        
+
         attachments.forEach(file => {
           formData.append('attachments', file);
         });
-console.log('Submitting form with data:', formData);
-        const response = await axios.post('http://localhost:5000/api/support-tickets', values);
+        console.log('Submitting form with data:', formData);
+        const response = await axios.post('/api/support-tickets', formData);
 
         if (response.data.success) {
           toast.success('Support ticket created successfully!');
@@ -94,7 +94,7 @@ console.log('Submitting form with data:', formData);
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFileUpload(e.dataTransfer.files);
     }
@@ -122,13 +122,13 @@ console.log('Submitting form with data:', formData);
           <div>
             <p className="text-sm font-medium text-green-900">Before creating a ticket</p>
             <p className="text-sm text-green-700 mt-1">
-              Please provide detailed information including equipment model numbers, rental dates, 
+              Please provide detailed information including equipment model numbers, rental dates,
               and any error messages to help us resolve your issue quickly.
             </p>
           </div>
         </div>
       </div>
-      
+
       <form onSubmit={formik.handleSubmit} className="space-y-8">
         {/* Subject */}
         <div>
@@ -142,11 +142,10 @@ console.log('Submitting form with data:', formData);
             value={formik.values.subject}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${
-              formik.touched.subject && formik.errors.subject
+            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.subject && formik.errors.subject
                 ? 'border-red-300 bg-red-50 focus:border-red-500'
                 : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
-            }`}
+              }`}
             placeholder="Brief description of your issue (e.g., Damaged tent rental #12345)"
           />
           {formik.touched.subject && formik.errors.subject && (
@@ -169,11 +168,10 @@ console.log('Submitting form with data:', formData);
               value={formik.values.category}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${
-                formik.touched.category && formik.errors.category
+              className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.category && formik.errors.category
                   ? 'border-red-300 bg-red-50 focus:border-red-500'
                   : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
-              }`}
+                }`}
             >
               <option value="">Select a category</option>
               {categories.map(cat => (
@@ -196,11 +194,10 @@ console.log('Submitting form with data:', formData);
               {priorities.map((priority) => (
                 <label
                   key={priority.value}
-                  className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
-                    formik.values.priority === priority.value
+                  className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${formik.values.priority === priority.value
                       ? 'border-green-500 bg-green-50'
                       : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -211,18 +208,16 @@ console.log('Submitting form with data:', formData);
                     className="sr-only"
                   />
                   <div className="flex items-center justify-between mb-1">
-                    <span className={`font-semibold ${
-                      formik.values.priority === priority.value ? 'text-green-900' : priority.color
-                    }`}>
+                    <span className={`font-semibold ${formik.values.priority === priority.value ? 'text-green-900' : priority.color
+                      }`}>
                       {priority.label}
                     </span>
                     {formik.values.priority === priority.value && (
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     )}
                   </div>
-                  <span className={`text-xs ${
-                    formik.values.priority === priority.value ? 'text-green-700' : 'text-slate-500'
-                  }`}>
+                  <span className={`text-xs ${formik.values.priority === priority.value ? 'text-green-700' : 'text-slate-500'
+                    }`}>
                     {priority.desc}
                   </span>
                 </label>
@@ -243,11 +238,10 @@ console.log('Submitting form with data:', formData);
             value={formik.values.description}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${
-              formik.touched.description && formik.errors.description
+            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.description && formik.errors.description
                 ? 'border-red-300 bg-red-50 focus:border-red-500'
                 : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
-            }`}
+              }`}
             placeholder="Please provide detailed information about your issue:
 • Equipment details (model, rental dates, condition)
 • Steps to reproduce the problem
