@@ -34,19 +34,19 @@ const orderSchema = new mongoose.Schema({
   deliveryAddress: {
     address: {
       type: String,
-      required: true
+      required: function () { return this.orderType === 'sales'; }
     },
     city: {
       type: String,
-      required: true
+      required: function () { return this.orderType === 'sales'; }
     },
     state: {
       type: String,
-      required: true
+      required: function () { return this.orderType === 'sales'; }
     },
     zipCode: {
       type: String,
-      required: true
+      required: function () { return this.orderType === 'sales'; }
     },
     country: {
       type: String,
@@ -98,7 +98,7 @@ const orderSchema = new mongoose.Schema({
   paymentDetails: {
     method: {
       type: String,
-      enum: ['card', 'paypal', 'cash'],
+      enum: ['card', 'paypal', 'cash', 'slip'],
       required: true
     },
     transactionId: String,
@@ -106,6 +106,13 @@ const orderSchema = new mongoose.Schema({
       type: Number,
       required: true
     }
+  },
+  paymentSlip: {
+    fileName: String,
+    fileUrl: String,
+    mimeType: String,
+    size: Number,
+    uploadedAt: Date
   },
   totalAmount: {
     type: Number,
@@ -126,7 +133,7 @@ const orderSchema = new mongoose.Schema({
   },
   paymentStatus: {
     type: String,
-    enum: ['pending', 'completed', 'failed', 'refunded'],
+    enum: ['pending', 'verification_pending', 'completed', 'failed', 'refunded'],
     default: 'pending'
   },
   priority: {

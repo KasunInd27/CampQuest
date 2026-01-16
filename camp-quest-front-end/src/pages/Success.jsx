@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle, Download, Home, Package } from 'lucide-react';
+import { CheckCircle, Download, Home, Package, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -16,7 +16,7 @@ const Success = () => {
   useEffect(() => {
     console.log('Location state:', location.state);
     console.log('Order ID:', orderId);
-    
+
     if (orderId) {
       fetchOrder();
     } else {
@@ -31,11 +31,11 @@ const Success = () => {
       console.log('Fetching order:', orderId);
       const response = await axios.get(`/orders/${orderId}`);
       console.log('Order response:', response.data);
-      
+
       // Handle different response structures
       const orderData = response.data.data || response.data.order || response.data;
       console.log('Order data:', orderData);
-      
+
       setOrder(orderData);
     } catch (error) {
       console.error('Error fetching order:', error);
@@ -92,39 +92,39 @@ const Success = () => {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-      doc.text('123 Mathale Road', 20, yPos + 6);
+      doc.text('Mathale Road', 20, yPos + 6);
       doc.text('Katupilagolla, Dodamgaslanda', 20, yPos + 12);
-      doc.text('Phone: +94 124 5709', 20, yPos + 18);
+      doc.text('Phone: 074 1245 709', 20, yPos + 18);
       doc.text('Email: campquest512@gmail.com', 20, yPos + 24);
 
       // Right side - Invoice details
       doc.setFontSize(10);
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-      
+
       const rightX = pageWidth - 20;
       const invoiceNumber = order._id ? order._id.slice(-8).toUpperCase() : 'N/A';
-      
+
       doc.setFont('helvetica', 'bold');
       doc.text('Invoice No:', rightX - 60, yPos, { align: 'left' });
       doc.setFont('helvetica', 'normal');
       doc.text(`#${invoiceNumber}`, rightX, yPos, { align: 'right' });
-      
+
       doc.setFont('helvetica', 'bold');
       doc.text('Date:', rightX - 60, yPos + 6, { align: 'left' });
       doc.setFont('helvetica', 'normal');
-      const orderDate = new Date(order.createdAt).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+      const orderDate = new Date(order.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
       doc.text(orderDate, rightX, yPos + 6, { align: 'right' });
-      
+
       doc.setFont('helvetica', 'bold');
       doc.text('Status:', rightX - 60, yPos + 12, { align: 'left' });
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(34, 197, 94);
       doc.text((order.status || 'pending').toUpperCase(), rightX, yPos + 12, { align: 'right' });
-      
+
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.setFont('helvetica', 'bold');
       doc.text('Payment:', rightX - 60, yPos + 18, { align: 'left' });
@@ -136,17 +136,17 @@ const Success = () => {
       yPos = 110;
       doc.setFillColor(245, 245, 245);
       doc.rect(20, yPos, pageWidth - 40, 35, 'F');
-      
+
       yPos += 8;
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.text('BILL TO:', 25, yPos);
-      
+
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
       doc.text(order.customer?.name || 'N/A', 25, yPos + 8);
-      
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
@@ -158,14 +158,14 @@ const Success = () => {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.text('DELIVER TO:', pageWidth / 2 + 10, yPos);
-      
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
       doc.text(order.deliveryAddress?.address || 'N/A', pageWidth / 2 + 10, yPos + 8);
       doc.text(
-        `${order.deliveryAddress?.city || ''}, ${order.deliveryAddress?.state || ''} ${order.deliveryAddress?.zipCode || ''}`, 
-        pageWidth / 2 + 10, 
+        `${order.deliveryAddress?.city || ''}, ${order.deliveryAddress?.state || ''} ${order.deliveryAddress?.zipCode || ''}`,
+        pageWidth / 2 + 10,
         yPos + 14
       );
       doc.text(order.deliveryAddress?.country || 'N/A', pageWidth / 2 + 10, yPos + 20);
@@ -174,10 +174,10 @@ const Success = () => {
       yPos = 155;
 
       const tableData = (order.items || []).map((item, index) => {
-        const itemDescription = item.type === 'sale' 
+        const itemDescription = item.type === 'sale'
           ? `Purchase (Qty: ${item.quantity})`
           : `Rental (${item.quantity} unit × ${item.rentalDays} days)`;
-        
+
         const unitPrice = item.type === 'sale'
           ? (item.subtotal / item.quantity)
           : (item.subtotal / (item.quantity * item.rentalDays));
@@ -270,12 +270,12 @@ const Success = () => {
       const notesY = paymentY + 20;
       doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
       doc.rect(20, notesY, pageWidth - 40, 25, 'F');
-      
+
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.text('NOTES:', 25, notesY + 8);
-      
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       doc.text('Thank you for choosing CampQuest! We hope you have an amazing adventure.', 25, notesY + 14);
@@ -292,7 +292,7 @@ const Success = () => {
       const fileName = `CampQuest_Invoice_${invoiceNumber}.pdf`;
       doc.save(fileName);
       toast.success('Invoice downloaded successfully!');
-      
+
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF. Please try again.');
@@ -328,7 +328,7 @@ const Success = () => {
     );
   }
 
-  
+
   return (
     <div className="min-h-screen bg-neutral-900 flex items-center justify-center py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -340,14 +340,31 @@ const Success = () => {
             </div>
           </div>
 
-          {/* Success Message */}
+          {/* Success Message - Payment Verification */}
           <h1 className="text-3xl font-bold text-white mb-4">
-            Order Placed Successfully! 🎉
+            Payment Verification in Progress 🕒
           </h1>
-          <p className="text-neutral-400 mb-8">
-            Thank you for your order. We've sent a confirmation email with your invoice to{' '}
-            <span className="text-lime-500 font-semibold">{order?.customer?.email}</span>
+          <p className="text-neutral-400 mb-2">
+            Thank you for your order. We have received your payment slip.
           </p>
+          <p className="text-neutral-400 mb-8">
+            We will verify your payment within <span className="text-lime-500 font-semibold">1 business day</span>.
+            Once verified, you will receive a confirmation email at {' '}
+            <span className="text-lime-500 font-semibold">{order?.customer?.email}</span>.
+          </p>
+
+          {/* Important Notices */}
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-8 text-left">
+            <h3 className="text-blue-400 font-semibold mb-2 flex items-center gap-2">
+              <AlertCircle size={18} />
+              Important Information
+            </h3>
+            <ul className="list-disc list-inside text-sm text-neutral-300 space-y-1">
+              <li>Please keep your Order Number <strong>#{order._id.slice(-8).toUpperCase()}</strong> for reference.</li>
+              <li>If verification is delayed, please contact support with your order number.</li>
+              <li>Do not re-upload the slip unless requested by support.</li>
+            </ul>
+          </div>
 
           {/* Order Details */}
           <div className="bg-neutral-700 rounded-lg p-6 mb-8 text-left">
@@ -355,7 +372,7 @@ const Success = () => {
               <Package className="text-lime-500" size={24} />
               Order Details
             </h2>
-            
+
             <div className="space-y-3 text-sm">
               <div className="flex justify-between border-b border-neutral-600 pb-2">
                 <span className="text-neutral-400">Order ID:</span>
@@ -363,7 +380,7 @@ const Success = () => {
                   #{order._id.slice(-8).toUpperCase()}
                 </span>
               </div>
-              
+
               <div className="flex justify-between border-b border-neutral-600 pb-2">
                 <span className="text-neutral-400">Order Date:</span>
                 <span className="text-white">
@@ -375,22 +392,25 @@ const Success = () => {
                   })}
                 </span>
               </div>
-              
+
               <div className="flex justify-between border-b border-neutral-600 pb-2">
                 <span className="text-neutral-400">Total Amount:</span>
                 <span className="text-lime-500 font-bold text-lg">
                   LKR {order.totalAmount.toFixed(2)}
                 </span>
               </div>
-              
+
               <div className="flex justify-between border-b border-neutral-600 pb-2">
                 <span className="text-neutral-400">Payment Status:</span>
-                <span className="flex items-center gap-2 text-green-400 font-semibold">
-                  <CheckCircle size={16} />
-                  Completed
+                <span className={`flex items-center gap-2 font-semibold ${order.paymentStatus === 'completed' ? 'text-green-400' :
+                  order.paymentStatus === 'verification_pending' ? 'text-yellow-400' : 'text-neutral-400'
+                  }`}>
+                  {order.paymentStatus === 'completed' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                  {order.paymentStatus === 'verification_pending' ? 'Verification Pending' :
+                    order.paymentStatus === 'completed' ? 'Completed' : order.paymentStatus}
                 </span>
               </div>
-              
+
               <div className="flex justify-between">
                 <span className="text-neutral-400">Order Status:</span>
                 <span className="bg-yellow-500/20 text-yellow-500 px-3 py-1 rounded-full text-xs font-semibold uppercase">
@@ -412,7 +432,7 @@ const Success = () => {
                       <div className="flex-1">
                         <p className="text-white font-medium">{item.name}</p>
                         <p className="text-neutral-400 text-xs mt-1">
-                          {item.type === 'sale' 
+                          {item.type === 'sale'
                             ? `Purchase • Quantity: ${item.quantity}`
                             : `Rental • ${item.quantity} unit × ${item.rentalDays} days`
                           }
@@ -430,20 +450,28 @@ const Success = () => {
             {/* Delivery Information */}
             <div className="mt-6 pt-6 border-t border-neutral-600">
               <h3 className="text-white font-semibold mb-3">📍 Delivery Address</h3>
-              <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm">
-                <p className="font-semibold text-white">{order.customer.name}</p>
-                <p className="mt-1">{order.deliveryAddress.address}</p>
-                <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}</p>
-                <p>{order.deliveryAddress.country}</p>
-                <p className="mt-2 text-neutral-400">📞 {order.customer.phone}</p>
-              </div>
+              {order.deliveryAddress ? (
+                <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm">
+                  <p className="font-semibold text-white">{order.customer.name}</p>
+                  <p className="mt-1">{order.deliveryAddress.address}</p>
+                  <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}</p>
+                  <p>{order.deliveryAddress.country}</p>
+                  <p className="mt-2 text-neutral-400">📞 {order.customer.phone}</p>
+                </div>
+              ) : (
+                <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm">
+                  <p className="text-neutral-400 italic">No delivery address provided (Rental / Store Pickup)</p>
+                  <p className="mt-2 font-semibold text-white">{order.customer.name}</p>
+                  <p className="text-neutral-400">📞 {order.customer.phone}</p>
+                </div>
+              )}
             </div>
 
-            {/* Estimated Delivery */}
+            {/* Estimated Delivery/Pickup */}
             <div className="mt-4 p-4 bg-lime-500/10 border border-lime-500/30 rounded-lg">
               <p className="text-lime-400 text-sm">
-                <span className="font-semibold">📦 Estimated Delivery:</span> 
-                {' '}3-5 business days
+                <span className="font-semibold">📦 Estimate:</span>
+                {order.deliveryAddress ? ' 3-5 business days for delivery' : ' Ready for pickup within 24 hours (after verification)'}
               </p>
             </div>
           </div>
@@ -457,7 +485,7 @@ const Success = () => {
               <Download size={20} />
               Download Invoice
             </button>
-            
+
             <Link
               to="/dashboard"
               className="flex items-center justify-center gap-2 px-6 py-3 bg-neutral-700 text-white rounded-lg font-medium hover:bg-neutral-600 transition-all transform hover:scale-105"
@@ -465,7 +493,7 @@ const Success = () => {
               <Package size={20} />
               View Orders
             </Link>
-            
+
             <Link
               to="/"
               className="flex items-center justify-center gap-2 px-6 py-3 border border-neutral-600 text-white rounded-lg font-medium hover:bg-neutral-700 transition-all transform hover:scale-105"

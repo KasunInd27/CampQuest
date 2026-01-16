@@ -1,12 +1,12 @@
 // components/admin/RentalOrders.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Package, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Download, 
-  Filter, 
+import {
+  Package,
+  Eye,
+  Edit,
+  Trash2,
+  Download,
+  Filter,
   Search,
   Calendar,
   Clock,
@@ -14,7 +14,8 @@ import {
   AlertTriangle,
   X,
   Plus,
-  MoreHorizontal
+  MoreHorizontal,
+  FileText
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -32,7 +33,7 @@ const RentalOrders = () => {
   const [editingOrder, setEditingOrder] = useState(null);
   const [stats, setStats] = useState(null);
   const [exportLoading, setExportLoading] = useState(false);
-  
+
   const [filters, setFilters] = useState({
     status: 'all',
     priority: 'all',
@@ -55,7 +56,7 @@ const RentalOrders = () => {
         ...filters,
         orderType: 'rental'
       });
-      
+
       const { data } = await axios.get(`/orders/admin/orders?${params}`);
       setOrders(data.orders);
     } catch (error) {
@@ -138,7 +139,7 @@ const RentalOrders = () => {
       // Header with gradient effect (simulated with rectangles)
       doc.setFillColor(10, 10, 10);
       doc.rect(0, 0, pageWidth, 45, 'F');
-      
+
       // Accent line
       doc.setFillColor(132, 204, 22); // Lime color
       doc.rect(0, 42, pageWidth, 3, 'F');
@@ -153,9 +154,9 @@ const RentalOrders = () => {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(200, 200, 200);
-      doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
+      doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
@@ -185,20 +186,20 @@ const RentalOrders = () => {
 
         statsData.forEach((stat, index) => {
           const x = 14 + (boxWidth + 3) * index;
-          
+
           // Box background
           doc.setFillColor(30, 30, 30);
           doc.roundedRect(x, boxY, boxWidth, boxHeight, 2, 2, 'F');
-          
+
           // Accent top border
           doc.setFillColor(...stat.color);
           doc.roundedRect(x, boxY, boxWidth, 2, 2, 2, 'F');
-          
+
           // Text
           doc.setFontSize(8);
           doc.setTextColor(160, 160, 160);
           doc.text(stat.label, x + boxWidth / 2, boxY + 7, { align: 'center' });
-          
+
           doc.setFontSize(14);
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(255, 255, 255);
@@ -209,7 +210,7 @@ const RentalOrders = () => {
       // Prepare table data
       const tableData = orders.map(order => {
         const rentalItem = order.items.find(item => item.rentalDays);
-        const rentalPeriod = rentalItem 
+        const rentalPeriod = rentalItem
           ? `${rentalItem.rentalDays} days${rentalItem.rentalStartDate ? '\n' + new Date(rentalItem.rentalStartDate).toLocaleDateString() : ''}`
           : 'N/A';
 
@@ -258,24 +259,24 @@ const RentalOrders = () => {
           2: { cellWidth: 35 },
           3: { cellWidth: 45 },
           4: { cellWidth: 30, fontSize: 7 },
-          5: { 
-            cellWidth: 25, 
+          5: {
+            cellWidth: 25,
             halign: 'center',
             fontStyle: 'bold'
           },
-          6: { 
-            cellWidth: 22, 
+          6: {
+            cellWidth: 22,
             halign: 'center',
             fontStyle: 'bold'
           },
-          7: { 
-            cellWidth: 30, 
+          7: {
+            cellWidth: 30,
             halign: 'right',
             fontStyle: 'bold',
             textColor: [132, 204, 22]
           },
         },
-        didParseCell: function(data) {
+        didParseCell: function (data) {
           // Color code status column
           if (data.column.index === 5 && data.section === 'body') {
             const status = data.cell.raw.toLowerCase();
@@ -293,7 +294,7 @@ const RentalOrders = () => {
               data.cell.styles.textColor = [156, 163, 175];
             }
           }
-          
+
           // Color code priority column
           if (data.column.index === 6 && data.section === 'body') {
             const priority = data.cell.raw.toLowerCase();
@@ -308,16 +309,16 @@ const RentalOrders = () => {
             }
           }
         },
-        didDrawPage: function(data) {
+        didDrawPage: function (data) {
           // Footer
           const footerY = pageHeight - 15;
-          
+
           doc.setFillColor(10, 10, 10);
           doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
-          
+
           doc.setFillColor(132, 204, 22);
           doc.rect(0, pageHeight - 20, pageWidth, 2, 'F');
-          
+
           doc.setFontSize(8);
           doc.setTextColor(160, 160, 160);
           doc.text(
@@ -326,13 +327,13 @@ const RentalOrders = () => {
             footerY,
             { align: 'center' }
           );
-          
+
           doc.text(
             'Confidential - Rental Orders Report',
             14,
             footerY
           );
-          
+
           doc.text(
             `© ${new Date().getFullYear()} Your Company`,
             pageWidth - 14,
@@ -346,7 +347,7 @@ const RentalOrders = () => {
       // Save the PDF
       const fileName = `rental-orders-${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
-      
+
       toast.success('PDF exported successfully');
     } catch (error) {
       console.error('Error exporting PDF:', error);
@@ -395,7 +396,7 @@ const RentalOrders = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filters
           </button>
-          <button 
+          <button
             onClick={handleExportPDF}
             disabled={exportLoading || orders.length === 0}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -462,7 +463,7 @@ const RentalOrders = () => {
                 <option value="returned">Returned</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-neutral-300 mb-2">Priority</label>
               <select
@@ -596,6 +597,9 @@ const RentalOrders = () => {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                  Payment
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
                   Priority
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
@@ -694,18 +698,18 @@ const StatsCard = ({ title, value, icon }) => (
 );
 
 // Order Table Row Component
-const OrderTableRow = ({ 
-  order, 
-  selected, 
-  onSelect, 
-  onView, 
-  onEdit, 
-  onDelete, 
-  getStatusColor, 
-  getPriorityColor 
+const OrderTableRow = ({
+  order,
+  selected,
+  onSelect,
+  onView,
+  onEdit,
+  onDelete,
+  getStatusColor,
+  getPriorityColor
 }) => {
   const rentalItem = order.items.find(item => item.rentalDays);
-  
+
   return (
     <tr className="hover:bg-neutral-800 transition-colors">
       <td className="px-6 py-4">
@@ -737,7 +741,7 @@ const OrderTableRow = ({
               <div>{rentalItem.rentalDays} days</div>
               {rentalItem.rentalStartDate && (
                 <div className="text-xs text-neutral-400">
-                  {new Date(rentalItem.rentalStartDate).toLocaleDateString()} - 
+                  {new Date(rentalItem.rentalStartDate).toLocaleDateString()} -
                   {new Date(rentalItem.rentalEndDate).toLocaleDateString()}
                 </div>
               )}
@@ -751,6 +755,21 @@ const OrderTableRow = ({
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
           {order.status}
         </span>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex flex-col gap-1">
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium w-fit ${order.paymentStatus === 'completed' ? 'text-green-400 bg-green-400/10' :
+            order.paymentStatus === 'verification_pending' ? 'text-yellow-400 bg-yellow-400/10' :
+              'text-neutral-400 bg-neutral-400/10'
+            }`}>
+            {order.paymentStatus === 'verification_pending' ? 'Verify' : order.paymentStatus}
+          </span>
+          {order.paymentSlip?.fileUrl && (
+            <span className="text-xs text-lime-500 flex items-center gap-1">
+              <FileText size={10} /> Slip Uploaded
+            </span>
+          )}
+        </div>
       </td>
       <td className="px-6 py-4">
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(order.priority)}`}>
@@ -769,6 +788,17 @@ const OrderTableRow = ({
           >
             <Eye className="w-4 h-4" />
           </button>
+
+          {order.paymentSlip?.fileUrl && (
+            <button
+              onClick={() => window.open(order.paymentSlip.fileUrl.startsWith('http') ? order.paymentSlip.fileUrl : `http://localhost:5000${order.paymentSlip.fileUrl}`, '_blank')}
+              className="p-2 text-neutral-400 hover:text-lime-400 hover:bg-neutral-800 rounded-lg transition-colors"
+              title="View Slip"
+            >
+              <FileText className="w-4 h-4" />
+            </button>
+          )}
+
           <button
             onClick={onEdit}
             className="p-2 text-neutral-400 hover:text-green-400 hover:bg-neutral-800 rounded-lg transition-colors"
@@ -867,9 +897,15 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor, getPriorityColor })
 
             <h4 className="text-md font-semibold text-white mt-6 mb-3">Delivery Address</h4>
             <div className="text-white">
-              <p>{order.deliveryAddress.address}</p>
-              <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}</p>
-              <p>{order.deliveryAddress.country}</p>
+              {order.deliveryAddress ? (
+                <>
+                  <p>{order.deliveryAddress.address}</p>
+                  <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}</p>
+                  <p>{order.deliveryAddress.country}</p>
+                </>
+              ) : (
+                <p className="text-neutral-400">No delivery required (Customer pickup at shop)</p>
+              )}
             </div>
           </div>
         </div>
@@ -889,7 +925,7 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor, getPriorityColor })
                         <p className="text-sm text-blue-400">Rental Period: {item.rentalDays} days</p>
                         {item.rentalStartDate && (
                           <p className="text-sm text-neutral-400">
-                            {new Date(item.rentalStartDate).toLocaleDateString()} - 
+                            {new Date(item.rentalStartDate).toLocaleDateString()} -
                             {new Date(item.rentalEndDate).toLocaleDateString()}
                           </p>
                         )}
@@ -960,13 +996,13 @@ const EditOrderModal = ({ order, onClose, onSuccess }) => {
     trackingNumber: order.trackingNumber || '',
     notes: order.notes || '',
     adminNotes: order.adminNotes || '',
-    paymentStatus: order.paymentStatus
+    paymentStatus: order.paymentStatus || 'pending'
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       await axios.put(`/orders/admin/orders/${order._id}`, formData);
       toast.success('Order updated successfully');
@@ -1078,6 +1114,24 @@ const EditOrderModal = ({ order, onClose, onSuccess }) => {
               className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
               placeholder="Internal notes (not visible to customer)"
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-neutral-300 mb-2">Payment Status</label>
+              <select
+                value={formData.paymentStatus}
+                onChange={(e) => setFormData(prev => ({ ...prev, paymentStatus: e.target.value }))}
+                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                required
+              >
+                <option value="pending">Pending</option>
+                <option value="verification_pending">Verification Pending</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
+              </select>
+            </div>
           </div>
 
           <div className="flex justify-end space-x-3">

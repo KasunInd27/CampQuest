@@ -12,8 +12,8 @@ const transporter = nodemailer.createTransport({
   port: process.env.SMTP_PORT || 587,
   secure: false,
   auth: {
- user: process.env.SMTP_USER || 'campquest512@gmail.com', // Your email
-      pass: process.env.SMTP_PASS || 'iwqqkifvraqcuvio'  
+    user: process.env.SMTP_USER || 'campquest512@gmail.com', // Your email
+    pass: process.env.SMTP_PASS || 'iwqqkifvraqcuvio'
   }
 });
 
@@ -22,14 +22,14 @@ const sendLowStockAlert = async (product, productType, currentStock) => {
   try {
     // Get all admin users
     const adminUsers = await User.find({ role: 'admin' }, 'email name');
-    
+
     if (adminUsers.length === 0) {
       console.log('No admin users found for low stock alert');
       return;
     }
 
     const adminEmails = adminUsers.map(admin => admin.email);
-    
+
     const mailOptions = {
       from: process.env.SMTP_EMAIL,
       to: adminEmails.join(','),
@@ -85,7 +85,7 @@ const updateProductQuantities = async (items) => {
 
       // Find the product
       product = await Model.findById(item.product);
-      
+
       if (!product) {
         console.error(`Product not found: ${item.product}`);
         continue;
@@ -141,9 +141,9 @@ export const createOrder = async (req, res) => {
 
   try {
     console.log('Received order data:', req.body);
-    
+
     const orderData = req.body;
-    
+
     // Validate required fields
     if (!orderData.customer || !orderData.items || !orderData.totalAmount) {
       await session.abortTransaction();
@@ -177,7 +177,7 @@ export const createOrder = async (req, res) => {
       }
 
       product = await Model.findById(item.product).session(session);
-      
+
       if (!product) {
         await session.abortTransaction();
         return res.status(400).json({
@@ -198,7 +198,7 @@ export const createOrder = async (req, res) => {
     // Determine order type if not provided
     let orderType = orderData.orderType;
     if (!orderType) {
-      const hasRentalItems = orderData.items.some(item => 
+      const hasRentalItems = orderData.items.some(item =>
         item.type === 'rental' || item.rentalDays > 0
       );
       orderType = hasRentalItems ? 'rental' : 'sales';
@@ -232,13 +232,13 @@ export const createOrder = async (req, res) => {
 
     // Update product quantities and send alerts (outside transaction for email)
     await session.commitTransaction();
-    
+
     // Update quantities and send alerts (this happens after successful order creation)
     const quantityUpdates = await updateProductQuantities(orderData.items);
-    
+
     console.log('Order created successfully with orderType:', order.orderType);
     console.log('Quantity updates:', quantityUpdates);
-    
+
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
@@ -275,7 +275,7 @@ const restoreProductQuantities = async (items) => {
       }
 
       const product = await Model.findById(item.product);
-      
+
       if (!product) {
         console.error(`Product not found for restoration: ${item.product}`);
         continue;
@@ -314,7 +314,7 @@ export const cancelUserOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const { cancelReason, userId } = req.body;
-    
+
     if (!userId) {
       await session.abortTransaction();
       return res.status(400).json({
@@ -333,7 +333,7 @@ export const cancelUserOrder = async (req, res) => {
     }
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    
+
     const order = await Order.findOne({
       _id: id,
       $or: [
@@ -341,7 +341,7 @@ export const cancelUserOrder = async (req, res) => {
         { 'customer.id': userObjectId }
       ]
     }).session(session);
-    
+
     if (!order) {
       await session.abortTransaction();
       return res.status(404).json({
@@ -349,7 +349,7 @@ export const cancelUserOrder = async (req, res) => {
         message: 'Order not found'
       });
     }
-    
+
     // Check if order can be cancelled
     if (!['pending', 'processing'].includes(order.status)) {
       await session.abortTransaction();
@@ -358,17 +358,17 @@ export const cancelUserOrder = async (req, res) => {
         message: 'Order cannot be cancelled at this stage'
       });
     }
-    
+
     // Update order status to cancelled
     order.status = 'cancelled';
     order.cancelReason = cancelReason || 'Cancelled by customer';
     await order.save({ session });
-    
+
     await session.commitTransaction();
-    
+
     // Restore product quantities (outside transaction)
     const restorations = await restoreProductQuantities(order.items);
-    
+
     res.json({
       success: true,
       message: 'Order cancelled successfully',
@@ -395,9 +395,9 @@ export const cancelOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const { cancelReason } = req.body;
-    
+
     const order = await Order.findById(id).session(session);
-    
+
     if (!order) {
       await session.abortTransaction();
       return res.status(404).json({
@@ -405,17 +405,17 @@ export const cancelOrder = async (req, res) => {
         message: 'Order not found'
       });
     }
-    
+
     // Update order status to cancelled
     order.status = 'cancelled';
     order.cancelReason = cancelReason || 'Cancelled by admin';
     await order.save({ session });
-    
+
     await session.commitTransaction();
-    
+
     // Restore product quantities (outside transaction)
     const restorations = await restoreProductQuantities(order.items);
-    
+
     res.json({
       success: true,
       message: 'Order cancelled successfully',
@@ -438,9 +438,9 @@ export const cancelOrder = async (req, res) => {
 export const getUserOrders = async (req, res) => {
   try {
     const { userId, page = 1, limit = 10, status } = req.query;
-    
+
     console.log('getUserOrders called with userId:', userId);
-    
+
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -457,31 +457,31 @@ export const getUserOrders = async (req, res) => {
     }
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    
+
     // Build query - check both customer.userId and customer.id fields
-    let query = { 
+    let query = {
       $or: [
         { 'customer.userId': userObjectId },
         { 'customer.id': userObjectId }
       ]
     };
-    
+
     if (status && status !== 'all') {
       query.status = status;
     }
-    
+
     console.log('Query:', JSON.stringify(query, null, 2));
-    
+
     const orders = await Order.find(query)
       .populate('items.product')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    
+
     console.log('Found orders:', orders.length);
-    
+
     const total = await Order.countDocuments(query);
-    
+
     res.json({
       success: true,
       orders,
@@ -502,7 +502,7 @@ export const getUserOrders = async (req, res) => {
 export const getUserOrderStats = async (req, res) => {
   try {
     const { userId } = req.query;
-    
+
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -524,7 +524,7 @@ export const getUserOrderStats = async (req, res) => {
     const userObjectId = new mongoose.Types.ObjectId(userId);
 
     // Build query - check both customer.userId and customer.id fields
-    const userQuery = { 
+    const userQuery = {
       $or: [
         { 'customer.userId': userObjectId },
         { 'customer.id': userObjectId }
@@ -548,17 +548,17 @@ export const getUserOrderStats = async (req, res) => {
 
     // Get total spent (excluding cancelled orders)
     const totalSpentResult = await Order.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           ...userQuery,
-          status: { $ne: 'cancelled' } 
-        } 
+          status: { $ne: 'cancelled' }
+        }
       },
-      { 
-        $group: { 
-          _id: null, 
-          total: { $sum: '$totalAmount' } 
-        } 
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalAmount' }
+        }
       }
     ]);
 
@@ -596,14 +596,14 @@ export const getUserOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const { userId } = req.query;
-    
+
     if (!userId) {
       return res.status(400).json({
         success: false,
         message: 'User ID is required'
       });
     }
-    
+
     // Validate IDs
     if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
@@ -613,7 +613,7 @@ export const getUserOrder = async (req, res) => {
     }
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    
+
     const order = await Order.findOne({
       _id: id,
       $or: [
@@ -621,14 +621,14 @@ export const getUserOrder = async (req, res) => {
         { 'customer.id': userObjectId }
       ]
     }).populate('items.product');
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-    
+
     res.json({
       success: true,
       order
@@ -647,7 +647,7 @@ export const updateOrderDeliveryDetails = async (req, res) => {
   try {
     const { id } = req.params;
     const { deliveryAddress, customer, userId } = req.body;
-    
+
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -664,7 +664,7 @@ export const updateOrderDeliveryDetails = async (req, res) => {
     }
 
     const userObjectId = new mongoose.Types.ObjectId(userId);
-    
+
     const order = await Order.findOne({
       _id: id,
       $or: [
@@ -672,26 +672,26 @@ export const updateOrderDeliveryDetails = async (req, res) => {
         { 'customer.id': userObjectId }
       ]
     });
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-    
+
     // Check if order is within 24 hours
     const orderTime = new Date(order.createdAt);
     const currentTime = new Date();
     const hoursDifference = (currentTime - orderTime) / (1000 * 60 * 60);
-    
+
     if (hoursDifference > 24) {
       return res.status(400).json({
         success: false,
         message: 'Order details can only be updated within 24 hours of placing the order'
       });
     }
-    
+
     // Check if order status allows updates
     if (!['pending', 'processing'].includes(order.status)) {
       return res.status(400).json({
@@ -699,7 +699,7 @@ export const updateOrderDeliveryDetails = async (req, res) => {
         message: 'Order cannot be updated as it is already in progress'
       });
     }
-    
+
     // Update order
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
@@ -710,7 +710,7 @@ export const updateOrderDeliveryDetails = async (req, res) => {
       },
       { new: true, runValidators: true }
     ).populate('items.product');
-    
+
     res.json({
       success: true,
       message: 'Order updated successfully',
@@ -728,21 +728,21 @@ export const updateOrderDeliveryDetails = async (req, res) => {
 export const getOrders = async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
-    
+
     let query = {};
     if (status && status !== 'all') {
       query.status = status;
     }
-    
+
     const orders = await Order.find(query)
       .populate('items.product')
       .populate('customer.userId', 'name email')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    
+
     const total = await Order.countDocuments(query);
-    
+
     res.json({
       success: true,
       orders,
@@ -764,14 +764,14 @@ export const getOrder = async (req, res) => {
     const order = await Order.findById(id)
       .populate('items.product')
       .populate('customer.userId', 'name email');
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-    
+
     res.json({
       success: true,
       order
@@ -788,20 +788,20 @@ export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, trackingNumber, notes } = req.body;
-    
+
     const order = await Order.findByIdAndUpdate(
       id,
       { status, trackingNumber, notes },
       { new: true, runValidators: true }
     ).populate('items.product');
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: 'Order updated successfully',
@@ -826,13 +826,13 @@ export const getOrderStats = async (req, res) => {
         }
       }
     ]);
-    
+
     const totalOrders = await Order.countDocuments();
     const totalRevenueResult = await Order.aggregate([
       { $match: { status: { $ne: 'cancelled' } } },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } }
     ]);
-    
+
     res.json({
       success: true,
       stats: {
@@ -854,41 +854,41 @@ export const getOrderStats = async (req, res) => {
 // controllers/orderController.js - Update getAdminOrders function
 export const getAdminOrders = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      status, 
-      orderType, 
+    const {
+      page = 1,
+      limit = 10,
+      status,
+      orderType,
       priority,
       startDate,
       endDate,
-      search 
+      search
     } = req.query;
-    
+
     let query = {};
-    
+
     // Filter by order type (rental/sales)
     if (orderType && orderType !== 'all') {
       query.orderType = orderType;
     }
-    
+
     // Filter by status
     if (status && status !== 'all') {
       query.status = status;
     }
-    
+
     // Filter by priority
     if (priority && priority !== 'all') {
       query.priority = priority;
     }
-    
+
     // Date range filter
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
-    
+
     // Search filter
     if (search) {
       query.$or = [
@@ -897,20 +897,20 @@ export const getAdminOrders = async (req, res) => {
         { 'customer.email': { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     console.log('Admin Orders Query:', JSON.stringify(query, null, 2));
-    
+
     const orders = await Order.find(query)
       .populate('items.product')
       .populate('customer.userId', 'name email')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    
+
     const total = await Order.countDocuments(query);
-    
+
     console.log(`Found ${orders.length} orders of type ${orderType || 'all'}`);
-    
+
     res.json({
       success: true,
       orders,
@@ -931,12 +931,12 @@ export const getAdminOrders = async (req, res) => {
 export const getAdminOrderStats = async (req, res) => {
   try {
     const { orderType } = req.query;
-    
+
     let matchQuery = {};
     if (orderType && orderType !== 'all') {
       matchQuery.orderType = orderType;
     }
-    
+
     // Get status breakdown
     const statusStats = await Order.aggregate([
       { $match: matchQuery },
@@ -948,7 +948,7 @@ export const getAdminOrderStats = async (req, res) => {
         }
       }
     ]);
-    
+
     // Get priority breakdown
     const priorityStats = await Order.aggregate([
       { $match: matchQuery },
@@ -959,32 +959,32 @@ export const getAdminOrderStats = async (req, res) => {
         }
       }
     ]);
-    
+
     // Get total orders count
     const totalOrders = await Order.countDocuments(matchQuery);
-    
+
     // Get total revenue (excluding cancelled orders)
     const revenueResult = await Order.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           ...matchQuery,
-          status: { $ne: 'cancelled' } 
-        } 
+          status: { $ne: 'cancelled' }
+        }
       },
-      { 
-        $group: { 
-          _id: null, 
-          total: { $sum: '$totalAmount' } 
-        } 
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalAmount' }
+        }
       }
     ]);
-    
+
     // Get pending orders count
-    const pendingOrders = await Order.countDocuments({ 
-      ...matchQuery, 
-      status: 'pending' 
+    const pendingOrders = await Order.countDocuments({
+      ...matchQuery,
+      status: 'pending'
     });
-    
+
     res.json({
       success: true,
       stats: {
@@ -1007,15 +1007,15 @@ export const getAdminOrderStats = async (req, res) => {
 export const updateAdminOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { 
-      status, 
-      trackingNumber, 
-      notes, 
-      adminNotes, 
+    const {
+      status,
+      trackingNumber,
+      notes,
+      adminNotes,
       priority,
       paymentStatus
     } = req.body;
-    
+
     const updateData = {};
     if (status) updateData.status = status;
     if (trackingNumber) updateData.trackingNumber = trackingNumber;
@@ -1023,20 +1023,20 @@ export const updateAdminOrder = async (req, res) => {
     if (adminNotes) updateData.adminNotes = adminNotes;
     if (priority) updateData.priority = priority;
     if (paymentStatus) updateData.paymentStatus = paymentStatus;
-    
+
     const order = await Order.findByIdAndUpdate(
       id,
       updateData,
       { new: true, runValidators: true }
     ).populate('items.product').populate('customer.userId', 'name email');
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: 'Order updated successfully',
@@ -1054,16 +1054,16 @@ export const updateAdminOrder = async (req, res) => {
 export const deleteAdminOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const order = await Order.findByIdAndDelete(id);
-    
+
     if (!order) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: 'Order deleted successfully'
@@ -1080,19 +1080,19 @@ export const deleteAdminOrder = async (req, res) => {
 export const bulkUpdateOrders = async (req, res) => {
   try {
     const { orderIds, updateData } = req.body;
-    
+
     if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Order IDs are required'
       });
     }
-    
+
     const result = await Order.updateMany(
       { _id: { $in: orderIds } },
       updateData
     );
-    
+
     res.json({
       success: true,
       message: `${result.modifiedCount} orders updated successfully`,
@@ -1102,6 +1102,51 @@ export const bulkUpdateOrders = async (req, res) => {
     res.status(400).json({
       success: false,
       message: error.message
+    });
+  }
+};
+
+// Upload Payment Slip
+export const uploadSlip = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Update order with slip details
+    order.paymentSlip = {
+      fileName: req.file.filename,
+      fileUrl: `/uploads/payment-slips/${req.file.filename}`,
+      uploadedAt: new Date()
+    };
+    order.paymentMethod = 'slip';
+    order.paymentStatus = 'verification_pending';
+
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Payment slip uploaded successfully',
+      order
+    });
+  } catch (error) {
+    console.error('Error uploading slip:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload payment slip'
     });
   }
 };

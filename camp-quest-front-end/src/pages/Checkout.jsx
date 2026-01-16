@@ -164,8 +164,8 @@ const Checkout = () => {
         // Store order data in session storage for payment page
         sessionStorage.setItem('orderData', JSON.stringify(orderData));
 
-        // Navigate to payment page
-        navigate('/payment');
+        // Navigate to payment method selection page
+        navigate('/payment-method');
       } catch (error) {
         toast.error('Something went wrong. Please try again.');
         console.error('Checkout error:', error);
