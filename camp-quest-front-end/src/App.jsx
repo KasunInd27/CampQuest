@@ -28,6 +28,11 @@ import AboutUs from './pages/About';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import VerifyOTP from './pages/VerifyOTP';
+import RefundPolicy from './pages/RefundPolicy';
+import DeliveryPolicy from './pages/DeliveryPolicy';
+import RentalTerms from './pages/RentalTerms';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 function App() {
   return (
     <Layout>
@@ -46,6 +51,11 @@ function App() {
         <Route path='/about' element={<AboutUs />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="verify-otp" element={<VerifyOTP />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
+        <Route path="/delivery-policy" element={<DeliveryPolicy />} />
+        <Route path="/rental-terms" element={<RentalTerms />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="reset-password" element={<ResetPassword />} />
 
         <Route

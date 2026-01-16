@@ -46,23 +46,23 @@ const Rent = () => {
 
   const exportToPDF = () => {
     const doc = new jsPDF();
-    
+
     // Add title
     doc.setFontSize(20);
     doc.setTextColor(132, 204, 22); // lime-500
     doc.text('Rental Equipment Catalog', 14, 22);
-    
+
     // Add generated date
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
-    
+
     // Add summary
     doc.setFontSize(12);
     doc.setTextColor(0);
     doc.text(`Total Products: ${filteredProducts.length}`, 14, 38);
     doc.text(`Available: ${filteredProducts.filter(p => p.availabilityStatus === 'available').length}`, 14, 44);
-    
+
     // Prepare table data
     const tableData = filteredProducts.map(product => [
       product.name,
@@ -73,17 +73,17 @@ const Rent = () => {
       product.condition,
       product.availabilityStatus
     ]);
-    
+
     // Add table using autoTable
     autoTable(doc, {
       head: [['Product', 'Category', 'Daily', 'Weekly', 'Available', 'Condition', 'Status']],
       body: tableData,
       startY: 50,
-      styles: { 
+      styles: {
         fontSize: 8,
         cellPadding: 2
       },
-      headStyles: { 
+      headStyles: {
         fillColor: [132, 204, 22],
         textColor: [0, 0, 0],
         fontStyle: 'bold'
@@ -92,7 +92,7 @@ const Rent = () => {
         fillColor: [245, 245, 245]
       }
     });
-    
+
     // Add footer
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -106,7 +106,7 @@ const Rent = () => {
         { align: 'center' }
       );
     }
-    
+
     // Save the PDF
     doc.save(`rental-catalog-${new Date().toISOString().split('T')[0]}.pdf`);
     toast.success('PDF exported successfully');
@@ -177,8 +177,8 @@ const Rent = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <RentalProductCard 
-              key={product._id} 
+            <RentalProductCard
+              key={product._id}
               product={product}
             />
           ))}
@@ -209,15 +209,15 @@ const RentalProductCard = ({ product }) => {
 
     try {
       // Add to cart
-      await addToCart(product, 'rental', rentalDays);
-      
+      addToCart(product, 'rental', rentalDays);
+
       // Update product quantity
       await axios.put(`/rental-products/${product._id}/quantity`, {
         quantity: 1
       });
-      
+
       toast.success('Item added to cart');
-      
+
       // Refresh the page or update the product list
       window.location.reload();
     } catch (error) {
@@ -248,13 +248,12 @@ const RentalProductCard = ({ product }) => {
             <Package className="w-16 h-16 text-neutral-600" />
           </div>
         )}
-        <span className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold ${
-          product.availabilityStatus === 'available' && product.availableQuantity > 0
-            ? 'bg-lime-500 text-neutral-900' 
-            : 'bg-red-500 text-white'
-        }`}>
+        <span className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold ${product.availabilityStatus === 'available' && product.availableQuantity > 0
+          ? 'bg-lime-500 text-neutral-900'
+          : 'bg-red-500 text-white'
+          }`}>
           {product.availabilityStatus === 'available' && product.availableQuantity > 0
-            ? `${product.availableQuantity} Available` 
+            ? `${product.availableQuantity} Available`
             : 'Unavailable'}
         </span>
       </div>
@@ -263,14 +262,14 @@ const RentalProductCard = ({ product }) => {
       <div className="p-4">
         <h3 className="font-semibold text-white mb-2 line-clamp-1">{product.name}</h3>
         <p className="text-neutral-400 text-sm mb-3 line-clamp-2">{product.description}</p>
-        
+
         {/* Rating */}
         <div className="flex items-center mb-3">
           {[...Array(5)].map((_, i) => (
-            <Star 
-              key={i} 
-              size={14} 
-              className={i < 4 ? 'text-yellow-400 fill-current' : 'text-neutral-600'} 
+            <Star
+              key={i}
+              size={14}
+              className={i < 4 ? 'text-yellow-400 fill-current' : 'text-neutral-600'}
             />
           ))}
           <span className="text-neutral-400 text-xs ml-2">(4.0)</span>
@@ -308,11 +307,10 @@ const RentalProductCard = ({ product }) => {
         <button
           onClick={handleRent}
           disabled={product.availabilityStatus !== 'available' || product.availableQuantity < 1}
-          className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors ${
-            product.availabilityStatus !== 'available' || product.availableQuantity < 1
-              ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
-              : 'bg-lime-500 text-neutral-900 hover:bg-lime-400'
-          }`}
+          className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors ${product.availabilityStatus !== 'available' || product.availableQuantity < 1
+            ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
+            : 'bg-lime-500 text-neutral-900 hover:bg-lime-400'
+            }`}
         >
           <Calendar size={16} />
           Rent Now

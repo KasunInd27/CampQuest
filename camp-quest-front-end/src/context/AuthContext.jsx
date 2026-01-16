@@ -25,6 +25,10 @@ export const AuthProvider = ({ children }) => {
 
   // 🔁 Check auth on app load
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
     checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -32,14 +36,24 @@ export const AuthProvider = ({ children }) => {
   // 🔍 Check current auth session
   const checkAuth = async () => {
     try {
+      // If we have a token in localStorage but not in headers (e.g. reload), set it
+      const token = localStorage.getItem("token");
+      if (token && !axios.defaults.headers.common["Authorization"]) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
+
       const { data } = await axios.get("/auth/me");
       if (data?.success && data?.user) {
         setUser(data.user);
       } else {
         setUser(null);
+        delete axios.defaults.headers.common["Authorization"];
+        localStorage.removeItem("token");
       }
     } catch (error) {
       setUser(null);
+      delete axios.defaults.headers.common["Authorization"];
+      localStorage.removeItem("token");
     } finally {
       setLoading(false);
     }
@@ -60,6 +74,7 @@ export const AuthProvider = ({ children }) => {
         // Optional: save JWT if backend returns it
         if (data.token) {
           localStorage.setItem("token", data.token);
+          axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
         }
 
         toast.success("Login successful!");
@@ -92,6 +107,7 @@ export const AuthProvider = ({ children }) => {
 
         // Save JWT if you use it elsewhere
         localStorage.setItem("token", data.token);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
         toast.success("Signed in with Google!");
         navigate(
@@ -147,6 +163,7 @@ export const AuthProvider = ({ children }) => {
       await axios.post("/auth/logout");
       setUser(null);
       localStorage.removeItem("token");
+      delete axios.defaults.headers.common["Authorization"];
 
       toast.success("Logged out successfully");
       navigate("/");

@@ -92,7 +92,7 @@ export const CartProvider = ({ children }) => {
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
-      const itemPrice = item.type === 'sale' 
+      const itemPrice = item.type === 'sale'
         ? item.price * item.quantity
         : item.price * item.rentalDays * item.quantity;
       return total + itemPrice;

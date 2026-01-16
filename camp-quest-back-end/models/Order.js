@@ -145,7 +145,7 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Generate order number before saving
-orderSchema.pre('save', async function(next) {
+orderSchema.pre('save', async function (next) {
   if (!this.orderNumber) {
     const count = await this.constructor.countDocuments();
     this.orderNumber = `ORD${Date.now()}${count + 1}`;
@@ -154,7 +154,7 @@ orderSchema.pre('save', async function(next) {
 });
 
 // Calculate tax before saving
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
   if (!this.tax) {
     this.tax = this.totalAmount * 0.08; // 8% tax
   }
@@ -162,26 +162,26 @@ orderSchema.pre('save', function(next) {
 });
 
 // Virtual for determining if order is rental
-orderSchema.virtual('isRental').get(function() {
+orderSchema.virtual('isRental').get(function () {
   return this.orderType === 'rental';
 });
 
 // Virtual for determining if order is sales
-orderSchema.virtual('isSales').get(function() {
+orderSchema.virtual('isSales').get(function () {
   return this.orderType === 'sales';
 });
 
 // Virtual for checking if order can be edited (within 24 hours and pending/processing)
-orderSchema.virtual('canBeEdited').get(function() {
+orderSchema.virtual('canBeEdited').get(function () {
   const orderTime = new Date(this.createdAt);
   const currentTime = new Date();
   const hoursDifference = (currentTime - orderTime) / (1000 * 60 * 60);
-  
+
   return hoursDifference <= 24 && ['pending', 'processing'].includes(this.status);
 });
 
 // Virtual for getting rental duration
-orderSchema.virtual('rentalDuration').get(function() {
+orderSchema.virtual('rentalDuration').get(function () {
   if (this.orderType === 'rental' && this.rentalDetails.startDate && this.rentalDetails.endDate) {
     const startDate = new Date(this.rentalDetails.startDate);
     const endDate = new Date(this.rentalDetails.endDate);
@@ -193,7 +193,7 @@ orderSchema.virtual('rentalDuration').get(function() {
 });
 
 // Instance method to check if order is overdue (for rentals)
-orderSchema.methods.isOverdue = function() {
+orderSchema.methods.isOverdue = function () {
   if (this.orderType === 'rental' && this.rentalDetails.endDate) {
     const currentDate = new Date();
     const endDate = new Date(this.rentalDetails.endDate);
@@ -203,7 +203,7 @@ orderSchema.methods.isOverdue = function() {
 };
 
 // Instance method to calculate late fees (for rentals)
-orderSchema.methods.calculateLateFees = function(dailyLateFee = 10) {
+orderSchema.methods.calculateLateFees = function (dailyLateFee = 10) {
   if (this.isOverdue()) {
     const currentDate = new Date();
     const endDate = new Date(this.rentalDetails.endDate);
@@ -214,12 +214,12 @@ orderSchema.methods.calculateLateFees = function(dailyLateFee = 10) {
 };
 
 // Static method to find orders by type
-orderSchema.statics.findByType = function(orderType) {
+orderSchema.statics.findByType = function (orderType) {
   return this.find({ orderType });
 };
 
 // Static method to find overdue rentals
-orderSchema.statics.findOverdueRentals = function() {
+orderSchema.statics.findOverdueRentals = function () {
   const currentDate = new Date();
   return this.find({
     orderType: 'rental',
@@ -229,9 +229,9 @@ orderSchema.statics.findOverdueRentals = function() {
 };
 
 // Static method to get order statistics
-orderSchema.statics.getStats = async function(orderType = null) {
+orderSchema.statics.getStats = async function (orderType = null) {
   const matchQuery = orderType ? { orderType } : {};
-  
+
   const stats = await this.aggregate([
     { $match: matchQuery },
     {
@@ -250,7 +250,7 @@ orderSchema.statics.getStats = async function(orderType = null) {
       }
     }
   ]);
-  
+
   return stats[0] || {
     totalOrders: 0,
     totalRevenue: 0,
@@ -263,7 +263,6 @@ orderSchema.statics.getStats = async function(orderType = null) {
 orderSchema.index({ orderType: 1, status: 1 });
 orderSchema.index({ 'customer.userId': 1 });
 orderSchema.index({ createdAt: -1 });
-orderSchema.index({ orderNumber: 1 });
 orderSchema.index({ 'rentalDetails.endDate': 1 });
 
 const Order = mongoose.model('Order', orderSchema);
