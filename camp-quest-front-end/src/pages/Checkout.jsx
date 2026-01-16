@@ -96,7 +96,6 @@ const Checkout = () => {
         const orderData = {
           orderType: orderType,
           customer: {
-            userId: user._id,
             name: values.name.trim(),
             email: values.email.trim(),
             phone: values.phone.trim()

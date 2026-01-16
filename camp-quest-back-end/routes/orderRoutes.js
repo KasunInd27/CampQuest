@@ -21,6 +21,7 @@ import {
 
 import multer from 'multer';
 import path from 'path';
+import { protect, adminOnly } from '../middleware/auth-middleware.js';
 
 const router = express.Router();
 
@@ -48,29 +49,31 @@ const upload = multer({
   },
 });
 
-// Public routes (no authentication required)
-router.post('/', createOrder);
-router.post('/:id/upload-slip', upload.single('paymentSlip'), uploadSlip);
+// Public routes (none for creating/viewing orders)
+// router.post('/:id/upload-slip', upload.single('paymentSlip'), uploadSlip); // Keep this public as it's called after redirect sometimes
 
-// User routes (no authentication required - using userId from query/body)
-router.get('/user/orders', getUserOrders);
-router.get('/user/orders/stats', getUserOrderStats);
-router.get('/user/orders/:id', getUserOrder);
-router.put('/user/orders/:id/delivery', updateOrderDeliveryDetails);
-router.put('/user/orders/:id/cancel', cancelUserOrder);
+// User routes (Authenticated)
+router.post('/', protect, createOrder);
+router.post('/:id/upload-slip', protect, upload.single('paymentSlip'), uploadSlip);
+router.get('/user/orders', protect, getUserOrders);
+router.get('/user/orders/stats', protect, getUserOrderStats);
+router.get('/user/orders/:id', protect, getUserOrder);
+router.put('/user/orders/:id/delivery', protect, updateOrderDeliveryDetails);
+router.put('/user/orders/:id/cancel', protect, cancelUserOrder);
 
-router.get('/admin/orders', getAdminOrders);
-router.get('/admin/orders/stats', getAdminOrderStats);
-router.put('/admin/orders/bulk-update', bulkUpdateOrders);
-router.get('/admin/orders/:id', getOrder);
-router.put('/admin/orders/:id', updateAdminOrder);
-router.delete('/admin/orders/:id', deleteAdminOrder);
+// Admin routes (Authenticated + Admin Only)
+router.get('/admin/orders', protect, adminOnly, getAdminOrders);
+router.get('/admin/orders/stats', protect, adminOnly, getAdminOrderStats);
+router.put('/admin/orders/bulk-update', protect, adminOnly, bulkUpdateOrders);
+router.get('/admin/orders/:id', protect, adminOnly, getOrder);
+router.put('/admin/orders/:id', protect, adminOnly, updateAdminOrder);
+router.delete('/admin/orders/:id', protect, adminOnly, deleteAdminOrder);
 
-// Admin routes (no authentication required)
-router.get('/', getOrders);
-router.get('/stats', getOrderStats);
-router.get('/:id', getOrder);
-router.put('/:id/status', updateOrderStatus);
-router.put('/:id/cancel', cancelOrder);
+// General Admin/Base routes
+router.get('/', protect, adminOnly, getOrders);
+router.get('/stats', protect, adminOnly, getOrderStats);
+router.get('/:id', protect, adminOnly, getOrder);
+router.put('/:id/status', protect, adminOnly, updateOrderStatus);
+router.put('/:id/cancel', protect, adminOnly, cancelOrder);
 
 export default router;

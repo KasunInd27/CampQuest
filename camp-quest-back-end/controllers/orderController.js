@@ -140,8 +140,6 @@ export const createOrder = async (req, res) => {
   session.startTransaction();
 
   try {
-    console.log('Received order data:', req.body);
-
     const orderData = req.body;
 
     // Validate required fields
@@ -154,13 +152,21 @@ export const createOrder = async (req, res) => {
     }
 
     // Ensure customer has userId - this is crucial!
-    if (!orderData.customer.userId) {
+    const userId = req.user?._id || orderData.customer?.userId;
+
+    if (!userId) {
       await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: 'Customer user ID is required'
       });
     }
+
+    // Update orderData with the resolved userId
+    orderData.customer = {
+      ...orderData.customer,
+      userId: userId
+    };
 
     // Validate stock availability before creating order
     for (const item of orderData.items) {
@@ -313,7 +319,8 @@ export const cancelUserOrder = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const { cancelReason, userId } = req.body;
+    const { cancelReason } = req.body;
+    const userId = req.user._id;
 
     if (!userId) {
       await session.abortTransaction();
@@ -434,19 +441,11 @@ export const cancelOrder = async (req, res) => {
   }
 };
 
-// Get user's orders (using userId from query params)
+// Get user's orders (using authenticated user ID)
 export const getUserOrders = async (req, res) => {
   try {
-    const { userId, page = 1, limit = 10, status } = req.query;
-
-    console.log('getUserOrders called with userId:', userId);
-
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'User ID is required'
-      });
-    }
+    const { page = 1, limit = 10, status } = req.query;
+    const userId = req.user._id;
 
     // Validate userId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -478,8 +477,6 @@ export const getUserOrders = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    console.log('Found orders:', orders.length);
-
     const total = await Order.countDocuments(query);
 
     res.json({
@@ -498,10 +495,10 @@ export const getUserOrders = async (req, res) => {
   }
 };
 
-// Get order statistics for user (using userId from query params)
+// Get order statistics for user (using authenticated user ID)
 export const getUserOrderStats = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.user._id;
 
     if (!userId) {
       return res.status(400).json({
@@ -595,7 +592,7 @@ export const getUserOrderStats = async (req, res) => {
 export const getUserOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId } = req.query;
+    const userId = req.user._id;
 
     if (!userId) {
       return res.status(400).json({
@@ -646,7 +643,8 @@ export const getUserOrder = async (req, res) => {
 export const updateOrderDeliveryDetails = async (req, res) => {
   try {
     const { id } = req.params;
-    const { deliveryAddress, customer, userId } = req.body;
+    const { deliveryAddress, customer } = req.body;
+    const userId = req.user._id;
 
     if (!userId) {
       return res.status(400).json({
@@ -898,8 +896,6 @@ export const getAdminOrders = async (req, res) => {
       ];
     }
 
-    console.log('Admin Orders Query:', JSON.stringify(query, null, 2));
-
     const orders = await Order.find(query)
       .populate('items.product')
       .populate('customer.userId', 'name email')
@@ -1118,11 +1114,18 @@ export const uploadSlip = async (req, res) => {
       });
     }
 
-    const order = await Order.findById(id);
+    const order = await Order.findOne({
+      _id: id,
+      $or: [
+        { 'customer.userId': req.user._id },
+        { 'customer.id': req.user._id }
+      ]
+    });
+
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: 'Order not found'
+        message: 'Order not found or access denied'
       });
     }
 

@@ -19,8 +19,6 @@ const Orders = () => {
   const [orderStats, setOrderStats] = useState(null);
 
   useEffect(() => {
-    console.log('User state:', user); // Debug log
-    console.log('Is authenticated:', isAuthenticated); // Debug log
     if (isAuthenticated && user?._id) {
       fetchOrders();
       fetchOrderStats();
@@ -35,9 +33,7 @@ const Orders = () => {
 
     setLoading(true);
     try {
-      console.log('Fetching orders for user:', user._id); // Debug log
-      const { data } = await axios.get(`/orders/user/orders?userId=${user._id}&status=${statusFilter}`);
-      console.log('Orders response:', data); // Debug log
+      const { data } = await axios.get(`/orders/user/orders?status=${statusFilter}`);
       setOrders(data.orders || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -52,9 +48,7 @@ const Orders = () => {
     if (!user?._id) return;
 
     try {
-      console.log('Fetching order stats for user:', user._id); // Debug log
-      const { data } = await axios.get(`/orders/user/orders/stats?userId=${user._id}`);
-      console.log('Order stats response:', data); // Debug log
+      const { data } = await axios.get(`/orders/user/orders/stats`);
       setOrderStats(data.stats);
     } catch (error) {
       console.error('Error fetching order stats:', error);
@@ -111,7 +105,7 @@ const Orders = () => {
     if (!user?._id) return;
 
     try {
-      const { data } = await axios.get(`/orders/user/orders/${orderId}?userId=${user._id}`);
+      const { data } = await axios.get(`/orders/user/orders/${orderId}`);
       setSelectedOrder(data.order);
       setShowOrderModal(true);
     } catch (error) {
@@ -135,7 +129,6 @@ const Orders = () => {
 
     try {
       const { data } = await axios.put(`/orders/user/orders/${cancellingOrder._id}/cancel`, {
-        userId: user._id,
         cancelReason: cancelReason || 'Cancelled by customer'
       });
 
@@ -302,7 +295,6 @@ const Orders = () => {
       {showEditModal && editingOrder && (
         <EditOrderModal
           order={editingOrder}
-          userId={user._id}
           onClose={() => {
             setShowEditModal(false);
             setEditingOrder(null);
@@ -596,7 +588,7 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor, getStatusIcon }) =>
 };
 
 // Edit Order Modal Component
-const EditOrderModal = ({ order, userId, onClose, onSuccess }) => {
+const EditOrderModal = ({ order, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     customer: {
@@ -628,8 +620,7 @@ const EditOrderModal = ({ order, userId, onClose, onSuccess }) => {
 
     try {
       await axios.put(`/orders/user/orders/${order._id}/delivery`, {
-        ...formData,
-        userId
+        ...formData
       });
       toast.success('Order updated successfully');
       onSuccess();
