@@ -16,6 +16,8 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
 
   const hasRentalItems = cartItems.some(item => item.type === 'rental');
+  const hasSaleItems = cartItems.some(item => item.type === 'sale');
+  const isRentalOnly = hasRentalItems && !hasSaleItems;
 
   // Calculate rental days
   const calculateRentalDays = (startDate, endDate) => {
@@ -63,7 +65,7 @@ const Checkout = () => {
       notes: ''
     },
     validationSchema: checkoutValidationSchema,
-    context: { hasRentalItems },
+    context: { hasRentalItems, hasSaleItems }, // Pass flags to validations
     onSubmit: async (values) => {
       setLoading(true);
 
@@ -71,8 +73,8 @@ const Checkout = () => {
         // Validate form data before sending
         console.log('Form values:', values);
 
-        // Check required fields
-        if (!values.address || !values.city || !values.state || !values.zipCode) {
+        // Check required fields (Delivery info only required for sales)
+        if (hasSaleItems && (!values.address || !values.city || !values.state || !values.zipCode)) {
           toast.error('Please fill in all delivery address fields');
           setLoading(false);
           return;
@@ -82,12 +84,12 @@ const Checkout = () => {
         const rentalDays = hasRentalItems ? calculateRentalDays(values.startDate, values.endDate) : 0;
 
         // Determine order type
-        const orderType = hasRentalItems ? 'rental' : 'sales';
+        const orderType = isRentalOnly ? 'rental' : 'sales';
 
         // Calculate total amount
         const subtotal = calculateCartTotal(values.startDate, values.endDate);
         const tax = 0;
-        const shippingCost = 450;
+        const shippingCost = hasSaleItems ? 450 : 0;
         const totalAmount = subtotal + tax + shippingCost;
 
         // Prepare order data with explicit structure
@@ -99,13 +101,16 @@ const Checkout = () => {
             email: values.email.trim(),
             phone: values.phone.trim()
           },
-          deliveryAddress: {
-            address: values.address.trim(),
-            city: values.city.trim(),
-            state: values.state.trim(),
-            zipCode: values.zipCode.trim(),
-            country: values.country || 'SL'
-          },
+          // Only include delivery address if sales items exist
+          ...(hasSaleItems && {
+            deliveryAddress: {
+              address: values.address.trim(),
+              city: values.city.trim(),
+              state: values.state.trim(),
+              zipCode: values.zipCode.trim(),
+              country: values.country || 'SL'
+            }
+          }),
           items: cartItems.map(item => {
             const baseItem = {
               product: item._id,
@@ -151,8 +156,8 @@ const Checkout = () => {
 
         console.log('Order data being sent:', JSON.stringify(orderData, null, 2));
 
-        // Validate orderData structure before sending
-        if (!orderData.deliveryAddress.address) {
+        // Validate orderData structure before sending (only if sales)
+        if (hasSaleItems && !orderData.deliveryAddress?.address) {
           throw new Error('Address is missing from order data');
         }
 
@@ -179,7 +184,7 @@ const Checkout = () => {
   // Get current cart total based on selected dates
   const currentSubtotal = calculateCartTotal(formik.values.startDate, formik.values.endDate);
   const currentTax = 0; // Tax is 0
-  const currentShipping = 450; // Shipping is LKR 450
+  const currentShipping = hasSaleItems ? 450 : 0;
   const currentTotal = currentSubtotal + currentTax + currentShipping;
 
   return (
@@ -257,96 +262,98 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* Delivery Information */}
-            <div className="bg-neutral-800 rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <MapPin size={20} />
-                Delivery Information
-              </h2>
+            {/* Delivery Information - Show only if not rental only */}
+            {!isRentalOnly && (
+              <div className="bg-neutral-800 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <MapPin size={20} />
+                  Delivery Information
+                </h2>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-1">
-                    Street Address *
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.address && formik.errors.address ? 'border-red-500' : 'border-neutral-600'
-                      }`}
-                    placeholder="123 Main Street"
-                  />
-                  {formik.touched.address && formik.errors.address && (
-                    <p className="mt-1 text-sm text-red-400">{formik.errors.address}</p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-300 mb-1">
-                      City *
+                      Street Address *
                     </label>
                     <input
                       type="text"
-                      name="city"
-                      value={formik.values.city}
+                      name="address"
+                      value={formik.values.address}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.city && formik.errors.city ? 'border-red-500' : 'border-neutral-600'
+                      className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.address && formik.errors.address ? 'border-red-500' : 'border-neutral-600'
                         }`}
-                      placeholder="Enter city"
+                      placeholder="123 Main Street"
                     />
-                    {formik.touched.city && formik.errors.city && (
-                      <p className="mt-1 text-sm text-red-400">{formik.errors.city}</p>
+                    {formik.touched.address && formik.errors.address && (
+                      <p className="mt-1 text-sm text-red-400">{formik.errors.address}</p>
                     )}
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-300 mb-1">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={formik.values.state}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.state && formik.errors.state ? 'border-red-500' : 'border-neutral-600'
-                        }`}
-                      placeholder="Enter state"
-                    />
-                    {formik.touched.state && formik.errors.state && (
-                      <p className="mt-1 text-sm text-red-400">{formik.errors.state}</p>
-                    )}
-                  </div>
-                </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-300 mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formik.values.city}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.city && formik.errors.city ? 'border-red-500' : 'border-neutral-600'
+                          }`}
+                        placeholder="Enter city"
+                      />
+                      {formik.touched.city && formik.errors.city && (
+                        <p className="mt-1 text-sm text-red-400">{formik.errors.city}</p>
+                      )}
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-300 mb-1">
-                      ZIP Code *
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={formik.values.zipCode}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.zipCode && formik.errors.zipCode ? 'border-red-500' : 'border-neutral-600'
-                        }`}
-                      placeholder="12345"
-                    />
-                    {formik.touched.zipCode && formik.errors.zipCode && (
-                      <p className="mt-1 text-sm text-red-400">{formik.errors.zipCode}</p>
-                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-300 mb-1">
+                        State *
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={formik.values.state}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.state && formik.errors.state ? 'border-red-500' : 'border-neutral-600'
+                          }`}
+                        placeholder="Enter state"
+                      />
+                      {formik.touched.state && formik.errors.state && (
+                        <p className="mt-1 text-sm text-red-400">{formik.errors.state}</p>
+                      )}
+                    </div>
                   </div>
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-300 mb-1">
+                        ZIP Code *
+                      </label>
+                      <input
+                        type="text"
+                        name="zipCode"
+                        value={formik.values.zipCode}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.zipCode && formik.errors.zipCode ? 'border-red-500' : 'border-neutral-600'
+                          }`}
+                        placeholder="12345"
+                      />
+                      {formik.touched.zipCode && formik.errors.zipCode && (
+                        <p className="mt-1 text-sm text-red-400">{formik.errors.zipCode}</p>
+                      )}
+                    </div>
+
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Rental Dates (if applicable) */}
             {hasRentalItems && (
@@ -440,11 +447,16 @@ const Checkout = () => {
               {/* Order Type Badge */}
               <div className="mb-4">
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${hasRentalItems
-                    ? 'text-blue-400 bg-blue-400/10'
-                    : 'text-green-400 bg-green-400/10'
+                  ? 'text-blue-400 bg-blue-400/10'
+                  : 'text-green-400 bg-green-400/10'
                   }`}>
                   {hasRentalItems ? 'Rental Order' : 'Sales Order'}
                 </span>
+                {isRentalOnly && (
+                  <p className="mt-2 text-xs text-neutral-300 text-center">
+                    Rental items are not delivered. Please collect from our shop.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-3 mb-6">
@@ -481,10 +493,13 @@ const Checkout = () => {
                   <span className="text-neutral-400">Subtotal</span>
                   <span className="text-white">LKR {currentSubtotal.toFixed(2)}/=</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-400">Delivery Fee</span>
-                  <span className="text-white">LKR {currentShipping.toFixed(2)}/=</span>
-                </div>
+                {/* Hide Delivery Fee if rental only */}
+                {!isRentalOnly && (
+                  <div className="flex justify-between">
+                    <span className="text-neutral-400">Delivery Fee</span>
+                    <span className="text-white">LKR {currentShipping.toFixed(2)}/=</span>
+                  </div>
+                )}
                 <div className="border-t border-neutral-700 pt-2 flex justify-between text-lg font-bold">
                   <span className="text-white">Total</span>
                   <span className="text-lime-500">LKR {currentTotal.toFixed(2)}/=</span>
@@ -525,7 +540,7 @@ const Checkout = () => {
                 <p>✓ Secure SSL Encryption</p>
                 <p>✓ Your information is safe with us</p>
                 <p>✓ {hasRentalItems ? 'Rental' : 'Sales'} Order</p>
-                <p>✓ Delivery Fee: LKR 450/=</p>
+                {!isRentalOnly && <p>✓ Delivery Fee: LKR 450/=</p>}
               </div>
             </div>
           </div>

@@ -29,28 +29,48 @@ export const checkoutValidationSchema = yup.object({
   // Delivery Information
   address: yup
     .string()
-    .required('Street address is required')
-    .min(5, 'Address must be at least 5 characters')
-    .max(200, 'Address must be less than 200 characters'),
+    .when('$hasSaleItems', {
+      is: true,
+      then: (schema) => schema
+        .required('Street address is required')
+        .min(5, 'Address must be at least 5 characters')
+        .max(200, 'Address must be less than 200 characters'),
+      otherwise: (schema) => schema.nullable()
+    }),
 
   city: yup
     .string()
-    .required('City is required')
-    .min(2, 'City must be at least 2 characters')
-    .max(50, 'City must be less than 50 characters')
-    .matches(/^[a-zA-Z\s]+$/, 'City can only contain letters and spaces'),
+    .when('$hasSaleItems', {
+      is: true,
+      then: (schema) => schema
+        .required('City is required')
+        .min(2, 'City must be at least 2 characters')
+        .max(50, 'City must be less than 50 characters')
+        .matches(/^[a-zA-Z\s]+$/, 'City can only contain letters and spaces'),
+      otherwise: (schema) => schema.nullable()
+    }),
 
   state: yup
     .string()
-    .required('State is required')
-    .min(2, 'State must be at least 2 characters')
-    .max(50, 'State must be less than 50 characters')
-    .matches(/^[a-zA-Z\s]+$/, 'State can only contain letters and spaces'),
+    .when('$hasSaleItems', {
+      is: true,
+      then: (schema) => schema
+        .required('State is required')
+        .min(2, 'State must be at least 2 characters')
+        .max(50, 'State must be less than 50 characters')
+        .matches(/^[a-zA-Z\s]+$/, 'State can only contain letters and spaces'),
+      otherwise: (schema) => schema.nullable()
+    }),
 
   zipCode: yup
     .string()
-    .required('ZIP code is required')
-    .matches(/^[0-9]{5}(-[0-9]{4})?$/, 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)'),
+    .when('$hasSaleItems', {
+      is: true,
+      then: (schema) => schema
+        .required('ZIP code is required')
+        .matches(/^[0-9]{5}(-[0-9]{4})?$/, 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)'),
+      otherwise: (schema) => schema.nullable()
+    }),
 
   country: yup
     .string()
@@ -77,14 +97,14 @@ export const checkoutValidationSchema = yup.object({
       then: (schema) => schema
         .required('End date is required for rental orders')
         .min(yup.ref('startDate'), 'End date must be after start date')
-        .test('min-rental-period', 'Minimum rental period is 1 day', function(value) {
+        .test('min-rental-period', 'Minimum rental period is 1 day', function (value) {
           const { startDate } = this.parent;
           if (!startDate || !value) return true;
           const diffTime = new Date(value) - new Date(startDate);
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           return diffDays >= 1;
         })
-        .test('max-rental-period', 'Maximum rental period is 365 days', function(value) {
+        .test('max-rental-period', 'Maximum rental period is 365 days', function (value) {
           const { startDate } = this.parent;
           if (!startDate || !value) return true;
           const diffTime = new Date(value) - new Date(startDate);
