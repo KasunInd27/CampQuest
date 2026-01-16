@@ -211,17 +211,15 @@ const RentalProductCard = ({ product }) => {
       // Add to cart
       addToCart(product, 'rental', rentalDays);
 
-      // Update product quantity
-      await axios.put(`/rental-products/${product._id}/quantity`, {
-        quantity: 1
-      });
+      // toast success message is handled in addToCart but adding one here just in case or we can rely on context
+      // actually context already toasts. Double toast? 
+      // Context says: toast.success('Added to cart');
+      // So I don't need another toast here. But if I want to be safe and match expectation:
+      // The context already toasts. I'll just return. 
+      // usage: addToCart(product, 'rental', rentalDays); is synchronous in new context.
 
-      toast.success('Item added to cart');
-
-      // Refresh the page or update the product list
-      window.location.reload();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add item to cart');
+      toast.error('Failed to add item to cart');
     }
   };
 
