@@ -1,6 +1,7 @@
 // context/CartContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -15,19 +16,29 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { user } = useAuth();
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage when user changes
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    if (user && user._id) {
+      const savedCart = localStorage.getItem(`cart_${user._id}`);
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      } else {
+        setCartItems([]);
+      }
+    } else {
+      // Clear cart if no user logged in
+      setCartItems([]);
     }
-  }, []);
+  }, [user]);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (user && user._id) {
+      localStorage.setItem(`cart_${user._id}`, JSON.stringify(cartItems));
+    }
+  }, [cartItems, user]);
 
   const addToCart = (product, type = 'sale', rentalDays = 1) => {
     const existingItem = cartItems.find(
@@ -87,7 +98,9 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
-    localStorage.removeItem('cart');
+    if (user && user._id) {
+      localStorage.removeItem(`cart_${user._id}`);
+    }
   };
 
   const getCartTotal = () => {
