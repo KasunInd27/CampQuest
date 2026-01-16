@@ -6,7 +6,8 @@ import {
   createRentalProduct,
   updateRentalProduct,
   deleteRentalProduct,
-  getRentalProductStats
+  getRentalProductStats,
+  updateProductQuantity
 } from '../controllers/rentalProductController.js';
 
 import { uploadRentalProductImages } from '../middleware/upload.js';
@@ -21,6 +22,7 @@ router.get('/:id', getRentalProduct);
 // Protected routes (Admin only) - Made public for testing
 router.post('/', uploadRentalProductImages.array('images', 10), createRentalProduct);
 router.put('/:id', uploadRentalProductImages.array('images', 10), updateRentalProduct);
+router.put('/:id/quantity', updateProductQuantity);
 router.delete('/:id', deleteRentalProduct);
 
 export default router;

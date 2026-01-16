@@ -21,19 +21,36 @@ const FeedbackList = ({ isAdmin = false }) => {
 
   const fetchFeedback = async () => {
     try {
-      const endpoint = isAdmin ? 'http://localhost:5000/api/feedback' : 'http://localhost:5000/api/feedback/my-feedback';
+      const endpoint = isAdmin ? '/feedback' : '/feedback/my-feedback';
       const params = new URLSearchParams({
         page: currentPage,
         ...filters
       });
-      
+
+      // DIAGNOSTIC LOGGING
+      const token = localStorage.getItem('token');
+      console.log('=== FEEDBACK FETCH DEBUG ===');
+      console.log('BASE_URL:', axios.defaults.baseURL);
+      console.log('TOKEN_PRESENT:', !!token);
+      console.log('AUTH_HEADER:', axios.defaults.headers.common['Authorization']);
+      console.log('IS_ADMIN:', isAdmin);
+      console.log('REQUEST_URL:', `${endpoint}?${params}`);
+
       const response = await axios.get(`${endpoint}?${params}`);
+
+      console.log('FEEDBACK_RESPONSE_STATUS:', response.status);
+      console.log('FEEDBACK_RESPONSE_DATA:', response.data);
+
       if (response.data.success) {
         setFeedback(response.data.feedback);
         setTotalPages(response.data.totalPages);
       }
     } catch (error) {
-      toast.error('Failed to fetch feedback');
+      console.error('=== FEEDBACK FETCH ERROR ===');
+      console.error('Failed to fetch feedback:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      toast.error(error.response?.data?.message || 'Failed to fetch feedback');
     } finally {
       setLoading(false);
     }
@@ -41,9 +58,9 @@ const FeedbackList = ({ isAdmin = false }) => {
 
   const deleteFeedback = async (feedbackId) => {
     if (!window.confirm('Are you sure you want to delete this feedback?')) return;
-    
+
     try {
-      const endpoint = isAdmin ? `http://localhost:5000/api/feedback/admin/${feedbackId}` : `http://localhost:5000/api/feedback/${feedbackId}`;
+      const endpoint = isAdmin ? `/feedback/admin/${feedbackId}` : `/feedback/${feedbackId}`;
       const response = await axios.delete(endpoint);
       if (response.data.success) {
         toast.success('Feedback deleted successfully');
@@ -166,11 +183,10 @@ const FeedbackList = ({ isAdmin = false }) => {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-3 py-1 rounded-md ${
-                page === currentPage
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+              className={`px-3 py-1 rounded-md ${page === currentPage
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
             >
               {page}
             </button>
@@ -192,7 +208,7 @@ const FeedbackCard = ({ feedback, isAdmin, onEdit, onDelete, getRatingStars, get
               {feedback.category.replace('-', ' ').toUpperCase()}
             </span>
           </div>
-          
+
           <div className="flex items-center space-x-4 mb-2">
             <div className="flex items-center">
               <span className={`text-lg ${getRatingColor(feedback.rating)}`}>
@@ -219,7 +235,7 @@ const FeedbackCard = ({ feedback, isAdmin, onEdit, onDelete, getRatingStars, get
             </p>
           )}
         </div>
-        
+
         <div className="flex space-x-2">
           {!isAdmin && (
             <button
@@ -232,7 +248,7 @@ const FeedbackCard = ({ feedback, isAdmin, onEdit, onDelete, getRatingStars, get
               </svg>
             </button>
           )}
-          
+
           <button
             onClick={() => onDelete(feedback._id)}
             className="text-red-600 hover:text-red-800"

@@ -1,16 +1,16 @@
 // pages/AdminUsers.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  Shield, 
-  User, 
-  Mail, 
-  Phone, 
+import {
+  Users,
+  Search,
+  Filter,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Shield,
+  User,
+  Mail,
+  Phone,
   MapPin,
   Calendar,
   Eye,
@@ -47,6 +47,22 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
+
+      // DIAGNOSTIC LOGGING
+      const token = localStorage.getItem('token');
+      console.log('=== USERS FETCH DEBUG ===');
+      console.log('BASE_URL:', axios.defaults.baseURL);
+      console.log('TOKEN_PRESENT:', !!token);
+      console.log('TOKEN_VALUE:', token ? token.substring(0, 20) + '...' : 'NONE');
+      console.log('AUTH_HEADER:', axios.defaults.headers.common['Authorization']);
+      console.log('REQUEST_URL:', '/users');
+      console.log('REQUEST_PARAMS:', {
+        page: currentPage,
+        limit: 12,
+        search: searchTerm,
+        role: roleFilter
+      });
+
       const response = await axios.get('/users', {
         params: {
           page: currentPage,
@@ -56,13 +72,20 @@ const AdminUsers = () => {
         }
       });
 
+      console.log('USERS_RESPONSE_STATUS:', response.status);
+      console.log('USERS_RESPONSE_DATA:', response.data);
+
       if (response.data.success) {
         setUsers(response.data.users);
         setTotalPages(response.data.totalPages);
         setTotalUsers(response.data.totalUsers);
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('=== USERS FETCH ERROR ===');
+      console.error('Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error headers:', error.response?.headers);
       toast.error('Failed to load users');
     } finally {
       setLoading(false);
@@ -197,9 +220,9 @@ const AdminUsers = () => {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
       const now = new Date();
-      const dateStr = now.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
+      const dateStr = now.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
@@ -234,11 +257,11 @@ const AdminUsers = () => {
         statsData.forEach((stat) => {
           doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
           doc.text(stat.label, stat.x, stat.y);
-          
+
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
           doc.text(stat.value, stat.x + 40, stat.y);
-          
+
           doc.setFont('helvetica', 'normal');
         });
 
@@ -303,25 +326,25 @@ const AdminUsers = () => {
         didDrawPage: (data) => {
           // ============ FOOTER ON EACH PAGE ============
           const footerY = pageHeight - 15;
-          
+
           // Footer line
           doc.setDrawColor(200, 200, 200);
           doc.setLineWidth(0.5);
           doc.line(10, footerY - 5, pageWidth - 10, footerY - 5);
-          
+
           // Footer text
           doc.setFontSize(8);
           doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
           doc.setFont('helvetica', 'normal');
-          
+
           // Left: Company name
           doc.text('CampQuest - User Management System', 15, footerY);
-          
+
           // Center: Page number
           const pageNum = doc.internal.getNumberOfPages();
           const pageStr = `Page ${data.pageNumber}${pageNum > 1 ? ' of ' + pageNum : ''}`;
           doc.text(pageStr, pageWidth / 2, footerY, { align: 'center' });
-          
+
           // Right: Total users
           doc.text(`Total: ${allUsers.length} users`, pageWidth - 15, footerY, { align: 'right' });
         },
@@ -337,7 +360,7 @@ const AdminUsers = () => {
 
       // ============ SUMMARY SECTION ============
       const finalY = doc.lastAutoTable.finalY + 15;
-      
+
       if (finalY + 35 < pageHeight - 20) {
         // Summary box
         doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
@@ -350,19 +373,19 @@ const AdminUsers = () => {
 
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        
+
         const adminCount = allUsers.filter(u => u.role === 'admin').length;
         const userCount = allUsers.filter(u => u.role === 'user' || !u.role).length;
-        
+
         doc.text(`• Total users in this report: ${allUsers.length}`, 15, finalY + 18);
-        doc.text(`• Admin users: ${adminCount} (${((adminCount/allUsers.length)*100).toFixed(1)}%)`, 15, finalY + 24);
-        doc.text(`• Regular users: ${userCount} (${((userCount/allUsers.length)*100).toFixed(1)}%)`, 100, finalY + 24);
+        doc.text(`• Admin users: ${adminCount} (${((adminCount / allUsers.length) * 100).toFixed(1)}%)`, 15, finalY + 24);
+        doc.text(`• Regular users: ${userCount} (${((userCount / allUsers.length) * 100).toFixed(1)}%)`, 100, finalY + 24);
       }
 
       // ============ SAVE PDF ============
       const timestamp = now.toISOString().split('T')[0];
       const filename = `CampQuest_Users_Report_${timestamp}.pdf`;
-      
+
       doc.save(filename);
 
       toast.success(`PDF exported successfully! (${allUsers.length} users)`, { id: 'pdf-export' });
@@ -441,11 +464,10 @@ const AdminUsers = () => {
               <button
                 key={role}
                 onClick={() => handleRoleFilter(role)}
-                className={`px-4 py-3 rounded-lg font-medium transition-colors capitalize ${
-                  roleFilter === role
+                className={`px-4 py-3 rounded-lg font-medium transition-colors capitalize ${roleFilter === role
                     ? 'bg-lime-500 text-neutral-900'
                     : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                }`}
+                  }`}
               >
                 {role === 'all' ? 'All Users' : `${role}s`}
               </button>
@@ -460,7 +482,7 @@ const AdminUsers = () => {
             {searchTerm && ` matching "${searchTerm}"`}
             {roleFilter !== 'all' && ` with role "${roleFilter}"`}
           </div>
-          
+
           {users.length > 0 && (
             <button
               onClick={exportToPDF}
@@ -478,7 +500,7 @@ const AdminUsers = () => {
       <div className="bg-neutral-900 rounded-lg border border-neutral-700">
         <div className="p-6">
           <h2 className="text-lg font-semibold text-white mb-4">All Users</h2>
-          
+
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-500"></div>
@@ -515,26 +537,25 @@ const AdminUsers = () => {
                   >
                     Previous
                   </button>
-                  
+
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
                     if (page > totalPages) return null;
-                    
+
                     return (
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                          currentPage === page
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === page
                             ? 'bg-lime-500 text-neutral-900'
                             : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                        }`}
+                          }`}
                       >
                         {page}
                       </button>
                     );
                   })}
-                  
+
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
@@ -609,17 +630,16 @@ const UserCard = ({ user, onViewDetails, onRoleUpdate, onDelete, formatDate }) =
           <div className="min-w-0">
             <h3 className="font-semibold text-white truncate">{user.name || 'Unknown'}</h3>
             <div className="flex items-center space-x-2 mt-1">
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                user.role === 'admin' 
-                  ? 'bg-green-400/20 text-green-400' 
+              <span className={`text-xs px-2 py-1 rounded-full ${user.role === 'admin'
+                  ? 'bg-green-400/20 text-green-400'
                   : 'bg-blue-400/20 text-blue-400'
-              }`}>
+                }`}>
                 {user.role || 'user'}
               </span>
             </div>
           </div>
         </div>
-        
+
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
@@ -627,11 +647,11 @@ const UserCard = ({ user, onViewDetails, onRoleUpdate, onDelete, formatDate }) =
           >
             <MoreVertical className="w-4 h-4" />
           </button>
-          
+
           {showDropdown && (
             <>
-              <div 
-                className="fixed inset-0 z-10" 
+              <div
+                className="fixed inset-0 z-10"
                 onClick={() => setShowDropdown(false)}
               ></div>
               <div className="absolute right-0 top-10 bg-neutral-700 rounded-lg border border-neutral-600 py-2 z-20 min-w-40 shadow-xl">
@@ -677,14 +697,14 @@ const UserCard = ({ user, onViewDetails, onRoleUpdate, onDelete, formatDate }) =
           <Mail className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{user.email || 'No email'}</span>
         </div>
-        
+
         {user.phone && (
           <div className="flex items-center space-x-2 text-sm text-neutral-400">
             <Phone className="w-4 h-4 flex-shrink-0" />
             <span>{user.phone}</span>
           </div>
         )}
-        
+
         <div className="flex items-center space-x-2 text-sm text-neutral-400">
           <Calendar className="w-4 h-4 flex-shrink-0" />
           <span>Joined {formatDate(user.createdAt || new Date())}</span>
@@ -734,11 +754,10 @@ const UserDetailsModal = ({ user, onClose, onRoleUpdate, formatDate }) => {
               <div className="flex-1 min-w-0">
                 <h3 className="text-2xl font-bold text-white truncate">{user.name || 'Unknown User'}</h3>
                 <div className="flex items-center space-x-2 mt-2">
-                  <span className={`text-sm px-3 py-1 rounded-full ${
-                    user.role === 'admin' 
-                      ? 'bg-green-400/20 text-green-400' 
+                  <span className={`text-sm px-3 py-1 rounded-full ${user.role === 'admin'
+                      ? 'bg-green-400/20 text-green-400'
                       : 'bg-blue-400/20 text-blue-400'
-                  }`}>
+                    }`}>
                     {user.role || 'user'}
                   </span>
                   <button
@@ -814,11 +833,11 @@ const DeleteConfirmModal = ({ user, onConfirm, onCancel }) => {
           </div>
           <h3 className="text-lg font-semibold text-white">Delete User</h3>
         </div>
-        
+
         <p className="text-neutral-300 mb-6">
           Are you sure you want to delete <strong className="text-white">{user.name || 'this user'}</strong>? This action cannot be undone and will permanently remove all user data.
         </p>
-        
+
         <div className="flex space-x-3">
           <button
             onClick={onCancel}

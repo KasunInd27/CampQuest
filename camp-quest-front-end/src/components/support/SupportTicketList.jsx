@@ -20,19 +20,36 @@ const SupportTicketList = ({ isAdmin = false }) => {
 
   const fetchTickets = async () => {
     try {
-      const endpoint = isAdmin ? 'http://localhost:5000/api/support-tickets' : 'http://localhost:5000/api/support-tickets/my-tickets';
+      const endpoint = isAdmin ? '/support-tickets' : '/support-tickets/my-tickets';
       const params = new URLSearchParams({
         page: currentPage,
         ...filters
       });
-      
+
+      // DIAGNOSTIC LOGGING
+      const token = localStorage.getItem('token');
+      console.log('=== SUPPORT TICKETS FETCH DEBUG ===');
+      console.log('BASE_URL:', axios.defaults.baseURL);
+      console.log('TOKEN_PRESENT:', !!token);
+      console.log('AUTH_HEADER:', axios.defaults.headers.common['Authorization']);
+      console.log('IS_ADMIN:', isAdmin);
+      console.log('REQUEST_URL:', `${endpoint}?${params}`);
+
       const response = await axios.get(`${endpoint}?${params}`);
+
+      console.log('TICKETS_RESPONSE_STATUS:', response.status);
+      console.log('TICKETS_RESPONSE_DATA:', response.data);
+
       if (response.data.success) {
         setTickets(response.data.tickets);
         setTotalPages(response.data.totalPages);
       }
     } catch (error) {
-      toast.error('Failed to fetch tickets');
+      console.error('=== SUPPORT TICKETS FETCH ERROR ===');
+      console.error('Failed to fetch tickets:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      toast.error(error.response?.data?.message || 'Failed to fetch tickets');
     } finally {
       setLoading(false);
     }
@@ -40,25 +57,26 @@ const SupportTicketList = ({ isAdmin = false }) => {
 
   const updateTicketStatus = async (ticketId, status, adminReply = '') => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/support-tickets/${ticketId}`, {
+      const response = await axios.put(`/support-tickets/${ticketId}`, {
         status,
         adminReply
       });
-      
+
       if (response.data.success) {
         toast.success('Ticket updated successfully');
         fetchTickets();
       }
     } catch (error) {
-      toast.error('Failed to update ticket');
+      console.error('Failed to update ticket:', error);
+      toast.error(error.response?.data?.message || 'Failed to update ticket');
     }
   };
 
   const deleteTicket = async (ticketId) => {
     if (!window.confirm('Are you sure you want to delete this ticket?')) return;
-    
+
     try {
-      const response = await axios.delete(`http://localhost:5000/api/support-tickets/${ticketId}`);
+      const response = await axios.delete(`/support-tickets/${ticketId}`);
       if (response.data.success) {
         toast.success('Ticket deleted successfully');
         fetchTickets();
@@ -70,36 +88,36 @@ const SupportTicketList = ({ isAdmin = false }) => {
 
   const downloadPDF = (ticket) => {
     const doc = new jsPDF();
-    
+
     // Set colors
     const primaryColor = [34, 197, 94]; // green-500
     const darkColor = [51, 65, 85]; // slate-700
     const lightColor = [241, 245, 249]; // slate-100
-    
+
     // Add header background
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, 210, 40, 'F');
-    
+
     // Header text
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont(undefined, 'bold');
     doc.text('Support Ticket', 20, 25);
-    
+
     // Reset text color
     doc.setTextColor(...darkColor);
-    
+
     // Ticket ID box
     doc.setFillColor(...lightColor);
     doc.roundedRect(20, 50, 170, 15, 3, 3, 'F');
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
     doc.text(`Ticket ID: #${ticket._id}`, 25, 60);
-    
+
     // Details section
     doc.setFont(undefined, 'normal');
     doc.setFontSize(11);
-    
+
     const details = [
       { label: 'Subject:', value: ticket.subject },
       { label: 'Category:', value: ticket.category },
@@ -107,7 +125,7 @@ const SupportTicketList = ({ isAdmin = false }) => {
       { label: 'Status:', value: ticket.status },
       { label: 'Created:', value: new Date(ticket.createdAt).toLocaleDateString() }
     ];
-    
+
     let yPos = 80;
     details.forEach(detail => {
       doc.setFont(undefined, 'bold');
@@ -116,19 +134,19 @@ const SupportTicketList = ({ isAdmin = false }) => {
       doc.text(detail.value, 60, yPos);
       yPos += 10;
     });
-    
+
     // Description section
     yPos += 10;
     doc.setFillColor(...lightColor);
     doc.roundedRect(20, yPos - 5, 170, 8, 2, 2, 'F');
     doc.setFont(undefined, 'bold');
     doc.text('Description', 25, yPos);
-    
+
     yPos += 15;
     doc.setFont(undefined, 'normal');
     const splitDescription = doc.splitTextToSize(ticket.description, 160);
     doc.text(splitDescription, 25, yPos);
-    
+
     // Admin reply if exists
     if (ticket.adminReply) {
       yPos += (splitDescription.length * 6) + 15;
@@ -136,173 +154,173 @@ const SupportTicketList = ({ isAdmin = false }) => {
       doc.roundedRect(20, yPos - 5, 170, 8, 2, 2, 'F');
       doc.setFont(undefined, 'bold');
       doc.text('Admin Reply', 25, yPos);
-      
+
       yPos += 15;
       doc.setFont(undefined, 'normal');
       const splitReply = doc.splitTextToSize(ticket.adminReply, 160);
       doc.text(splitReply, 25, yPos);
     }
-    
+
     // Footer
     doc.setFillColor(...primaryColor);
     doc.rect(0, 280, 210, 17, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
     doc.text(`Generated on ${new Date().toLocaleDateString()}`, 105, 290, { align: 'center' });
-    
+
     doc.save(`ticket-${ticket._id}.pdf`);
   };
-const downloadAllPDF = () => {
-  console.log(tickets);
-  const doc = new jsPDF();
-  
-  // Set colors
-  const primaryColor = [34, 197, 94]; // green-500
-  const darkColor = [51, 65, 85]; // slate-700
-  const lightColor = [241, 245, 249]; // slate-100
-  const mediumColor = [226, 232, 240]; // slate-200
-  
-  // Add header background
-  doc.setFillColor(...primaryColor);
-  doc.rect(0, 0, 210, 40, 'F');
-  
-  // Header text
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(24);
-  doc.setFont(undefined, 'bold');
-  doc.text('Support Tickets Report', 20, 25);
-  
-  // Total tickets count
-  doc.setFontSize(14);
-  doc.setFont(undefined, 'normal');
-  doc.text(`Total Tickets: ${tickets.length}`, 20, 35);
-  
-  // Info box
-  doc.setFillColor(...lightColor);
-  doc.roundedRect(20, 50, 170, 20, 3, 3, 'F');
-  doc.setTextColor(...darkColor);
-  doc.setFontSize(11);
-  doc.text(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 25, 60);
-  
-  // Status summary
-  const statusCounts = tickets.reduce((acc, ticket) => {
-    acc[ticket.status] = (acc[ticket.status] || 0) + 1;
-    return acc;
-  }, {});
-  
-  let statusText = 'Status: ';
-  Object.entries(statusCounts).forEach(([status, count], index) => {
-    statusText += `${status} (${count})${index < Object.entries(statusCounts).length - 1 ? ', ' : ''}`;
-  });
-  doc.text(statusText, 25, 67);
-  
-  // Start rendering tickets as cards
-  let yPos = 85;
-  let pageNumber = 1;
-  const pageHeight = 280; // Leave space for footer
-  
-  if (tickets.length === 0) {
-    doc.setFontSize(14);
-    doc.text('No tickets to display', 105, 120, { align: 'center' });
-  } else {
-    tickets.forEach((ticket, index) => {
-      // Check if we need a new page
-      if (yPos + 60 > pageHeight) {
-        // Add footer to current page
-        doc.setFillColor(...primaryColor);
-        doc.rect(0, 280, 210, 17, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(10);
-        doc.text(`Page ${pageNumber} | Total Tickets: ${tickets.length}`, 105, 290, { align: 'center' });
-        
-        // Add new page
-        doc.addPage();
-        pageNumber++;
-        yPos = 20;
-      }
-      
-      // Card background
-      doc.setFillColor(...mediumColor);
-      doc.roundedRect(20, yPos, 170, 50, 3, 3, 'F');
-      
-      // Card content
-      doc.setTextColor(...darkColor);
-      
-      // Ticket ID and Status badge
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text(`#${ticket._id.slice(-6)}`, 25, yPos + 10);
-      
-      // Status badge (simplified)
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      const statusColors = {
-        open: primaryColor,
-        'in-progress': [251, 191, 36], // yellow
-        resolved: primaryColor,
-        closed: darkColor
-      };
-      const statusColor = statusColors[ticket.status] || darkColor;
-      doc.setTextColor(...statusColor);
-      doc.text(ticket.status.toUpperCase(), 170, yPos + 10, { align: 'right' });
-      
-      // Reset color for other text
-      doc.setTextColor(...darkColor);
-      
-      // Subject
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'bold');
-      const truncatedSubject = ticket.subject && ticket.subject.length > 50 
-        ? ticket.subject.substring(0, 50) + '...' 
-        : ticket.subject || 'No subject';
-      doc.text(truncatedSubject, 25, yPos + 20);
-      
-      // Details row
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Category: ${ticket.category || 'N/A'}`, 25, yPos + 30);
-      doc.text(`Priority: ${ticket.priority || 'N/A'}`, 80, yPos + 30);
-      doc.text(`Created: ${ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString() : 'N/A'}`, 130, yPos + 30);
-      
-      // Description preview
-      doc.setFontSize(9);
-      const descriptionPreview = ticket.description && ticket.description.length > 80 
-        ? ticket.description.substring(0, 80) + '...' 
-        : ticket.description || 'No description';
-      const splitDesc = doc.splitTextToSize(descriptionPreview, 160);
-      doc.text(splitDesc[0] || '', 25, yPos + 40);
-      
-      // Admin reply indicator
-      if (ticket.adminReply) {
-        doc.setTextColor(...primaryColor);
-        doc.setFont(undefined, 'italic');
-        doc.text('✓ Has admin reply', 25, yPos + 47);
-      }
-      
-      yPos += 60; // Space between cards
-    });
-  }
-  
-  // Add footer to last page
-  const totalPages = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
+  const downloadAllPDF = () => {
+    console.log(tickets);
+    const doc = new jsPDF();
+
+    // Set colors
+    const primaryColor = [34, 197, 94]; // green-500
+    const darkColor = [51, 65, 85]; // slate-700
+    const lightColor = [241, 245, 249]; // slate-100
+    const mediumColor = [226, 232, 240]; // slate-200
+
+    // Add header background
     doc.setFillColor(...primaryColor);
-    doc.rect(0, 280, 210, 17, 'F');
+    doc.rect(0, 0, 210, 40, 'F');
+
+    // Header text
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text(`Page ${i} of ${totalPages} | Total Tickets: ${tickets.length} | Generated on ${new Date().toLocaleDateString()}`, 105, 290, { align: 'center' });
-  }
-  
-  // Save the PDF
-  try {
-    doc.save(`support-tickets-report-${new Date().toISOString().split('T')[0]}.pdf`);
-    toast.success('PDF downloaded successfully!');
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    toast.error('Failed to generate PDF. Please try again.');
-  }
-};
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('Support Tickets Report', 20, 25);
+
+    // Total tickets count
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Total Tickets: ${tickets.length}`, 20, 35);
+
+    // Info box
+    doc.setFillColor(...lightColor);
+    doc.roundedRect(20, 50, 170, 20, 3, 3, 'F');
+    doc.setTextColor(...darkColor);
+    doc.setFontSize(11);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 25, 60);
+
+    // Status summary
+    const statusCounts = tickets.reduce((acc, ticket) => {
+      acc[ticket.status] = (acc[ticket.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    let statusText = 'Status: ';
+    Object.entries(statusCounts).forEach(([status, count], index) => {
+      statusText += `${status} (${count})${index < Object.entries(statusCounts).length - 1 ? ', ' : ''}`;
+    });
+    doc.text(statusText, 25, 67);
+
+    // Start rendering tickets as cards
+    let yPos = 85;
+    let pageNumber = 1;
+    const pageHeight = 280; // Leave space for footer
+
+    if (tickets.length === 0) {
+      doc.setFontSize(14);
+      doc.text('No tickets to display', 105, 120, { align: 'center' });
+    } else {
+      tickets.forEach((ticket, index) => {
+        // Check if we need a new page
+        if (yPos + 60 > pageHeight) {
+          // Add footer to current page
+          doc.setFillColor(...primaryColor);
+          doc.rect(0, 280, 210, 17, 'F');
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(10);
+          doc.text(`Page ${pageNumber} | Total Tickets: ${tickets.length}`, 105, 290, { align: 'center' });
+
+          // Add new page
+          doc.addPage();
+          pageNumber++;
+          yPos = 20;
+        }
+
+        // Card background
+        doc.setFillColor(...mediumColor);
+        doc.roundedRect(20, yPos, 170, 50, 3, 3, 'F');
+
+        // Card content
+        doc.setTextColor(...darkColor);
+
+        // Ticket ID and Status badge
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text(`#${ticket._id.slice(-6)}`, 25, yPos + 10);
+
+        // Status badge (simplified)
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        const statusColors = {
+          open: primaryColor,
+          'in-progress': [251, 191, 36], // yellow
+          resolved: primaryColor,
+          closed: darkColor
+        };
+        const statusColor = statusColors[ticket.status] || darkColor;
+        doc.setTextColor(...statusColor);
+        doc.text(ticket.status.toUpperCase(), 170, yPos + 10, { align: 'right' });
+
+        // Reset color for other text
+        doc.setTextColor(...darkColor);
+
+        // Subject
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        const truncatedSubject = ticket.subject && ticket.subject.length > 50
+          ? ticket.subject.substring(0, 50) + '...'
+          : ticket.subject || 'No subject';
+        doc.text(truncatedSubject, 25, yPos + 20);
+
+        // Details row
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Category: ${ticket.category || 'N/A'}`, 25, yPos + 30);
+        doc.text(`Priority: ${ticket.priority || 'N/A'}`, 80, yPos + 30);
+        doc.text(`Created: ${ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString() : 'N/A'}`, 130, yPos + 30);
+
+        // Description preview
+        doc.setFontSize(9);
+        const descriptionPreview = ticket.description && ticket.description.length > 80
+          ? ticket.description.substring(0, 80) + '...'
+          : ticket.description || 'No description';
+        const splitDesc = doc.splitTextToSize(descriptionPreview, 160);
+        doc.text(splitDesc[0] || '', 25, yPos + 40);
+
+        // Admin reply indicator
+        if (ticket.adminReply) {
+          doc.setTextColor(...primaryColor);
+          doc.setFont(undefined, 'italic');
+          doc.text('✓ Has admin reply', 25, yPos + 47);
+        }
+
+        yPos += 60; // Space between cards
+      });
+    }
+
+    // Add footer to last page
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, 280, 210, 17, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.text(`Page ${i} of ${totalPages} | Total Tickets: ${tickets.length} | Generated on ${new Date().toLocaleDateString()}`, 105, 290, { align: 'center' });
+    }
+
+    // Save the PDF
+    try {
+      doc.save(`support-tickets-report-${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('PDF downloaded successfully!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF. Please try again.');
+    }
+  };
 
   const getStatusColor = (status) => {
     const colors = {
@@ -424,11 +442,10 @@ const downloadAllPDF = () => {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                page === currentPage
-                  ? 'bg-green-500 text-white shadow-md'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${page === currentPage
+                ? 'bg-green-500 text-white shadow-md'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
             >
               {page}
             </button>
@@ -511,7 +528,7 @@ const TicketCard = ({ ticket, isAdmin, onStatusUpdate, onDelete, onDownloadPDF }
             </div>
           )}
         </div>
-        
+
         <div className="flex gap-2">
           <button
             onClick={() => onDownloadPDF(ticket)}
@@ -522,7 +539,7 @@ const TicketCard = ({ ticket, isAdmin, onStatusUpdate, onDelete, onDownloadPDF }
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </button>
-          
+
           {isAdmin && (
             <button
               onClick={() => onDelete(ticket._id)}

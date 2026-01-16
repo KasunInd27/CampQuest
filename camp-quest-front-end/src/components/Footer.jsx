@@ -1,14 +1,13 @@
 
 import React from 'react'
+import { Link } from 'react-router-dom';
 import {
-  Facebook,
-  Twitter,
-  Instagram,
   Mail,
   Phone,
   MapPin,
   Send,
-} from 'lucide-react'
+} from 'lucide-react';
+import { FaFacebookF, FaTiktok, FaWhatsapp } from 'react-icons/fa';
 export default function Footer() {
   return (
     <footer className="bg-neutral-900 text-white">
@@ -25,25 +24,31 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="#"
+                href="https://www.facebook.com/share/1LNfqHW9M5/?mibextid=wwXIfr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-[#242424] p-2 rounded-full hover:bg-[#8BE13B] hover:text-[#1A1A1A] transition-colors"
                 aria-label="Facebook"
               >
-                <Facebook size={20} />
+                <FaFacebookF size={20} />
               </a>
               <a
-                href="#"
+                href="https://www.tiktok.com/@camp_quest2.0?_r=1&_t=ZS-933ttDUzD17"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-[#242424] p-2 rounded-full hover:bg-[#8BE13B] hover:text-[#1A1A1A] transition-colors"
-                aria-label="Twitter"
+                aria-label="TikTok"
               >
-                <Twitter size={20} />
+                <FaTiktok size={20} />
               </a>
               <a
-                href="#"
+                href="https://api.whatsapp.com/send?phone=%2B94741245709&fbclid=IwY2xjawPUSTVleHRuA2FlbQIxMABicmlkETFPSjZxbVpzT285azZVY0F2c3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHn5BiFqLHa82zWEbv3B0RFNiadiznTJ_XjCjbrzcItx3_qWhfpzThfhyTmZb_aem_FRyEmuSiRGvEL5nmX_mDpw"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-[#242424] p-2 rounded-full hover:bg-[#8BE13B] hover:text-[#1A1A1A] transition-colors"
-                aria-label="Instagram"
+                aria-label="WhatsApp"
               >
-                <Instagram size={20} />
+                <FaWhatsapp size={20} />
               </a>
             </div>
           </div>
@@ -54,52 +59,44 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Home
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/about"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/rent"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Rental Equipment
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/shop"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Shop
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/blog"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Blog
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-300 hover:text-[#8BE13B] transition-colors"
-                >
-                  Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -110,52 +107,52 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/support"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
-                  FAQ
-                </a>
+                  FAQ & Support
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/delivery-policy"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
-                  Dilivery Policy
-                </a>
+                  Delivery Policy
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/refund-policy"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Return Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/rental-terms"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Rental Terms
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/privacy-policy"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/terms-of-service"
                   className="text-gray-300 hover:text-[#8BE13B] transition-colors"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -184,16 +181,19 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               <li className="flex items-center text-gray-300">
-                <MapPin size={16} className="mr-3 text-[#8BE13B]" />
-                <span>123 Adventure Ave, Outdoor City</span>
+                <MapPin size={16} className="mr-3 text-[#8BE13B] shrink-0" />
+                <span>Katupilagolla, Dodangaslanda</span>
+              </li>
+              <li className="flex items-start text-gray-300">
+                <Phone size={16} className="mr-3 mt-1 text-[#8BE13B] shrink-0" />
+                <div className="flex flex-col">
+                  <a href="tel:0741245709" className="hover:text-[#8BE13B] transition-colors">074 1245 709</a>
+                  <a href="tel:0726558586" className="hover:text-[#8BE13B] transition-colors">072 6558 586</a>
+                </div>
               </li>
               <li className="flex items-center text-gray-300">
-                <Phone size={16} className="mr-3 text-[#8BE13B]" />
-                <span>(555) 123-4567</span>
-              </li>
-              <li className="flex items-center text-gray-300">
-                <Mail size={16} className="mr-3 text-[#8BE13B]" />
-                <span>info@campquest.com</span>
+                <Mail size={16} className="mr-3 text-[#8BE13B] shrink-0" />
+                <a href="mailto:campquest512@gmail.com" className="hover:text-[#8BE13B] transition-colors">campquest512@gmail.com</a>
               </li>
             </ul>
           </div>

@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Trash2, Plus, Minus, Calendar, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -76,13 +76,13 @@ const Cart = () => {
           <div className="lg:col-span-1">
             <div className="bg-neutral-800 rounded-lg p-6 sticky top-4">
               <h2 className="text-xl font-bold text-white mb-4">Order Summary</h2>
-              
+
               <div className="space-y-3 mb-6">
                 {cartItems.map((item) => (
                   <div key={`${item._id}-${item.type}`} className="flex justify-between text-sm">
                     <span className="text-neutral-400 line-clamp-1">{item.name}</span>
                     <span className="text-white">
-                      LKR {item.type === 'sale' 
+                      LKR {item.type === 'sale'
                         ? (item.price * item.quantity).toFixed(2)
                         : (item.price * item.rentalDays * item.quantity).toFixed(2)
                       }/=
@@ -155,11 +155,10 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateRentalDays, onRemove }) => {
         </div>
 
         <div className="flex items-center gap-4 mb-2">
-          <span className={`text-xs px-2 py-1 rounded ${
-            item.type === 'sale' 
-              ? 'bg-blue-500/20 text-blue-400' 
-              : 'bg-green-500/20 text-green-400'
-          }`}>
+          <span className={`text-xs px-2 py-1 rounded ${item.type === 'sale'
+            ? 'bg-blue-500/20 text-blue-400'
+            : 'bg-green-500/20 text-green-400'
+            }`}>
             {item.type === 'sale' ? 'Purchase' : 'Rental'}
           </span>
           <span className="text-neutral-400 text-sm">
@@ -185,25 +184,10 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateRentalDays, onRemove }) => {
             </button>
           </div>
 
-          {/* Rental Days Selector */}
-          {item.type === 'rental' && (
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-neutral-400" />
-              <input
-                type="number"
-                min="1"
-                value={item.rentalDays}
-                onChange={(e) => onUpdateRentalDays(item._id, Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-16 px-2 py-1 bg-neutral-700 border border-neutral-600 rounded text-white text-sm"
-              />
-              <span className="text-neutral-400 text-sm">days</span>
-            </div>
-          )}
-
           {/* Subtotal */}
           <div className="ml-auto">
             <span className="text-lime-500 font-bold">
-              LKR {item.type === 'sale' 
+              LKR {item.type === 'sale'
                 ? (item.price * item.quantity).toFixed(2)
                 : (item.price * item.rentalDays * item.quantity).toFixed(2)
               }/=

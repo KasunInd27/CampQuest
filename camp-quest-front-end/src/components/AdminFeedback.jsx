@@ -11,7 +11,7 @@ const AdminFeedback = () => {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState(null);
   const [exportingPDF, setExportingPDF] = useState(false);
-  
+
   const [filters, setFilters] = useState({
     category: 'all',
     rating: 'all',
@@ -29,7 +29,7 @@ const AdminFeedback = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      
+
       if (filters.category !== 'all') {
         params.append('category', filters.category);
       }
@@ -41,13 +41,28 @@ const AdminFeedback = () => {
       }
       params.append('page', filters.page);
       params.append('limit', filters.limit);
-      
+
+      // Diagnostic logging
+      const token = localStorage.getItem('token');
+      console.log('=== ADMIN FEEDBACK FETCH DEBUG ===');
+      console.log('BASE_URL:', axios.defaults.baseURL);
+      console.log('TOKEN_PRESENT:', !!token);
+      console.log('AUTH_HEADER:', axios.defaults.headers.common['Authorization']);
+      console.log('REQUEST_URL:', `/feedback?${params.toString()}`);
+
       const response = await axios.get(`/feedback?${params.toString()}`);
+
+      console.log('RESPONSE_STATUS:', response.status);
+      console.log('RESPONSE_DATA:', response.data);
+
       if (response.data.success) {
         setFeedback(response.data.feedback);
       }
     } catch (error) {
-      console.error('Error fetching feedback:', error);
+      console.error('=== ADMIN FEEDBACK FETCH ERROR ===');
+      console.error('Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       toast.error('Failed to fetch feedback');
     } finally {
       setLoading(false);
@@ -88,59 +103,59 @@ const AdminFeedback = () => {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
       const pageHeight = doc.internal.pageSize.height;
-      
+
       // Add modern header with gradient effect (simulated with colors)
       doc.setFillColor(139, 195, 74); // Lime color
       doc.rect(0, 0, pageWidth, 40, 'F');
-      
+
       // Add title
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont(undefined, 'bold');
       doc.text('Feedback Report', pageWidth / 2, 20, { align: 'center' });
-      
+
       // Add subtitle with filters
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
       const filterText = `Category: ${filters.category === 'all' ? 'All' : filters.category} | Rating: ${filters.rating === 'all' ? 'All' : filters.rating + ' Stars'}`;
       doc.text(filterText, pageWidth / 2, 30, { align: 'center' });
-      
+
       // Add generation date
       const dateText = `Generated on: ${new Date().toLocaleString()}`;
       doc.text(dateText, pageWidth / 2, 36, { align: 'center' });
-      
+
       // Reset text color
       doc.setTextColor(0, 0, 0);
-      
+
       // Add statistics summary
       let yPosition = 50;
-      
+
       if (stats) {
         doc.setFillColor(245, 245, 245);
         doc.roundedRect(14, yPosition, pageWidth - 28, 35, 3, 3, 'F');
-        
+
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(51, 51, 51);
         doc.text('Summary Statistics', 20, yPosition + 10);
-        
+
         doc.setFontSize(10);
         doc.setFont(undefined, 'normal');
         doc.setTextColor(85, 85, 85);
-        
+
         const col1X = 20;
         const col2X = pageWidth / 2;
-        
+
         doc.text(`Total Feedback: ${stats.totalFeedback}`, col1X, yPosition + 20);
         doc.text(`Average Rating: ${stats.overallRating.toFixed(2)}/5`, col2X, yPosition + 20);
-        
+
         const positiveReviews = stats.ratingBreakdown?.filter(r => r._id >= 4).reduce((sum, r) => sum + r.count, 0) || 0;
         doc.text(`Positive Reviews (4-5): ${positiveReviews}`, col1X, yPosition + 28);
         doc.text(`Categories: ${stats.categoryBreakdown?.length || 0}`, col2X, yPosition + 28);
-        
+
         yPosition += 45;
       }
-      
+
       // Prepare table data
       const tableData = feedback.map((item, index) => [
         index + 1,
@@ -151,7 +166,7 @@ const AdminFeedback = () => {
         new Date(item.createdAt).toLocaleDateString(),
         item.message.substring(0, 50) + (item.message.length > 50 ? '...' : '')
       ]);
-      
+
       // Use autoTable as a function (not as doc.autoTable)
       autoTable(doc, {
         startY: yPosition,
@@ -182,7 +197,7 @@ const AdminFeedback = () => {
           6: { cellWidth: 'auto' }
         },
         margin: { top: 10, left: 14, right: 14 },
-        didDrawPage: function(data) {
+        didDrawPage: function (data) {
           // Footer
           doc.setFontSize(8);
           doc.setTextColor(128, 128, 128);
@@ -194,62 +209,62 @@ const AdminFeedback = () => {
           );
         }
       });
-      
+
       // Add detailed feedback section on new page
       if (feedback.length > 0) {
         doc.addPage();
         yPosition = 20;
-        
+
         doc.setFontSize(16);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(51, 51, 51);
         doc.text('Detailed Feedback', 20, yPosition);
-        
+
         yPosition += 10;
-        
+
         feedback.forEach((item, index) => {
           // Check if we need a new page
           if (yPosition > pageHeight - 60) {
             doc.addPage();
             yPosition = 20;
           }
-          
+
           // Feedback box
           doc.setFillColor(245, 248, 250);
           doc.roundedRect(14, yPosition, pageWidth - 28, 50, 2, 2, 'F');
-          
+
           // Feedback number and subject
           doc.setFontSize(11);
           doc.setFont(undefined, 'bold');
           doc.setTextColor(51, 51, 51);
           doc.text(`${index + 1}. ${item.subject}`, 20, yPosition + 8);
-          
+
           // Category and Rating
           doc.setFontSize(9);
           doc.setFont(undefined, 'normal');
           doc.setTextColor(85, 85, 85);
           doc.text(`Category: ${item.category.toUpperCase()}`, 20, yPosition + 16);
           doc.text(`Rating: ${'*'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)} (${item.rating}/5)`, 80, yPosition + 16);
-          
+
           // User and Date
           const userName = item.isAnonymous ? 'Anonymous' : (item.user?.name || 'N/A');
           doc.text(`By: ${userName}`, 20, yPosition + 23);
           doc.text(`Date: ${new Date(item.createdAt).toLocaleDateString()}`, 80, yPosition + 23);
-          
+
           // Message
           doc.setFontSize(8);
           doc.setTextColor(68, 68, 68);
           const splitMessage = doc.splitTextToSize(item.message, pageWidth - 48);
           doc.text(splitMessage.slice(0, 3), 20, yPosition + 31);
-          
+
           yPosition += 58;
         });
       }
-      
+
       // Save the PDF
       const fileName = `feedback-report-${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
-      
+
       toast.success('PDF exported successfully!');
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -361,15 +376,15 @@ const AdminFeedback = () => {
                       <Cell key={`cell-${index}`} fill={COLORS[entry.rating - 1]} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#262626', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#262626',
                       border: '1px solid #404040',
                       borderRadius: '8px',
                       color: '#fff'
                     }}
                   />
-                  <Legend 
+                  <Legend
                     wrapperStyle={{ color: '#fff' }}
                     formatter={(value, entry) => <span style={{ color: '#d4d4d4' }}>{value}</span>}
                   />
@@ -385,8 +400,8 @@ const AdminFeedback = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <RechartsBarChart data={categoryChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#404040" />
-                  <XAxis 
-                    dataKey="name" 
+                  <XAxis
+                    dataKey="name"
                     stroke="#d4d4d4"
                     angle={-45}
                     textAnchor="end"
@@ -394,9 +409,9 @@ const AdminFeedback = () => {
                     tick={{ fill: '#d4d4d4', fontSize: 12 }}
                   />
                   <YAxis stroke="#d4d4d4" tick={{ fill: '#d4d4d4' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#262626', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#262626',
                       border: '1px solid #404040',
                       borderRadius: '8px',
                       color: '#fff'
@@ -435,7 +450,7 @@ const AdminFeedback = () => {
                 </div>
                 <div className="mt-3">
                   <div className="w-full bg-neutral-700 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-lime-500 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${(cat.averageRating / 5) * 100}%` }}
                     ></div>
@@ -467,7 +482,7 @@ const AdminFeedback = () => {
             <option value="pricing">Pricing</option>
             <option value="suggestion">Suggestion</option>
           </select>
-          
+
           <select
             value={filters.rating}
             onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value, page: 1 }))}
@@ -564,7 +579,7 @@ const FeedbackCard = ({ feedback, onDelete, getRatingStars, getRatingColor }) =>
               {feedback.category.toUpperCase()}
             </span>
           </div>
-          
+
           <div className="flex items-center space-x-4 mb-2">
             <div className="flex items-center">
               <span className={`text-lg ${getRatingColor(feedback.rating)}`}>
@@ -575,9 +590,9 @@ const FeedbackCard = ({ feedback, onDelete, getRatingStars, getRatingColor }) =>
               </span>
             </div>
             <span className="text-sm text-neutral-400">
-              {new Date(feedback.createdAt).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
+              {new Date(feedback.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
@@ -605,7 +620,7 @@ const FeedbackCard = ({ feedback, onDelete, getRatingStars, getRatingColor }) =>
             </p>
           )}
         </div>
-        
+
         <button
           onClick={onDelete}
           className="p-2 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-lg transition-colors"

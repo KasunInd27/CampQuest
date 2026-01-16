@@ -23,11 +23,11 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
       try {
         let response;
         if (existingFeedback) {
-          response = await axios.put(`http://localhost:5000/api/feedback/${existingFeedback._id}`, values);
+          response = await axios.put(`/feedback/${existingFeedback._id}`, values);
         } else {
-          response = await axios.post('http://localhost:5000/api/feedback', values);
+          response = await axios.post('/feedback', values);
         }
-        
+
         if (response.data.success) {
           toast.success(existingFeedback ? 'Feedback updated successfully!' : 'Feedback submitted successfully!');
           if (!existingFeedback) resetForm();
@@ -91,13 +91,13 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
           <div>
             <p className="text-sm font-medium text-green-900">Your feedback matters!</p>
             <p className="text-sm text-green-700 mt-1">
-              We read every submission and use your input to enhance our camping equipment rental service. 
+              We read every submission and use your input to enhance our camping equipment rental service.
               Thank you for helping us serve outdoor enthusiasts better.
             </p>
           </div>
         </div>
       </div>
-      
+
       <form onSubmit={formik.handleSubmit} className="space-y-8">
         {/* Subject */}
         <div>
@@ -111,11 +111,10 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
             value={formik.values.subject}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${
-              formik.touched.subject && formik.errors.subject
+            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.subject && formik.errors.subject
                 ? 'border-red-300 bg-red-50 focus:border-red-500'
                 : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
-            }`}
+              }`}
             placeholder="Brief summary of your feedback (e.g., Great tent quality, Website loading issue)"
           />
           {formik.touched.subject && formik.errors.subject && (
@@ -137,11 +136,10 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
               {categories.map((cat) => (
                 <label
                   key={cat.value}
-                  className={`relative flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
-                    formik.values.category === cat.value
+                  className={`relative flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${formik.values.category === cat.value
                       ? 'border-green-500 bg-green-50'
                       : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -155,18 +153,16 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
                     <span className="text-xl">{cat.icon}</span>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <span className={`font-semibold ${
-                          formik.values.category === cat.value ? 'text-green-900' : 'text-slate-900'
-                        }`}>
+                        <span className={`font-semibold ${formik.values.category === cat.value ? 'text-green-900' : 'text-slate-900'
+                          }`}>
                           {cat.label}
                         </span>
                         {formik.values.category === cat.value && (
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         )}
                       </div>
-                      <span className={`text-sm ${
-                        formik.values.category === cat.value ? 'text-green-700' : 'text-slate-600'
-                      }`}>
+                      <span className={`text-sm ${formik.values.category === cat.value ? 'text-green-700' : 'text-slate-600'
+                        }`}>
                         {cat.desc}
                       </span>
                     </div>
@@ -200,16 +196,15 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
                       className="p-2 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-lg"
                     >
                       <Star
-                        className={`w-8 h-8 ${
-                          star <= (hoveredStar || formik.values.rating)
+                        className={`w-8 h-8 ${star <= (hoveredStar || formik.values.rating)
                             ? 'text-yellow-400 fill-current'
                             : 'text-slate-300'
-                        }`}
+                          }`}
                       />
                     </button>
                   ))}
                 </div>
-                
+
                 {formik.values.rating > 0 && (
                   <div className="text-center">
                     <p className="text-lg font-semibold text-slate-900">
@@ -243,11 +238,10 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
             value={formik.values.message}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 resize-none ${
-              formik.touched.message && formik.errors.message
+            className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 resize-none ${formik.touched.message && formik.errors.message
                 ? 'border-red-300 bg-red-50 focus:border-red-500'
                 : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
-            }`}
+              }`}
             placeholder="Share your detailed feedback about our camping equipment and service:
 
 • Equipment condition and performance
@@ -304,8 +298,8 @@ Your detailed feedback helps us serve outdoor enthusiasts better!"
             className="flex items-center px-8 py-4 bg-green-500 text-white rounded-xl hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-sm hover:shadow-md"
           >
             <Send className="w-5 h-5 mr-2" />
-            {isSubmitting 
-              ? (existingFeedback ? 'Updating Feedback...' : 'Submitting Feedback...') 
+            {isSubmitting
+              ? (existingFeedback ? 'Updating Feedback...' : 'Submitting Feedback...')
               : (existingFeedback ? 'Update Feedback' : 'Submit Feedback')
             }
           </button>
