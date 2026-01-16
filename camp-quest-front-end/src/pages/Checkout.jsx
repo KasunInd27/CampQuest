@@ -54,7 +54,7 @@ const Checkout = () => {
       address: '',
       city: '',
       state: '',
-      zipCode: '',
+      postalCode: '',
       country: 'SL',
 
       // Rental Specific (if applicable)
@@ -74,7 +74,7 @@ const Checkout = () => {
         console.log('Form values:', values);
 
         // Check required fields (Delivery info only required for sales)
-        if (hasSaleItems && (!values.address || !values.city || !values.state || !values.zipCode)) {
+        if (hasSaleItems && (!values.address || !values.city || !values.state || !values.postalCode)) {
           toast.error('Please fill in all delivery address fields');
           setLoading(false);
           return;
@@ -96,7 +96,6 @@ const Checkout = () => {
         const orderData = {
           orderType: orderType,
           customer: {
-            userId: user._id,
             name: values.name.trim(),
             email: values.email.trim(),
             phone: values.phone.trim()
@@ -107,7 +106,8 @@ const Checkout = () => {
               address: values.address.trim(),
               city: values.city.trim(),
               state: values.state.trim(),
-              zipCode: values.zipCode.trim(),
+              state: values.state.trim(),
+              postalCode: values.postalCode.trim(),
               country: values.country || 'SL'
             }
           }),
@@ -164,8 +164,8 @@ const Checkout = () => {
         // Store order data in session storage for payment page
         sessionStorage.setItem('orderData', JSON.stringify(orderData));
 
-        // Navigate to payment page
-        navigate('/payment');
+        // Navigate to payment method selection page
+        navigate('/payment-method');
       } catch (error) {
         toast.error('Something went wrong. Please try again.');
         console.error('Checkout error:', error);
@@ -333,20 +333,20 @@ const Checkout = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-neutral-300 mb-1">
-                        ZIP Code *
+                        Postal Code *
                       </label>
                       <input
                         type="text"
-                        name="zipCode"
-                        value={formik.values.zipCode}
+                        name="postalCode"
+                        value={formik.values.postalCode}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.zipCode && formik.errors.zipCode ? 'border-red-500' : 'border-neutral-600'
+                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.postalCode && formik.errors.postalCode ? 'border-red-500' : 'border-neutral-600'
                           }`}
                         placeholder="12345"
                       />
-                      {formik.touched.zipCode && formik.errors.zipCode && (
-                        <p className="mt-1 text-sm text-red-400">{formik.errors.zipCode}</p>
+                      {formik.touched.postalCode && formik.errors.postalCode && (
+                        <p className="mt-1 text-sm text-red-400">{formik.errors.postalCode}</p>
                       )}
                     </div>
 

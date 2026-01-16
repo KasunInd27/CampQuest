@@ -1,12 +1,12 @@
 // components/admin/SalesOrders.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  ShoppingCart, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Download, 
-  Filter, 
+import {
+  ShoppingCart,
+  Eye,
+  Edit,
+  Trash2,
+  Download,
+  Filter,
   Search,
   DollarSign,
   Clock,
@@ -15,7 +15,8 @@ import {
   X,
   Plus,
   MoreHorizontal,
-  Package
+  Package,
+  FileText
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -33,7 +34,7 @@ const SalesOrders = () => {
   const [editingOrder, setEditingOrder] = useState(null);
   const [stats, setStats] = useState(null);
   const [exportLoading, setExportLoading] = useState(false);
-  
+
   const [filters, setFilters] = useState({
     status: 'all',
     priority: 'all',
@@ -56,7 +57,7 @@ const SalesOrders = () => {
         ...filters,
         orderType: 'sales'
       });
-      
+
       const { data } = await axios.get(`/orders/admin/orders?${params}`);
       setOrders(data.orders);
       console.log(data.orders);
@@ -140,7 +141,7 @@ const SalesOrders = () => {
       // Header with gradient effect (simulated with rectangles)
       doc.setFillColor(10, 10, 10);
       doc.rect(0, 0, pageWidth, 45, 'F');
-      
+
       // Accent line
       doc.setFillColor(132, 204, 22); // Lime color
       doc.rect(0, 42, pageWidth, 3, 'F');
@@ -155,9 +156,9 @@ const SalesOrders = () => {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(200, 200, 200);
-      doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
+      doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
@@ -187,20 +188,20 @@ const SalesOrders = () => {
 
         statsData.forEach((stat, index) => {
           const x = 14 + (boxWidth + 3) * index;
-          
+
           // Box background
           doc.setFillColor(30, 30, 30);
           doc.roundedRect(x, boxY, boxWidth, boxHeight, 2, 2, 'F');
-          
+
           // Accent top border
           doc.setFillColor(...stat.color);
           doc.roundedRect(x, boxY, boxWidth, 2, 2, 2, 'F');
-          
+
           // Text
           doc.setFontSize(8);
           doc.setTextColor(160, 160, 160);
           doc.text(stat.label, x + boxWidth / 2, boxY + 7, { align: 'center' });
-          
+
           doc.setFontSize(14);
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(255, 255, 255);
@@ -258,24 +259,24 @@ const SalesOrders = () => {
           2: { cellWidth: 38 },
           3: { cellWidth: 50 },
           4: { cellWidth: 20, halign: 'center' },
-          5: { 
-            cellWidth: 28, 
+          5: {
+            cellWidth: 28,
             halign: 'center',
             fontStyle: 'bold'
           },
-          6: { 
-            cellWidth: 24, 
+          6: {
+            cellWidth: 24,
             halign: 'center',
             fontStyle: 'bold'
           },
-          7: { 
-            cellWidth: 32, 
+          7: {
+            cellWidth: 32,
             halign: 'right',
             fontStyle: 'bold',
             textColor: [132, 204, 22]
           },
         },
-        didParseCell: function(data) {
+        didParseCell: function (data) {
           // Color code status column
           if (data.column.index === 5 && data.section === 'body') {
             const status = data.cell.raw.toLowerCase();
@@ -295,7 +296,7 @@ const SalesOrders = () => {
               data.cell.styles.textColor = [156, 163, 175];
             }
           }
-          
+
           // Color code priority column
           if (data.column.index === 6 && data.section === 'body') {
             const priority = data.cell.raw.toLowerCase();
@@ -310,16 +311,16 @@ const SalesOrders = () => {
             }
           }
         },
-        didDrawPage: function(data) {
+        didDrawPage: function (data) {
           // Footer
           const footerY = pageHeight - 15;
-          
+
           doc.setFillColor(10, 10, 10);
           doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
-          
+
           doc.setFillColor(132, 204, 22);
           doc.rect(0, pageHeight - 20, pageWidth, 2, 'F');
-          
+
           doc.setFontSize(8);
           doc.setTextColor(160, 160, 160);
           doc.text(
@@ -328,13 +329,13 @@ const SalesOrders = () => {
             footerY,
             { align: 'center' }
           );
-          
+
           doc.text(
             'Confidential - Sales Orders Report',
             14,
             footerY
           );
-          
+
           doc.text(
             `© ${new Date().getFullYear()} Your Company`,
             pageWidth - 14,
@@ -348,7 +349,7 @@ const SalesOrders = () => {
       // Save the PDF
       const fileName = `sales-orders-${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
-      
+
       toast.success('PDF exported successfully');
     } catch (error) {
       console.error('Error exporting PDF:', error);
@@ -397,7 +398,7 @@ const SalesOrders = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filters
           </button>
-          <button 
+          <button
             onClick={handleExportPDF}
             disabled={exportLoading || orders.length === 0}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -464,7 +465,7 @@ const SalesOrders = () => {
                 <option value="returned">Returned</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-neutral-300 mb-2">Priority</label>
               <select
@@ -601,6 +602,9 @@ const SalesOrders = () => {
                   Priority
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                  Payment
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
                   Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
@@ -681,15 +685,15 @@ const SalesOrders = () => {
 };
 
 // Sales Order Table Row Component
-const SalesOrderTableRow = ({ 
-  order, 
-  selected, 
-  onSelect, 
-  onView, 
-  onEdit, 
-  onDelete, 
-  getStatusColor, 
-  getPriorityColor 
+const SalesOrderTableRow = ({
+  order,
+  selected,
+  onSelect,
+  onView,
+  onEdit,
+  onDelete,
+  getStatusColor,
+  getPriorityColor
 }) => {
   return (
     <tr className="hover:bg-neutral-800 transition-colors">
@@ -731,6 +735,21 @@ const SalesOrderTableRow = ({
         </span>
       </td>
       <td className="px-6 py-4">
+        <div className="flex flex-col gap-1">
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium w-fit ${order.paymentStatus === 'completed' ? 'text-green-400 bg-green-400/10' :
+            order.paymentStatus === 'verification_pending' ? 'text-yellow-400 bg-yellow-400/10' :
+              'text-neutral-400 bg-neutral-400/10'
+            }`}>
+            {order.paymentStatus === 'verification_pending' ? 'Verify' : order.paymentStatus}
+          </span>
+          {order.paymentSlip?.fileUrl && (
+            <span className="text-xs text-lime-500 flex items-center gap-1">
+              <FileText size={10} /> Slip Uploaded
+            </span>
+          )}
+        </div>
+      </td>
+      <td className="px-6 py-4">
         <div className="text-sm font-medium text-white">LKR {order.totalAmount.toFixed(2)}/=</div>
       </td>
       <td className="px-6 py-4">
@@ -742,6 +761,17 @@ const SalesOrderTableRow = ({
           >
             <Eye className="w-4 h-4" />
           </button>
+
+          {order.paymentSlip?.fileUrl && (
+            <button
+              onClick={() => window.open(order.paymentSlip.fileUrl.startsWith('http') ? order.paymentSlip.fileUrl : `http://localhost:5000${order.paymentSlip.fileUrl}`, '_blank')}
+              className="p-2 text-neutral-400 hover:text-lime-400 hover:bg-neutral-800 rounded-lg transition-colors"
+              title="View Slip"
+            >
+              <FileText className="w-4 h-4" />
+            </button>
+          )}
+
           <button
             onClick={onEdit}
             className="p-2 text-neutral-400 hover:text-green-400 hover:bg-neutral-800 rounded-lg transition-colors"
@@ -839,11 +869,10 @@ const SalesOrderDetailsModal = ({ order, onClose, getStatusColor, getPriorityCol
             </div>
 
             <h4 className="text-md font-semibold text-white mt-6 mb-3">Delivery Address</h4>
-            <div className="text-white">
-              <p>{order.deliveryAddress.address}</p>
-              <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}</p>
-              <p>{order.deliveryAddress.country}</p>
-            </div>
+            <p className="text-sm text-neutral-400">Address:</p>
+            <p className="text-white">
+              {order.deliveryAddress.address}, {order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.postalCode || order.deliveryAddress.zipCode}, {order.deliveryAddress.country}
+            </p>
           </div>
         </div>
 
@@ -873,20 +902,36 @@ const SalesOrderDetailsModal = ({ order, onClose, getStatusColor, getPriorityCol
         <div className="bg-neutral-800 rounded-lg p-4">
           <h3 className="text-lg font-semibold text-white mb-4">Payment Summary</h3>
           <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-neutral-400">Subtotal</span>
-              <span className="text-white">LKR {(order.totalAmount - order.tax - order.shippingCost).toFixed(2)}/=</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-neutral-400">Delivery</span>
-              <span className="text-white">LKR {order.shippingCost.toFixed(2)}/=</span>
-            </div>
-            <div className="border-t border-neutral-700 pt-2 mt-2">
-              <div className="flex justify-between">
-                <span className="text-lg font-semibold text-white">Total</span>
-                <span className="text-lg font-semibold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+            {order.orderType === 'sales' ? (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Subtotal</span>
+                  <span className="text-white">LKR {(order.totalAmount - order.tax - order.shippingCost).toFixed(2)}/=</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Delivery</span>
+                  <span className="text-white">LKR {order.shippingCost.toFixed(2)}/=</span>
+                </div>
+                <div className="border-t border-neutral-700 pt-2 mt-2">
+                  <div className="flex justify-between">
+                    <span className="text-lg font-semibold text-white">Total</span>
+                    <span className="text-lg font-semibold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center bg-neutral-700/30 p-3 rounded-lg border border-neutral-600/50">
+                  <span className="text-lg font-semibold text-white">Total Amount</span>
+                  <span className="text-xl font-bold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+                </div>
+                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <p className="text-sm text-blue-400 italic">
+                    This is a rental order. Items are collected from the shop. No delivery charges apply.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -928,7 +973,7 @@ const EditSalesOrderModal = ({ order, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       await axios.put(`/orders/admin/orders/${order._id}`, formData);
       toast.success('Order updated successfully');
