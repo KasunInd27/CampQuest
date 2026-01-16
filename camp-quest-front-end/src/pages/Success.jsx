@@ -157,18 +157,31 @@ const Success = () => {
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-      doc.text('DELIVER TO:', pageWidth / 2 + 10, yPos);
 
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-      doc.text(order.deliveryAddress?.address || 'N/A', pageWidth / 2 + 10, yPos + 8);
-      doc.text(
-        `${order.deliveryAddress?.city || ''}, ${order.deliveryAddress?.state || ''} ${order.deliveryAddress?.zipCode || ''}`,
-        pageWidth / 2 + 10,
-        yPos + 14
-      );
-      doc.text(order.deliveryAddress?.country || 'N/A', pageWidth / 2 + 10, yPos + 20);
+      if (order.orderType === 'rental') {
+        doc.text('PICKUP AT:', pageWidth / 2 + 10, yPos);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
+        doc.text('CampQuest Store', pageWidth / 2 + 10, yPos + 8);
+        doc.text('Mathale Road, Katupilagolla', pageWidth / 2 + 10, yPos + 14);
+        doc.text('Dodamgaslanda', pageWidth / 2 + 10, yPos + 20);
+        doc.text('Status: Pickup Required', pageWidth / 2 + 10, yPos + 26);
+      } else {
+        doc.text('DELIVER TO:', pageWidth / 2 + 10, yPos);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
+        doc.text(order.deliveryAddress?.address || 'N/A', pageWidth / 2 + 10, yPos + 8);
+        doc.text(
+          `${order.deliveryAddress?.city || ''}, ${order.deliveryAddress?.state || ''} ${order.deliveryAddress?.postalCode || order.deliveryAddress?.zipCode || ''}`,
+          pageWidth / 2 + 10,
+          yPos + 14
+        );
+        doc.text(order.deliveryAddress?.country || 'N/A', pageWidth / 2 + 10, yPos + 20);
+      }
 
       // ===== ITEMS TABLE =====
       yPos = 155;
@@ -206,7 +219,7 @@ const Success = () => {
         },
         styles: {
           fontSize: 9,
-          cellPadding: 5
+          cellPadding: 3 // Reduced padding to save space
         },
         columnStyles: {
           0: { cellWidth: 15, halign: 'center' },
@@ -222,64 +235,91 @@ const Success = () => {
       });
 
       // ===== TOTALS SECTION =====
-      const finalY = doc.lastAutoTable.finalY + 10;
+      const finalY = doc.lastAutoTable.finalY + 8; // Tightened gap
       const totalsX = pageWidth - 75;
 
-      const subtotal = order.totalAmount || 0;
+      const total = order.totalAmount || 0;
       const deliveryfee = 450;
-      const total = subtotal;
 
-      doc.setFillColor(245, 245, 245);
-      doc.rect(totalsX - 10, finalY, 65, 35, 'F');
+      if (order.orderType === 'rental') {
+        doc.setFillColor(245, 245, 245);
+        doc.rect(totalsX - 10, finalY, 65, 18, 'F'); // Reduced height
 
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-      doc.text('Subtotal:', totalsX, finalY + 8);
-      doc.text(`LKR ${(subtotal - deliveryfee).toFixed(2)}`, pageWidth - 25, finalY + 8, { align: 'right' });
+        doc.setFontSize(11); // Slightly smaller
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text('TOTAL :', totalsX, finalY + 11);
+        doc.text(`LKR ${total.toFixed(2)}`, pageWidth - 25, finalY + 11, { align: 'right' });
 
-      doc.text('Delivery Fee:', totalsX, finalY + 16);
-      doc.text(`LKR ${deliveryfee.toFixed(2)}`, pageWidth - 25, finalY + 16, { align: 'right' });
+        // Add rental note closer to totals
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
+        doc.text('This is a rental order. Items are collected from the shop.', totalsX - 10, finalY + 24);
+        doc.text('No delivery charges apply.', totalsX - 10, finalY + 28);
+      } else {
+        doc.setFillColor(245, 245, 245);
+        doc.rect(totalsX - 10, finalY, 65, 32, 'F'); // Reduced height
 
-      doc.setLineWidth(0.5);
-      doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.line(totalsX, finalY + 22, pageWidth - 20, finalY + 22);
+        doc.setFontSize(9); // Slightly smaller
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+        doc.text('Subtotal:', totalsX, finalY + 7);
+        doc.text(`LKR ${(total - deliveryfee).toFixed(2)}`, pageWidth - 25, finalY + 7, { align: 'right' });
 
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.text('TOTAL:', totalsX, finalY + 30);
-      doc.text(`LKR ${total.toFixed(2)}`, pageWidth - 25, finalY + 30, { align: 'right' });
+        doc.text('Delivery Fee:', totalsX, finalY + 14);
+        doc.text(`LKR ${deliveryfee.toFixed(2)}`, pageWidth - 25, finalY + 14, { align: 'right' });
+
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.line(totalsX, finalY + 19, pageWidth - 20, finalY + 19);
+
+        doc.setFontSize(11); // Slightly smaller
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text('TOTAL:', totalsX, finalY + 26);
+        doc.text(`LKR ${total.toFixed(2)}`, pageWidth - 25, finalY + 26, { align: 'right' });
+      }
 
       // ===== PAYMENT INFO =====
-      const paymentY = finalY + 45;
+      const paymentY = finalY + (order.orderType === 'rental' ? 38 : 42); // Optimized gap
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
       doc.text('Payment Method:', 20, paymentY);
       doc.setFont('helvetica', 'normal');
-      const paymentMethodText = order.paymentMethod === 'card' ? 'Credit/Debit Card' : 'PayPal';
+      const paymentMethodText = order.paymentMethod === 'card' ? 'Credit/Debit Card' : 'Payment Slip';
       doc.text(paymentMethodText, 55, paymentY);
 
       doc.setFont('helvetica', 'bold');
-      doc.text('Transaction ID:', 20, paymentY + 6);
+      doc.text('Transaction ID:', 20, paymentY + 5); // Tighter line height
       doc.setFont('helvetica', 'normal');
-      doc.text(order.paymentDetails?.transactionId || 'N/A', 55, paymentY + 6);
+      doc.text(order.paymentDetails?.transactionId || 'N/A', 55, paymentY + 5);
 
       // ===== NOTES SECTION =====
-      const notesY = paymentY + 20;
-      doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.rect(20, notesY, pageWidth - 40, 25, 'F');
+      let notesY = paymentY + 15; // Tightened gap
 
-      doc.setFontSize(9);
+      // Page-break guard replaced with repositioning guard
+      const footerLimit = pageHeight - 30;
+      if (notesY + 25 > footerLimit) {
+        notesY = footerLimit - 25; // Force upward to fit on single page
+      }
+
+      // Render NOTES heading explicitly
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-      doc.text('NOTES:', 25, notesY + 8);
+      doc.setFontSize(9); // Slightly smaller
+      doc.setTextColor(0, 0, 0);
+      doc.text('NOTES:', 20, notesY);
+
+      // Notes content box
+      doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.rect(20, notesY + 3, pageWidth - 40, 18, 'F'); // Reduced height
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
-      doc.text('Thank you for choosing CampQuest! We hope you have an amazing adventure.', 25, notesY + 14);
-      doc.text('For any queries, please contact us at support@campquest.com or call (555) 123-4567.', 25, notesY + 19);
+      doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+      doc.text('Thank you for choosing CampQuest! We hope you have an amazing adventure.', 25, notesY + 10);
+      doc.text('For any queries, please contact us at campquest512@gmail.com or call 074 1245 709.', 25, notesY + 15);
 
       // ===== FOOTER =====
       doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
@@ -395,9 +435,16 @@ const Success = () => {
 
               <div className="flex justify-between border-b border-neutral-600 pb-2">
                 <span className="text-neutral-400">Total Amount:</span>
-                <span className="text-lime-500 font-bold text-lg">
-                  LKR {order.totalAmount.toFixed(2)}
-                </span>
+                <div className="text-right">
+                  <span className="text-lime-500 font-bold text-lg">
+                    LKR {order.totalAmount.toFixed(2)}
+                  </span>
+                  {order.orderType === 'rental' && (
+                    <p className="text-[10px] text-blue-400 italic mt-1">
+                      * This is a rental order. Items are collected from the shop. No delivery charges apply.
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-between border-b border-neutral-600 pb-2">
@@ -447,23 +494,41 @@ const Success = () => {
               </div>
             </div>
 
-            {/* Delivery Information */}
+            {/* Delivery Information / Pickup Info */}
             <div className="mt-6 pt-6 border-t border-neutral-600">
-              <h3 className="text-white font-semibold mb-3">📍 Delivery Address</h3>
-              {order.deliveryAddress ? (
-                <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm">
-                  <p className="font-semibold text-white">{order.customer.name}</p>
-                  <p className="mt-1">{order.deliveryAddress.address}</p>
-                  <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}</p>
-                  <p>{order.deliveryAddress.country}</p>
-                  <p className="mt-2 text-neutral-400">📞 {order.customer.phone}</p>
-                </div>
+              {order.orderType === 'rental' ? (
+                <>
+                  <h3 className="text-white font-semibold mb-3">🏪 Pickup Required</h3>
+                  <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm border-l-4 border-yellow-500">
+                    <p className="font-semibold text-white mb-1">This is a rental order.</p>
+                    <p className="mb-2">Please collect your items from our shop. Delivery is not available for rentals.</p>
+                    <div className="mt-3 pt-3 border-t border-neutral-700">
+                      <p className="text-neutral-400 text-xs uppercase tracking-wide mb-1">Pickup Location:</p>
+                      <p className="text-white">CampQuest Store</p>
+                      <p>Mathale Road, Katupilagolla</p>
+                      <p>Dodamgaslanda</p>
+                    </div>
+                  </div>
+                </>
               ) : (
-                <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm">
-                  <p className="text-neutral-400 italic">No delivery address provided (Rental / Store Pickup)</p>
-                  <p className="mt-2 font-semibold text-white">{order.customer.name}</p>
-                  <p className="text-neutral-400">📞 {order.customer.phone}</p>
-                </div>
+                <>
+                  <h3 className="text-white font-semibold mb-3">📍 Delivery Address</h3>
+                  {order.deliveryAddress ? (
+                    <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm">
+                      <p className="font-semibold text-white">{order.customer.name}</p>
+                      <p className="mt-1">{order.deliveryAddress.address}</p>
+                      <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.postalCode || order.deliveryAddress.zipCode}</p>
+                      <p>{order.deliveryAddress.country}</p>
+                      <p className="mt-2 text-neutral-400">📞 {order.customer.phone}</p>
+                    </div>
+                  ) : (
+                    <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm">
+                      <p className="text-neutral-400 italic">No delivery address provided</p>
+                      <p className="mt-2 font-semibold text-white">{order.customer.name}</p>
+                      <p className="text-neutral-400">📞 {order.customer.phone}</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

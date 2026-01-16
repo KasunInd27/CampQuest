@@ -44,7 +44,7 @@ const orderSchema = new mongoose.Schema({
       type: String,
       required: function () { return this.orderType === 'sales'; }
     },
-    zipCode: {
+    postalCode: {
       type: String,
       required: function () { return this.orderType === 'sales'; }
     },

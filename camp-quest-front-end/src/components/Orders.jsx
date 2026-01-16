@@ -32,7 +32,7 @@ const Orders = () => {
       console.log('No user ID available');
       return;
     }
-    
+
     setLoading(true);
     try {
       console.log('Fetching orders for user:', user._id); // Debug log
@@ -50,7 +50,7 @@ const Orders = () => {
 
   const fetchOrderStats = async () => {
     if (!user?._id) return;
-    
+
     try {
       console.log('Fetching order stats for user:', user._id); // Debug log
       const { data } = await axios.get(`/orders/user/orders/stats?userId=${user._id}`);
@@ -96,7 +96,10 @@ const Orders = () => {
     const orderTime = new Date(order.createdAt);
     const currentTime = new Date();
     const hoursDifference = (currentTime - orderTime) / (1000 * 60 * 60);
-    
+
+    // Rentals cannot be edited
+    if (order.orderType === 'rental') return false;
+
     return hoursDifference <= 24 && ['pending', 'processing'].includes(order.status);
   };
 
@@ -106,7 +109,7 @@ const Orders = () => {
 
   const handleViewOrder = async (orderId) => {
     if (!user?._id) return;
-    
+
     try {
       const { data } = await axios.get(`/orders/user/orders/${orderId}?userId=${user._id}`);
       setSelectedOrder(data.order);
@@ -176,7 +179,7 @@ const Orders = () => {
         <div className="text-center">
           <Package className="w-16 h-16 text-neutral-600 mx-auto mb-4" />
           <p className="text-white mb-4">Please login to view your orders</p>
-          <button 
+          <button
             onClick={() => window.location.href = '/login'}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -209,7 +212,7 @@ const Orders = () => {
               <Package className="w-8 h-8 text-blue-400" />
             </div>
           </div>
-          
+
           <div className="bg-neutral-900 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -219,7 +222,7 @@ const Orders = () => {
               <CheckCircle className="w-8 h-8 text-lime-500" />
             </div>
           </div>
-          
+
           <div className="bg-neutral-900 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -259,8 +262,8 @@ const Orders = () => {
             <Package className="w-16 h-16 text-neutral-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No Orders Found</h3>
             <p className="text-neutral-400">
-              {statusFilter === 'all' 
-                ? "You haven't placed any orders yet." 
+              {statusFilter === 'all'
+                ? "You haven't placed any orders yet."
                 : `No orders found with status: ${statusFilter}`
               }
             </p>
@@ -365,12 +368,21 @@ const OrderCard = ({ order, onView, onEdit, onCancel, canEdit, canCancel, getSta
             </div>
           </div>
 
-          <div className="flex items-center text-sm text-neutral-400">
-            <MapPin className="w-4 h-4 mr-1" />
-            <span>
-              {order.deliveryAddress?.city}, {order.deliveryAddress?.state}
-            </span>
-          </div>
+          {order.orderType === 'rental' ? (
+            <>
+              <div className="flex items-center text-sm text-yellow-500">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span>Pickup at Shop</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center text-sm text-neutral-400">
+              <MapPin className="w-4 h-4 mr-1" />
+              <span>
+                {order.deliveryAddress?.city}, {order.deliveryAddress?.state}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-3">
@@ -467,19 +479,38 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor, getStatusIcon }) =>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Delivery Address</h3>
-              <div className="space-y-2">
-                <div className="flex items-start">
-                  <MapPin className="w-5 h-5 text-blue-400 mr-2 mt-0.5" />
-                  <div>
-                    <p className="text-white">{order.deliveryAddress.address}</p>
-                    <p className="text-neutral-400">
-                      {order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}
+              {order.orderType === 'rental' ? (
+                <>
+                  <h3 className="text-lg font-semibold text-white mb-4">Pickup Information</h3>
+                  <div className="bg-neutral-800 rounded-lg p-4 border border-yellow-500/30">
+                    <p className="text-yellow-500 font-medium mb-2">Pickup Required</p>
+                    <p className="text-sm text-neutral-300">
+                      Please collect your items from our shop.
                     </p>
-                    <p className="text-neutral-400">{order.deliveryAddress.country}</p>
+                    <div className="mt-3 text-sm text-neutral-400">
+                      <p>CampQuest Store</p>
+                      <p>Mathale Road, Katupilagolla</p>
+                      <p>Dodamgaslanda</p>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-lg font-semibold text-white mb-4">Delivery Address</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-start">
+                      <MapPin className="w-5 h-5 text-blue-400 mr-2 mt-0.5" />
+                      <div>
+                        <p className="text-white">{order.deliveryAddress?.address}</p>
+                        <p className="text-neutral-400">
+                          {order.deliveryAddress?.city}, {order.deliveryAddress?.state} {order.deliveryAddress?.postalCode || order.deliveryAddress?.zipCode}
+                        </p>
+                        <p className="text-neutral-400">{order.deliveryAddress?.country}</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="mt-4 pt-4 border-t border-neutral-700">
                 <h4 className="text-md font-semibold text-white mb-3">Customer Details</h4>
@@ -526,20 +557,36 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor, getStatusIcon }) =>
           <div className="bg-neutral-800 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-white mb-4">Payment Summary</h3>
             <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-neutral-400">Subtotal</span>
-                <span className="text-white">LKR {(order.totalAmount - order.shippingCost).toFixed(2)}/=</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-400">Delivery Fee</span>
-                <span className="text-white">LKR {order.shippingCost.toFixed(2)}/=</span>
-              </div>
-              <div className="border-t border-neutral-700 pt-2 mt-2">
-                <div className="flex justify-between">
-                  <span className="text-lg font-semibold text-white">Total</span>
-                  <span className="text-lg font-semibold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+              {order.orderType === 'sales' ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-400">Subtotal</span>
+                    <span className="text-white">LKR {(order.totalAmount - order.shippingCost).toFixed(2)}/=</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-400">Delivery Fee</span>
+                    <span className="text-white">LKR {order.shippingCost.toFixed(2)}/=</span>
+                  </div>
+                  <div className="border-t border-neutral-700 pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span className="text-lg font-semibold text-white">Total</span>
+                      <span className="text-lg font-semibold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center bg-neutral-700/30 p-3 rounded-lg border border-neutral-600/50">
+                    <span className="text-lg font-semibold text-white">Total Amount</span>
+                    <span className="text-xl font-bold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+                  </div>
+                  <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <p className="text-sm text-blue-400 italic">
+                      This is a rental order. Items are collected from the shop. No delivery charges apply.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -560,7 +607,7 @@ const EditOrderModal = ({ order, userId, onClose, onSuccess }) => {
       address: order.deliveryAddress.address,
       city: order.deliveryAddress.city,
       state: order.deliveryAddress.state,
-      zipCode: order.deliveryAddress.zipCode,
+      postalCode: order.deliveryAddress.postalCode || order.deliveryAddress.zipCode || '',
       country: order.deliveryAddress.country
     }
   });
@@ -578,7 +625,7 @@ const EditOrderModal = ({ order, userId, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       await axios.put(`/orders/user/orders/${order._id}/delivery`, {
         ...formData,
@@ -694,12 +741,12 @@ const EditOrderModal = ({ order, userId, onClose, onSuccess }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-neutral-300 mb-2">
-                    ZIP Code
+                    Postal Code
                   </label>
                   <input
                     type="text"
-                    value={formData.deliveryAddress.zipCode}
-                    onChange={(e) => handleChange('deliveryAddress', 'zipCode', e.target.value)}
+                    value={formData.deliveryAddress.postalCode}
+                    onChange={(e) => handleChange('deliveryAddress', 'postalCode', e.target.value)}
                     className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                     required
                   />
@@ -774,7 +821,7 @@ const CancelOrderModal = ({ order, onClose, onConfirm }) => {
               </div>
             </div>
 
-            
+
 
             <div>
               <label className="block text-sm font-medium text-neutral-300 mb-2">

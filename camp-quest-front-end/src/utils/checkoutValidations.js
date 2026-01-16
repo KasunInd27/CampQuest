@@ -62,13 +62,13 @@ export const checkoutValidationSchema = yup.object({
       otherwise: (schema) => schema.nullable()
     }),
 
-  zipCode: yup
+  postalCode: yup
     .string()
     .when('$hasSaleItems', {
       is: true,
       then: (schema) => schema
-        .required('ZIP code is required')
-        .matches(/^[0-9]{5}(-[0-9]{4})?$/, 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)'),
+        .required('Postal code is required')
+        .matches(/^[0-9]{5}(-[0-9]{4})?$/, 'Please enter a valid Postal code'),
       otherwise: (schema) => schema.nullable()
     }),
 

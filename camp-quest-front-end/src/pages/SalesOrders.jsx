@@ -869,11 +869,10 @@ const SalesOrderDetailsModal = ({ order, onClose, getStatusColor, getPriorityCol
             </div>
 
             <h4 className="text-md font-semibold text-white mt-6 mb-3">Delivery Address</h4>
-            <div className="text-white">
-              <p>{order.deliveryAddress.address}</p>
-              <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.zipCode}</p>
-              <p>{order.deliveryAddress.country}</p>
-            </div>
+            <p className="text-sm text-neutral-400">Address:</p>
+            <p className="text-white">
+              {order.deliveryAddress.address}, {order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.postalCode || order.deliveryAddress.zipCode}, {order.deliveryAddress.country}
+            </p>
           </div>
         </div>
 
@@ -903,20 +902,36 @@ const SalesOrderDetailsModal = ({ order, onClose, getStatusColor, getPriorityCol
         <div className="bg-neutral-800 rounded-lg p-4">
           <h3 className="text-lg font-semibold text-white mb-4">Payment Summary</h3>
           <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-neutral-400">Subtotal</span>
-              <span className="text-white">LKR {(order.totalAmount - order.tax - order.shippingCost).toFixed(2)}/=</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-neutral-400">Delivery</span>
-              <span className="text-white">LKR {order.shippingCost.toFixed(2)}/=</span>
-            </div>
-            <div className="border-t border-neutral-700 pt-2 mt-2">
-              <div className="flex justify-between">
-                <span className="text-lg font-semibold text-white">Total</span>
-                <span className="text-lg font-semibold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+            {order.orderType === 'sales' ? (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Subtotal</span>
+                  <span className="text-white">LKR {(order.totalAmount - order.tax - order.shippingCost).toFixed(2)}/=</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Delivery</span>
+                  <span className="text-white">LKR {order.shippingCost.toFixed(2)}/=</span>
+                </div>
+                <div className="border-t border-neutral-700 pt-2 mt-2">
+                  <div className="flex justify-between">
+                    <span className="text-lg font-semibold text-white">Total</span>
+                    <span className="text-lg font-semibold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center bg-neutral-700/30 p-3 rounded-lg border border-neutral-600/50">
+                  <span className="text-lg font-semibold text-white">Total Amount</span>
+                  <span className="text-xl font-bold text-lime-500">LKR {order.totalAmount.toFixed(2)}/=</span>
+                </div>
+                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <p className="text-sm text-blue-400 italic">
+                    This is a rental order. Items are collected from the shop. No delivery charges apply.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
