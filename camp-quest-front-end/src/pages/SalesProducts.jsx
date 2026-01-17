@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Package, Tag, Upload, X, Eye, Download } from 'lucide-react';
-import axios from '../lib/axios';
+import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import { salesProductValidationSchema } from '../utils/productValidations';
@@ -599,7 +599,7 @@ const SalesProducts = () => {
                       {editingProduct.images.map((image, index) => (
                         <img
                           key={index}
-                          src={`/uploads/sales-products/${image}`}
+                          src={`${BASE_URL}/uploads/sales-products/${image}`}
                           alt={`Product ${index}`}
                           className="w-full h-20 object-cover rounded"
                         />
@@ -658,7 +658,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
         <div className="relative h-48 bg-neutral-800">
           {product.images && product.images.length > 0 ? (
             <img
-              src={`/uploads/sales-products/${product.images[0]}`}
+              src={`${BASE_URL}/uploads/sales-products/${product.images[0]}`}
               alt={product.name}
               className="w-full h-full object-cover rounded-t-lg"
             />
@@ -696,8 +696,8 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
               <h3 className="font-semibold text-white truncate">{product.name}</h3>
             </div>
             <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${product.isActive
-                ? 'bg-lime-500/20 text-lime-500'
-                : 'bg-neutral-700 text-neutral-400'
+              ? 'bg-lime-500/20 text-lime-500'
+              : 'bg-neutral-700 text-neutral-400'
               }`}>
               {product.isActive ? 'Active' : 'Inactive'}
             </span>
@@ -749,7 +749,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
                   {product.images.map((image, index) => (
                     <img
                       key={index}
-                      src={`/uploads/sales-products/${image}`}
+                      src={`${BASE_URL}/uploads/sales-products/${image}`}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-32 object-cover rounded"
                     />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Package, Tag, Upload, X, Eye, Download } from 'lucide-react';
-import axios from '../lib/axios';
+import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import { rentalProductValidationSchema } from '../utils/productValidations';
@@ -494,7 +494,7 @@ const RentalProducts = () => {
                       {editingProduct.images.map((image, index) => (
                         <img
                           key={index}
-                          src={`/uploads/rental-products/${image}`}
+                          src={`${BASE_URL}/uploads/rental-products/${image}`}
                           alt={`Product ${index}`}
                           className="w-full h-20 object-cover rounded"
                         />
@@ -562,7 +562,7 @@ const RentalProductCard = ({ product, onEdit, onDelete }) => {
         <div className="relative h-48 bg-neutral-800">
           {product.images && product.images.length > 0 ? (
             <img
-              src={`/uploads/rental-products/${product.images[0]}`}
+              src={`${BASE_URL}/uploads/rental-products/${product.images[0]}`}
               alt={product.name}
               className="w-full h-full object-cover rounded-t-lg"
             />
@@ -656,7 +656,7 @@ const RentalProductCard = ({ product, onEdit, onDelete }) => {
                   {product.images.map((image, index) => (
                     <img
                       key={index}
-                      src={`/uploads/rental-products/${image}`}
+                      src={`${BASE_URL}/uploads/rental-products/${image}`}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-32 object-cover rounded"
                     />
