@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Calendar, Star, Package, Download } from 'lucide-react';
-import axios from '../lib/axios';
+import axios, { BASE_URL } from '../lib/axios';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
@@ -236,7 +236,7 @@ const RentalProductCard = ({ product }) => {
       <div className="relative h-48 bg-neutral-700 rounded-t-lg overflow-hidden">
         {product.images && product.images.length > 0 && !imageError ? (
           <img
-            src={`/uploads/rental-products/${product.images[0]}`}
+            src={`${BASE_URL}/uploads/rental-products/${product.images[0]}`}
             alt={product.name}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}

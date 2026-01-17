@@ -1,7 +1,7 @@
 // HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from '../lib/axios';
+import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 
 // Hero Component
@@ -199,8 +199,8 @@ function FeaturedProducts() {
             <button
               onClick={() => setActiveTab('rent')}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'rent'
-                  ? 'bg-lime-500 text-gray-900'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-lime-500 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               For Rent
@@ -208,8 +208,8 @@ function FeaturedProducts() {
             <button
               onClick={() => setActiveTab('sale')}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'sale'
-                  ? 'bg-lime-500 text-gray-900'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-lime-500 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               For Sale
@@ -217,8 +217,8 @@ function FeaturedProducts() {
             <button
               onClick={() => setActiveTab('all')}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'all'
-                  ? 'bg-lime-500 text-gray-900'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-lime-500 text-gray-900'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               View All
@@ -239,7 +239,7 @@ function FeaturedProducts() {
                   <div className="relative">
                     <img
                       src={product.images && product.images.length > 0
-                        ? `/uploads/${product.type === 'rental' ? 'rental-products' : 'sales-products'}/${product.images[0]}`
+                        ? `${BASE_URL}/uploads/${product.type === 'rental' ? 'rental-products' : 'sales-products'}/${product.images[0]}`
                         : 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
                       }
                       alt={product.name}
@@ -249,8 +249,8 @@ function FeaturedProducts() {
                       }}
                     />
                     <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded ${product.type === 'rental'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-green-100 text-green-800'
                       }`}>
                       {product.type === 'rental' ? 'RENTAL' : 'FOR SALE'}
                     </span>
@@ -496,7 +496,7 @@ function BlogPreview() {
               <div key={post._id} className="bg-neutral-900 border border-lime-500 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                 <div className="relative">
                   <img
-                    src={`/uploads/blog-images/${post.image}`}
+                    src={`${BASE_URL}/uploads/blog-images/${post.image}`}
                     alt={post.title}
                     className="w-full h-48 object-cover rounded-t-lg"
                     onError={(e) => {

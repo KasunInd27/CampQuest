@@ -1,11 +1,11 @@
 // pages/Shop.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShoppingCart, Star, Package } from 'lucide-react';
-import axios from '../lib/axios';
+import axios, { BASE_URL } from '../lib/axios';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 
-const API_BASE_URL = axios.defaults.baseURL || 'http://localhost:5000';
+// (API_BASE_URL redundant, using BASE_URL directly for images)
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -137,7 +137,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       <div className="relative h-48 bg-neutral-700">
         {product.images && product.images.length > 0 ? (
           <img
-            src={`/uploads/sales-products/${product.images}`}
+            src={`${BASE_URL}/uploads/sales-products/${product.images}`}
             alt={product.name}
             className="w-full h-full object-cover rounded-lg"
             onError={() => setImageError(true)}
@@ -183,8 +183,8 @@ const ProductCard = ({ product, onAddToCart }) => {
             onClick={() => onAddToCart(product)}
             disabled={product.stock === 0}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors ${product.stock === 0
-                ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
-                : 'bg-lime-500 text-neutral-900 hover:bg-lime-500'
+              ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
+              : 'bg-lime-500 text-neutral-900 hover:bg-lime-500'
               }`}
           >
             <ShoppingCart size={16} />

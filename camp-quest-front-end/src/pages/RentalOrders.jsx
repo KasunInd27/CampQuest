@@ -17,7 +17,7 @@ import {
   MoreHorizontal,
   FileText
 } from 'lucide-react';
-import axios from '../lib/axios';
+import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -791,7 +791,7 @@ const OrderTableRow = ({
 
           {order.paymentSlip?.fileUrl && (
             <button
-              onClick={() => window.open(order.paymentSlip.fileUrl.startsWith('http') ? order.paymentSlip.fileUrl : `http://localhost:5000${order.paymentSlip.fileUrl}`, '_blank')}
+              onClick={() => window.open(order.paymentSlip.fileUrl.startsWith('http') ? order.paymentSlip.fileUrl : `${BASE_URL}${order.paymentSlip.fileUrl}`, '_blank')}
               className="p-2 text-neutral-400 hover:text-lime-400 hover:bg-neutral-800 rounded-lg transition-colors"
               title="View Slip"
             >

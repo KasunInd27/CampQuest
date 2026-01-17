@@ -12,7 +12,7 @@ import {
   MessageCircle,
   Send
 } from 'lucide-react';
-import axios from '../lib/axios'; // Import the configured axios
+import axios, { BASE_URL } from '../lib/axios'; // Import the configured axios
 import toast from 'react-hot-toast';
 
 const BlogPosts = () => {
@@ -237,8 +237,8 @@ const BlogPosts = () => {
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === page
-                        ? 'bg-lime-500 text-neutral-900'
-                        : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                      ? 'bg-lime-500 text-neutral-900'
+                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
                       }`}
                   >
                     {page}
@@ -275,7 +275,7 @@ const BlogCard = ({ post, onRead, formatDate, truncateContent, getCategoryColor 
     <div className="bg-neutral-800 rounded-xl border border-neutral-700 hover:border-neutral-600 transition-all duration-300 group overflow-hidden">
       <div className="relative h-48 w-full">
         <img
-          src={`/uploads/blog-images/${post.image}`}
+          src={`${BASE_URL}/uploads/blog-images/${post.image}`}
           alt={post.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
@@ -501,7 +501,7 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
         <div className="overflow-y-auto">
           <div className="relative h-64 md:h-80">
             <img
-              src={`/uploads/blog-images/${post.image}`}
+              src={`${BASE_URL}/uploads/blog-images/${post.image}`}
               alt={post.title}
               className="w-full h-full object-cover"
             />
@@ -539,8 +539,8 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
                       >
                         <Star
                           className={`w-8 h-8 transition-colors ${star <= (hoveredRating || userRating)
-                              ? 'text-yellow-500 fill-yellow-500'
-                              : 'text-neutral-600'
+                            ? 'text-yellow-500 fill-yellow-500'
+                            : 'text-neutral-600'
                             }`}
                         />
                       </button>
@@ -567,8 +567,8 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
                   <button
                     onClick={handleLikeToggle}
                     className={`flex items-center space-x-3 px-6 py-3 rounded-lg transition-all ${liked
-                        ? 'bg-red-500/20 text-red-500 border border-red-500/30 hover:bg-red-500/30'
-                        : 'bg-neutral-800 text-neutral-400 border border-neutral-700 hover:border-red-500/30 hover:text-red-500'
+                      ? 'bg-red-500/20 text-red-500 border border-red-500/30 hover:bg-red-500/30'
+                      : 'bg-neutral-800 text-neutral-400 border border-neutral-700 hover:border-red-500/30 hover:text-red-500'
                       }`}
                   >
                     <Heart className={`w-6 h-6 transition-all ${liked ? 'fill-red-500 scale-110' : ''}`} />

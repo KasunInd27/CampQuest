@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useFormik } from 'formik';
 import { blogPostSchema, blogPostUpdateSchema, blogCategories } from '../utils/blogValidationSchemas';
-import axios from '../lib/axios';
+import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const AdminBlogPosts = () => {
@@ -61,7 +61,7 @@ const AdminBlogPosts = () => {
 
   const openModal = (post = null) => {
     setEditingPost(post);
-    setImagePreview(post ? `/uploads/blog-images/${post.image}` : null);
+    setImagePreview(post ? `${BASE_URL}/uploads/blog-images/${post.image}` : null);
     setShowModal(true);
   };
 
@@ -93,7 +93,7 @@ const AdminBlogPosts = () => {
       };
       reader.readAsDataURL(file);
     } else {
-      setImagePreview(editingPost ? `/uploads/blog-images/${editingPost.image}` : null);
+      setImagePreview(editingPost ? `${BASE_URL}/uploads/blog-images/${editingPost.image}` : null);
     }
   };
 
@@ -314,7 +314,7 @@ const BlogPostCard = ({ post, onEdit, onDelete, onViewDetails, formatDate, getCa
   <div className="flex items-center justify-between p-4 bg-neutral-800 rounded-lg border border-neutral-700 hover:border-neutral-600 transition-colors">
     <div className="flex items-center space-x-4 flex-1">
       <img
-        src={`/uploads/blog-images/${post.image}`}
+        src={`${BASE_URL}/uploads/blog-images/${post.image}`}
         alt={post.title}
         className="w-20 h-20 object-cover rounded-lg"
         onError={(e) => {
@@ -330,8 +330,8 @@ const BlogPostCard = ({ post, onEdit, onDelete, onViewDetails, formatDate, getCa
           <span>•</span>
           <span>{formatDate(post.publishedDate)}</span>
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${post.status === 'published'
-              ? 'bg-lime-500/20 text-lime-500'
-              : 'bg-yellow-400/20 text-yellow-400'
+            ? 'bg-lime-500/20 text-lime-500'
+            : 'bg-yellow-400/20 text-yellow-400'
             }`}>
             {post.status}
           </span>
@@ -426,8 +426,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.title && formik.errors.title
-                      ? 'border-red-500'
-                      : 'border-neutral-600'
+                    ? 'border-red-500'
+                    : 'border-neutral-600'
                     }`}
                   placeholder="Enter blog post title"
                 />
@@ -449,8 +449,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.author && formik.errors.author
-                      ? 'border-red-500'
-                      : 'border-neutral-600'
+                    ? 'border-red-500'
+                    : 'border-neutral-600'
                     }`}
                   placeholder="Enter author name"
                 />
@@ -471,8 +471,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.category && formik.errors.category
-                      ? 'border-red-500'
-                      : 'border-neutral-600'
+                    ? 'border-red-500'
+                    : 'border-neutral-600'
                     }`}
                 >
                   <option value="">Select a category</option>
@@ -500,8 +500,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.publishedDate && formik.errors.publishedDate
-                      ? 'border-red-500'
-                      : 'border-neutral-600'
+                    ? 'border-red-500'
+                    : 'border-neutral-600'
                     }`}
                 />
                 {formik.touched.publishedDate && formik.errors.publishedDate && (
@@ -521,8 +521,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.status && formik.errors.status
-                      ? 'border-red-500'
-                      : 'border-neutral-600'
+                    ? 'border-red-500'
+                    : 'border-neutral-600'
                     }`}
                 >
                   <option value="published">Published</option>
@@ -547,8 +547,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   accept="image/*"
                   onChange={onImageChange}
                   className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-lime-500 file:text-neutral-900 hover:file:bg-lime-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.image && formik.errors.image
-                      ? 'border-red-500'
-                      : 'border-neutral-600'
+                    ? 'border-red-500'
+                    : 'border-neutral-600'
                     }`}
                 />
                 {formik.touched.image && formik.errors.image && (
@@ -581,8 +581,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors resize-none ${formik.touched.content && formik.errors.content
-                    ? 'border-red-500'
-                    : 'border-neutral-600'
+                  ? 'border-red-500'
+                  : 'border-neutral-600'
                   }`}
                 placeholder="Write your blog post content here..."
               />
@@ -696,8 +696,8 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
           <button
             onClick={() => setActiveTab('stats')}
             className={`flex-1 px-6 py-3 font-medium transition-colors ${activeTab === 'stats'
-                ? 'text-lime-500 border-b-2 border-lime-500 bg-neutral-900/50'
-                : 'text-neutral-400 hover:text-white hover:bg-neutral-900/30'
+              ? 'text-lime-500 border-b-2 border-lime-500 bg-neutral-900/50'
+              : 'text-neutral-400 hover:text-white hover:bg-neutral-900/30'
               }`}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -708,8 +708,8 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
           <button
             onClick={() => setActiveTab('comments')}
             className={`flex-1 px-6 py-3 font-medium transition-colors ${activeTab === 'comments'
-                ? 'text-lime-500 border-b-2 border-lime-500 bg-neutral-900/50'
-                : 'text-neutral-400 hover:text-white hover:bg-neutral-900/30'
+              ? 'text-lime-500 border-b-2 border-lime-500 bg-neutral-900/50'
+              : 'text-neutral-400 hover:text-white hover:bg-neutral-900/30'
               }`}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -846,10 +846,10 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
                           <div className="flex items-center space-x-3 mb-1">
                             <h5 className="font-semibold text-white">{comment.name}</h5>
                             <span className={`px-2 py-0.5 rounded-full text-xs ${comment.status === 'approved'
-                                ? 'bg-green-500/20 text-green-500'
-                                : comment.status === 'pending'
-                                  ? 'bg-yellow-500/20 text-yellow-500'
-                                  : 'bg-red-500/20 text-red-500'
+                              ? 'bg-green-500/20 text-green-500'
+                              : comment.status === 'pending'
+                                ? 'bg-yellow-500/20 text-yellow-500'
+                                : 'bg-red-500/20 text-red-500'
                               }`}>
                               {comment.status}
                             </span>

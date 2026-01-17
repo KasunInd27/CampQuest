@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
-const API_BASE_URL = 'http://localhost:5000';
+import { BASE_URL } from '../lib/axios';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -130,7 +130,7 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateRentalDays, onRemove }) => {
       <div className="w-24 h-24 bg-neutral-700 rounded-lg overflow-hidden flex-shrink-0">
         {item.images && item.images.length > 0 ? (
           <img
-            src={imageUrl}
+            src={`${BASE_URL}${imageUrl}`}
             alt={item.name}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}
