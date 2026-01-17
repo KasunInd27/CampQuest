@@ -3,7 +3,7 @@ import React from 'react';
 
 import kasunImg from "../assets/Kasun1.jpeg";
 import shehanImg from "../assets/Shehan.jpeg";
-import thiliniImg from "../assets/thilini.jpeg";
+import thiliniImg from "../assets/Thilini.jpeg";
 import somiruwanImg from "../assets/Somiruwan.jpeg";
 
 
