@@ -106,7 +106,6 @@ const Checkout = () => {
               address: values.address.trim(),
               city: values.city.trim(),
               state: values.state.trim(),
-              state: values.state.trim(),
               postalCode: values.postalCode.trim(),
               country: values.country || 'SL'
             }
