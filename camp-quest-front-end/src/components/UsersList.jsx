@@ -20,7 +20,7 @@ import {
   Download,
   FileText
 } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -465,8 +465,8 @@ const AdminUsers = () => {
                 key={role}
                 onClick={() => handleRoleFilter(role)}
                 className={`px-4 py-3 rounded-lg font-medium transition-colors capitalize ${roleFilter === role
-                    ? 'bg-lime-500 text-neutral-900'
-                    : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                  ? 'bg-lime-500 text-neutral-900'
+                  : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
                   }`}
               >
                 {role === 'all' ? 'All Users' : `${role}s`}
@@ -547,8 +547,8 @@ const AdminUsers = () => {
                         key={page}
                         onClick={() => setCurrentPage(page)}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === page
-                            ? 'bg-lime-500 text-neutral-900'
-                            : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                          ? 'bg-lime-500 text-neutral-900'
+                          : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
                           }`}
                       >
                         {page}
@@ -631,8 +631,8 @@ const UserCard = ({ user, onViewDetails, onRoleUpdate, onDelete, formatDate }) =
             <h3 className="font-semibold text-white truncate">{user.name || 'Unknown'}</h3>
             <div className="flex items-center space-x-2 mt-1">
               <span className={`text-xs px-2 py-1 rounded-full ${user.role === 'admin'
-                  ? 'bg-green-400/20 text-green-400'
-                  : 'bg-blue-400/20 text-blue-400'
+                ? 'bg-green-400/20 text-green-400'
+                : 'bg-blue-400/20 text-blue-400'
                 }`}>
                 {user.role || 'user'}
               </span>
@@ -755,8 +755,8 @@ const UserDetailsModal = ({ user, onClose, onRoleUpdate, formatDate }) => {
                 <h3 className="text-2xl font-bold text-white truncate">{user.name || 'Unknown User'}</h3>
                 <div className="flex items-center space-x-2 mt-2">
                   <span className={`text-sm px-3 py-1 rounded-full ${user.role === 'admin'
-                      ? 'bg-green-400/20 text-green-400'
-                      : 'bg-blue-400/20 text-blue-400'
+                    ? 'bg-green-400/20 text-green-400'
+                    : 'bg-blue-400/20 text-blue-400'
                     }`}>
                     {user.role || 'user'}
                   </span>

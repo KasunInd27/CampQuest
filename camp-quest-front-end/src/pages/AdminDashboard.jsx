@@ -1,20 +1,20 @@
 // pages/AdminDashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Package, 
-  AlertCircle, 
-  DollarSign, 
-  Users, 
-  ShoppingCart, 
-  MessageSquare, 
-  TrendingUp, 
+import {
+  Package,
+  AlertCircle,
+  DollarSign,
+  Users,
+  ShoppingCart,
+  MessageSquare,
+  TrendingUp,
   TrendingDown,
   Calendar,
   Star,
   Package2,
   FileText
 } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
@@ -32,7 +32,7 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all dashboard data in parallel
       const [
         statsRes,
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
           Refresh Data
         </button>
       </div>
-      
+
       {/* Main Dashboard Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <DashboardCard
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
           subtext="Published"
         />
       </div>
-      
+
       {/* Dashboard Content */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Recent Inventory Updates */}
@@ -196,7 +196,7 @@ export default function AdminDashboard() {
             )}
           </div>
         </div>
-        
+
         {/* Recent Customer Feedback */}
         <div className="bg-neutral-900 rounded-lg p-6 border border-neutral-700">
           <div className="flex justify-between items-center mb-4">

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { User, Lock, Trash2, Save, AlertTriangle, Mail, Phone, MapPin, FileText, Calendar, Shield, Settings, Activity, Ticket, MessageSquare, Mountain, Edit, Key, UserX, Package } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
-import axios from 'axios'
+import axios from '../lib/axios'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import Orders from '../components/Orders'
@@ -146,17 +146,16 @@ const UserDashboard = () => {
             </div>
             <h1 className="text-xl font-bold text-white">CampQuest</h1>
           </div>
-          
+
           <nav className="space-y-2">
             {menuItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                  activeSection === item.id
-                    ? 'bg-lime-500 text-black'
-                    : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
-                }`}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeSection === item.id
+                  ? 'bg-lime-500 text-black'
+                  : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
+                  }`}
               >
                 <item.icon className="w-5 h-5 mr-3" />
                 {item.label}
@@ -170,7 +169,7 @@ const UserDashboard = () => {
           {activeSection === 'overview' && (
             <div className="space-y-6">
               <h1 className="text-2xl font-bold text-white">Welcome back, {user?.name}!</h1>
-              
+
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardCard
@@ -238,28 +237,28 @@ const UserDashboard = () => {
               <div className="bg-neutral-900 rounded-lg p-6">
                 <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                  <button 
+                  <button
                     onClick={() => setActiveSection('orders')}
                     className="flex items-center justify-center px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                   >
                     <Package className="w-5 h-5 mr-2" />
                     View Orders
                   </button>
-                  <button 
+                  <button
                     onClick={() => setActiveSection('profile')}
                     className="flex items-center justify-center px-4 py-3 bg-lime-500 text-black rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     <Edit className="w-5 h-5 mr-2" />
                     Edit Profile
                   </button>
-                  <button 
+                  <button
                     onClick={() => setActiveSection('security')}
                     className="flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
                     <Key className="w-5 h-5 mr-2" />
                     Change Password
                   </button>
-                  <button 
+                  <button
                     onClick={() => setActiveSection('support')}
                     className="flex items-center justify-center px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
                   >
@@ -274,14 +273,14 @@ const UserDashboard = () => {
           {activeSection === 'orders' && (
             <div className="space-y-6">
               <h1 className="text-2xl font-bold text-white">My Orders</h1>
-              <Orders />
+              <Orders key={user?._id || 'guest'} />
             </div>
           )}
 
           {activeSection === 'profile' && (
             <div className="space-y-6">
               <h1 className="text-2xl font-bold text-white">Profile Settings</h1>
-              
+
               <div className="bg-neutral-900 rounded-lg p-6">
                 <h2 className="text-lg font-semibold text-white mb-6">Edit Profile Information</h2>
                 <form onSubmit={profileFormik.handleSubmit} className="space-y-6">
@@ -297,11 +296,10 @@ const UserDashboard = () => {
                         value={profileFormik.values.name}
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
-                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                          profileFormik.touched.name && profileFormik.errors.name
-                            ? 'border-red-500 focus:ring-red-500'
-                            : 'border-neutral-700'
-                        }`}
+                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${profileFormik.touched.name && profileFormik.errors.name
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-neutral-700'
+                          }`}
                       />
                       {profileFormik.touched.name && profileFormik.errors.name && (
                         <p className="mt-1 text-sm text-red-400 flex items-center">
@@ -310,7 +308,7 @@ const UserDashboard = () => {
                         </p>
                       )}
                     </div>
-                    
+
                     {/* Email Address */}
                     <div>
                       <label className="block text-sm font-medium text-neutral-300 mb-2">
@@ -322,11 +320,10 @@ const UserDashboard = () => {
                         value={profileFormik.values.email}
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
-                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                          profileFormik.touched.email && profileFormik.errors.email
-                            ? 'border-red-500 focus:ring-red-500'
-                            : 'border-neutral-700'
-                        }`}
+                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${profileFormik.touched.email && profileFormik.errors.email
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-neutral-700'
+                          }`}
                       />
                       {profileFormik.touched.email && profileFormik.errors.email && (
                         <p className="mt-1 text-sm text-red-400 flex items-center">
@@ -335,7 +332,7 @@ const UserDashboard = () => {
                         </p>
                       )}
                     </div>
-                    
+
                     {/* Phone Number */}
                     <div>
                       <label className="block text-sm font-medium text-neutral-300 mb-2">
@@ -347,11 +344,10 @@ const UserDashboard = () => {
                         value={profileFormik.values.phone}
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
-                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                          profileFormik.touched.phone && profileFormik.errors.phone
-                            ? 'border-red-500 focus:ring-red-500'
-                            : 'border-neutral-700'
-                        }`}
+                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${profileFormik.touched.phone && profileFormik.errors.phone
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-neutral-700'
+                          }`}
                         placeholder="+1 (555) 123-4567"
                       />
                       {profileFormik.touched.phone && profileFormik.errors.phone && (
@@ -361,7 +357,7 @@ const UserDashboard = () => {
                         </p>
                       )}
                     </div>
-                    
+
                     {/* Address */}
                     <div>
                       <label className="block text-sm font-medium text-neutral-300 mb-2">
@@ -373,11 +369,10 @@ const UserDashboard = () => {
                         value={profileFormik.values.address}
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
-                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                          profileFormik.touched.address && profileFormik.errors.address
-                            ? 'border-red-500 focus:ring-red-500'
-                            : 'border-neutral-700'
-                        }`}
+                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${profileFormik.touched.address && profileFormik.errors.address
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-neutral-700'
+                          }`}
                         placeholder="123 Main St, City, Country"
                       />
                       {profileFormik.touched.address && profileFormik.errors.address && (
@@ -387,7 +382,7 @@ const UserDashboard = () => {
                         </p>
                       )}
                     </div>
-                    
+
                     {/* Bio */}
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-neutral-300 mb-2">
@@ -399,11 +394,10 @@ const UserDashboard = () => {
                         onChange={profileFormik.handleChange}
                         onBlur={profileFormik.handleBlur}
                         rows="4"
-                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                          profileFormik.touched.bio && profileFormik.errors.bio
-                            ? 'border-red-500 focus:ring-red-500'
-                            : 'border-neutral-700'
-                        }`}
+                        className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${profileFormik.touched.bio && profileFormik.errors.bio
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-neutral-700'
+                          }`}
                         placeholder="Tell us about yourself..."
                       />
                       <div className="flex justify-between items-center mt-1">
@@ -415,17 +409,16 @@ const UserDashboard = () => {
                             </p>
                           )}
                         </div>
-                        <p className={`text-xs ${
-                          profileFormik.values.bio?.length > 450 
-                            ? 'text-yellow-400' 
-                            : 'text-neutral-500'
-                        }`}>
+                        <p className={`text-xs ${profileFormik.values.bio?.length > 450
+                          ? 'text-yellow-400'
+                          : 'text-neutral-500'
+                          }`}>
                           {profileFormik.values.bio?.length || 0}/500 characters
                         </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end">
                     <button
                       type="submit"
@@ -444,10 +437,10 @@ const UserDashboard = () => {
           {activeSection === 'security' && (
             <div className="space-y-6">
               <h1 className="text-2xl font-bold text-white">Security Settings</h1>
-              
+
               <div className="bg-neutral-900 rounded-lg p-6">
                 <h2 className="text-lg font-semibold text-white mb-6">Change Password</h2>
-                
+
                 <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                   <div className="flex items-start">
                     <Shield className="w-5 h-5 text-blue-400 mr-3 mt-0.5" />
@@ -461,7 +454,7 @@ const UserDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <form onSubmit={passwordFormik.handleSubmit} className="space-y-6 max-w-lg">
                   {/* Current Password */}
                   <div>
@@ -474,11 +467,10 @@ const UserDashboard = () => {
                       value={passwordFormik.values.currentPassword}
                       onChange={passwordFormik.handleChange}
                       onBlur={passwordFormik.handleBlur}
-                      className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                        passwordFormik.touched.currentPassword && passwordFormik.errors.currentPassword
-                          ? 'border-red-500 focus:ring-red-500'
-                          : 'border-neutral-700'
-                      }`}
+                      className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${passwordFormik.touched.currentPassword && passwordFormik.errors.currentPassword
+                        ? 'border-red-500 focus:ring-red-500'
+                        : 'border-neutral-700'
+                        }`}
                     />
                     {passwordFormik.touched.currentPassword && passwordFormik.errors.currentPassword && (
                       <p className="mt-1 text-sm text-red-400 flex items-center">
@@ -487,7 +479,7 @@ const UserDashboard = () => {
                       </p>
                     )}
                   </div>
-                  
+
                   {/* New Password */}
                   <div>
                     <label className="block text-sm font-medium text-neutral-300 mb-2">
@@ -499,11 +491,10 @@ const UserDashboard = () => {
                       value={passwordFormik.values.newPassword}
                       onChange={passwordFormik.handleChange}
                       onBlur={passwordFormik.handleBlur}
-                      className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                        passwordFormik.touched.newPassword && passwordFormik.errors.newPassword
-                          ? 'border-red-500 focus:ring-red-500'
-                          : 'border-neutral-700'
-                      }`}
+                      className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${passwordFormik.touched.newPassword && passwordFormik.errors.newPassword
+                        ? 'border-red-500 focus:ring-red-500'
+                        : 'border-neutral-700'
+                        }`}
                     />
                     {passwordFormik.touched.newPassword && passwordFormik.errors.newPassword && (
                       <p className="mt-1 text-sm text-red-400 flex items-center">
@@ -512,7 +503,7 @@ const UserDashboard = () => {
                       </p>
                     )}
                   </div>
-                  
+
                   {/* Confirm New Password */}
                   <div>
                     <label className="block text-sm font-medium text-neutral-300 mb-2">
@@ -524,11 +515,10 @@ const UserDashboard = () => {
                       value={passwordFormik.values.confirmPassword}
                       onChange={passwordFormik.handleChange}
                       onBlur={passwordFormik.handleBlur}
-                      className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${
-                        passwordFormik.touched.confirmPassword && passwordFormik.errors.confirmPassword
-                          ? 'border-red-500 focus:ring-red-500'
-                          : 'border-neutral-700'
-                      }`}
+                      className={`w-full px-4 py-3 bg-neutral-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white transition-colors ${passwordFormik.touched.confirmPassword && passwordFormik.errors.confirmPassword
+                        ? 'border-red-500 focus:ring-red-500'
+                        : 'border-neutral-700'
+                        }`}
                     />
                     {passwordFormik.touched.confirmPassword && passwordFormik.errors.confirmPassword && (
                       <p className="mt-1 text-sm text-red-400 flex items-center">
@@ -537,7 +527,7 @@ const UserDashboard = () => {
                       </p>
                     )}
                   </div>
-                  
+
                   <button
                     type="submit"
                     disabled={loading || passwordFormik.isSubmitting || !passwordFormik.isValid}
@@ -561,10 +551,10 @@ const UserDashboard = () => {
           {activeSection === 'danger' && (
             <div className="space-y-6">
               <h1 className="text-2xl font-bold text-white">Account Settings</h1>
-              
+
               <div className="bg-neutral-900 rounded-lg p-6">
                 <h2 className="text-lg font-semibold text-white mb-6">Danger Zone</h2>
-                
+
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6">
                   <div className="flex items-start">
                     <AlertTriangle className="w-6 h-6 text-red-400 mr-4 flex-shrink-0 mt-0.5" />
@@ -573,7 +563,7 @@ const UserDashboard = () => {
                         Delete Account
                       </h3>
                       <p className="text-red-200 mb-4">
-                        Once you delete your account, there is no going back. Please be certain. 
+                        Once you delete your account, there is no going back. Please be certain.
                         This will permanently delete your CampGear account and remove all associated data.
                       </p>
                       <button
@@ -603,11 +593,11 @@ const UserDashboard = () => {
                 Delete Account?
               </h3>
             </div>
-            
+
             <p className="text-neutral-300 mb-6">
               This action cannot be undone. This will permanently delete your CampGear account and remove all your data from our servers.
             </p>
-            
+
             <div className="bg-neutral-800 border border-neutral-700 rounded-lg p-4 mb-6">
               <p className="text-sm text-neutral-300 font-medium mb-2">
                 You will lose access to:
@@ -619,7 +609,7 @@ const UserDashboard = () => {
                 <li>• Account settings and data</li>
               </ul>
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowDeleteModal(false)}

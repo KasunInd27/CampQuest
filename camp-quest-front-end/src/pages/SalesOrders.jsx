@@ -18,7 +18,7 @@ import {
   Package,
   FileText
 } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';

@@ -4,7 +4,7 @@ import { CreditCard, Upload, FileText, Check, AlertCircle, Loader } from 'lucide
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import axios from '../lib/axios';
 
 const PaymentMethod = () => {
     const navigate = useNavigate();

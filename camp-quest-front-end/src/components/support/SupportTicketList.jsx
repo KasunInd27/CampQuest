@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../lib/axios';
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf'; // Note: destructured import
 import autoTable from 'jspdf-autotable'; // This is the correct import

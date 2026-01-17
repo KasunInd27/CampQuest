@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader } from 'lucide-react';
 import { useFormik } from 'formik';
 import { forgotPasswordValidationSchema } from '../utils/authValidations';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const ForgotPassword = () => {
@@ -20,11 +20,11 @@ const ForgotPassword = () => {
       setLoading(true);
       try {
         const response = await axios.post('/users/forgot-password', values);
-        
+
         if (response.data.success) {
           toast.success(response.data.message);
           // Navigate to OTP verification with email
-          navigate('/verify-otp', { 
+          navigate('/verify-otp', {
             state: { email: values.email }
           });
         }
@@ -65,9 +65,8 @@ const ForgotPassword = () => {
                   value={formik.values.email}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full pl-10 pr-4 py-3 bg-neutral-700 border rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500 ${
-                    formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-neutral-600'
-                  }`}
+                  className={`w-full pl-10 pr-4 py-3 bg-neutral-700 border rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500 ${formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-neutral-600'
+                    }`}
                   placeholder="Enter your email address"
                 />
               </div>

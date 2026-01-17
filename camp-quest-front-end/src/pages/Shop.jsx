@@ -1,7 +1,7 @@
 // pages/Shop.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShoppingCart, Star, Package } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 
@@ -108,9 +108,9 @@ const Shop = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <ProductCard 
-              key={product._id} 
-              product={product} 
+            <ProductCard
+              key={product._id}
+              product={product}
               onAddToCart={handleAddToCart}
             />
           ))}
@@ -163,14 +163,14 @@ const ProductCard = ({ product, onAddToCart }) => {
       <div className="p-4">
         <h3 className="font-semibold text-white mb-2 line-clamp-1">{product.name}</h3>
         <p className="text-neutral-400 text-sm mb-3 line-clamp-2">{product.description}</p>
-        
+
         {/* Rating */}
         <div className="flex items-center mb-3">
           {[...Array(5)].map((_, i) => (
-            <Star 
-              key={i} 
-              size={14} 
-              className={i < 4 ? 'text-yellow-400 fill-current' : 'text-neutral-600'} 
+            <Star
+              key={i}
+              size={14}
+              className={i < 4 ? 'text-yellow-400 fill-current' : 'text-neutral-600'}
             />
           ))}
           <span className="text-neutral-400 text-xs ml-2">(4.0)</span>
@@ -182,11 +182,10 @@ const ProductCard = ({ product, onAddToCart }) => {
           <button
             onClick={() => onAddToCart(product)}
             disabled={product.stock === 0}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors ${
-              product.stock === 0
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-colors ${product.stock === 0
                 ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
                 : 'bg-lime-500 text-neutral-900 hover:bg-lime-500'
-            }`}
+              }`}
           >
             <ShoppingCart size={16} />
             Add

@@ -1,18 +1,18 @@
 // pages/BlogPosts.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  User, 
-  Eye, 
-  X, 
-  Clock, 
-  Search, 
-  Star, 
-  Heart, 
-  MessageCircle, 
-  Send 
+import {
+  Calendar,
+  User,
+  Eye,
+  X,
+  Clock,
+  Search,
+  Star,
+  Heart,
+  MessageCircle,
+  Send
 } from 'lucide-react';
-import axios from 'axios'; // Import the configured axios
+import axios from '../lib/axios'; // Import the configured axios
 import toast from 'react-hot-toast';
 
 const BlogPosts = () => {
@@ -22,7 +22,7 @@ const BlogPosts = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -58,7 +58,7 @@ const BlogPosts = () => {
       }
 
       const response = await axios.get(`/blog-posts?${params}`);
-      
+
       if (response.data.success) {
         setBlogPosts(response.data.blogPosts);
         setTotalPages(response.data.totalPages);
@@ -211,10 +211,10 @@ const BlogPosts = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {blogPosts.map((post) => (
-                <BlogCard 
-                  key={post._id} 
-                  post={post} 
-                  onRead={() => openModal(post._id)} 
+                <BlogCard
+                  key={post._id}
+                  post={post}
+                  onRead={() => openModal(post._id)}
                   formatDate={formatDate}
                   truncateContent={truncateContent}
                   getCategoryColor={getCategoryColor}
@@ -231,21 +231,20 @@ const BlogPosts = () => {
                 >
                   Previous
                 </button>
-                
+
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      currentPage === page
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === page
                         ? 'bg-lime-500 text-neutral-900'
                         : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                    }`}
+                      }`}
                   >
                     {page}
                   </button>
                 ))}
-                
+
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
@@ -259,9 +258,9 @@ const BlogPosts = () => {
         )}
 
         {showModal && selectedPost && (
-          <BlogModal 
-            post={selectedPost} 
-            onClose={closeModal} 
+          <BlogModal
+            post={selectedPost}
+            onClose={closeModal}
             formatDate={formatDate}
             getCategoryColor={getCategoryColor}
           />
@@ -284,7 +283,7 @@ const BlogCard = ({ post, onRead, formatDate, truncateContent, getCategoryColor 
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/50 to-transparent"></div>
-        
+
         <div className="absolute top-3 left-3">
           <span className={`px-3 py-1 rounded-full text-xs font-medium border capitalize ${getCategoryColor(post.category)}`}>
             {post.category}
@@ -296,7 +295,7 @@ const BlogCard = ({ post, onRead, formatDate, truncateContent, getCategoryColor 
         <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 leading-tight">
           {post.title}
         </h3>
-        
+
         <div className="flex items-center space-x-4 text-sm text-neutral-400 mb-4">
           <div className="flex items-center space-x-1">
             <User className="w-4 h-4" />
@@ -404,15 +403,15 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
 
   const handleRatingClick = async (rating) => {
     if (submittingRating) return;
-    
+
     try {
       setSubmittingRating(true);
       const response = await axios.post(`/blog-interactions/${post._id}/ratings`, { rating });
-      
+
       if (response.data.success) {
         setUserRating(rating);
         toast.success('Rating submitted successfully! ⭐');
-        
+
         if (response.data.stats) {
           setStats(prevStats => ({
             ...prevStats,
@@ -431,7 +430,7 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
   const handleLikeToggle = async () => {
     try {
       const response = await axios.post(`/blog-interactions/${post._id}/likes/toggle`);
-      
+
       if (response.data.success) {
         setLiked(response.data.liked);
         setLikeCount(response.data.totalLikes);
@@ -445,7 +444,7 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!commentForm.name.trim() || !commentForm.email.trim() || !commentForm.comment.trim()) {
       toast.error('Please fill in all fields');
       return;
@@ -460,12 +459,12 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
     try {
       setSubmittingComment(true);
       const response = await axios.post(`/blog-interactions/${post._id}/comments`, commentForm);
-      
+
       if (response.data.success) {
         toast.success('Comment added successfully! 💬');
         setCommentForm({ name: '', email: '', comment: '' });
         fetchComments();
-        
+
         setStats(prevStats => ({
           ...prevStats,
           totalComments: (prevStats.totalComments || 0) + 1
@@ -539,11 +538,10 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
                         className="transition-transform hover:scale-110 disabled:cursor-not-allowed"
                       >
                         <Star
-                          className={`w-8 h-8 transition-colors ${
-                            star <= (hoveredRating || userRating)
+                          className={`w-8 h-8 transition-colors ${star <= (hoveredRating || userRating)
                               ? 'text-yellow-500 fill-yellow-500'
                               : 'text-neutral-600'
-                          }`}
+                            }`}
                         />
                       </button>
                     ))}
@@ -568,11 +566,10 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
                   <h3 className="text-lg font-semibold text-white mb-3">Like this post</h3>
                   <button
                     onClick={handleLikeToggle}
-                    className={`flex items-center space-x-3 px-6 py-3 rounded-lg transition-all ${
-                      liked
+                    className={`flex items-center space-x-3 px-6 py-3 rounded-lg transition-all ${liked
                         ? 'bg-red-500/20 text-red-500 border border-red-500/30 hover:bg-red-500/30'
                         : 'bg-neutral-800 text-neutral-400 border border-neutral-700 hover:border-red-500/30 hover:text-red-500'
-                    }`}
+                      }`}
                   >
                     <Heart className={`w-6 h-6 transition-all ${liked ? 'fill-red-500 scale-110' : ''}`} />
                     <span className="font-medium">
@@ -592,12 +589,12 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
                     {[5, 4, 3, 2, 1].map((rating) => {
                       const count = stats.ratingDistribution[rating] || 0;
                       const percentage = stats.totalRatings > 0 ? (count / stats.totalRatings) * 100 : 0;
-                      
+
                       return (
                         <div key={rating} className="flex items-center space-x-3">
                           <span className="text-sm text-neutral-400 w-12">{rating} stars</span>
                           <div className="flex-1 h-2 bg-neutral-700 rounded-full overflow-hidden">
-                            <div 
+                            <div
                               className="h-full bg-yellow-500 transition-all duration-500"
                               style={{ width: `${percentage}%` }}
                             />

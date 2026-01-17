@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Download, Home, Package, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
+import { useAuth } from '../context/AuthContext';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import toast from 'react-hot-toast';
@@ -11,20 +12,27 @@ const Success = () => {
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
   const orderId = location.state?.orderId;
 
   useEffect(() => {
     console.log('Location state:', location.state);
     console.log('Order ID:', orderId);
+    console.log('Auth loading:', authLoading);
 
     if (orderId) {
-      fetchOrder();
+      if (!authLoading) {
+        fetchOrder();
+      }
     } else {
-      console.error('No order ID found in location state');
       setLoading(false);
-      toast.error('No order ID provided');
+      // Don't show error immediately on mount if things are still loading
+      if (!authLoading) {
+        console.error('No order ID found in location state');
+        toast.error('No order ID provided');
+      }
     }
-  }, [orderId]);
+  }, [orderId, authLoading]);
 
   const fetchOrder = async () => {
     try {

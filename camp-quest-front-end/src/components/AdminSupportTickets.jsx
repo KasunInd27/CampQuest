@@ -1,7 +1,7 @@
 // components/admin/AdminSupportTickets.jsx
 import React, { useState, useEffect } from 'react';
 import { LifeBuoy, Eye, Trash2, Filter, Search, Clock, CheckCircle, AlertTriangle, Reply, X, Download, BarChart } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import jsPDF from 'jspdf';
@@ -15,7 +15,7 @@ const AdminSupportTickets = () => {
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [stats, setStats] = useState(null);
   const [exportingPDF, setExportingPDF] = useState(false);
-  
+
   const [filters, setFilters] = useState({
     status: 'all',
     category: 'all',
@@ -34,7 +34,7 @@ const AdminSupportTickets = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      
+
       // Add filters to params
       if (filters.status !== 'all') {
         params.append('status', filters.status);
@@ -50,7 +50,7 @@ const AdminSupportTickets = () => {
       }
       params.append('page', filters.page);
       params.append('limit', filters.limit);
-      
+
       const response = await axios.get(`/support-tickets?${params.toString()}`);
       if (response.data.success) {
         setTickets(response.data.tickets);
@@ -120,61 +120,61 @@ const AdminSupportTickets = () => {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
       const pageHeight = doc.internal.pageSize.height;
-      
+
       // Add modern header
       doc.setFillColor(139, 195, 74);
       doc.rect(0, 0, pageWidth, 40, 'F');
-      
+
       // Add title
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont(undefined, 'bold');
       doc.text('Support Tickets Report', pageWidth / 2, 20, { align: 'center' });
-      
+
       // Add filters info
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
       const filterText = `Status: ${filters.status === 'all' ? 'All' : filters.status} | Category: ${filters.category === 'all' ? 'All' : filters.category} | Priority: ${filters.priority === 'all' ? 'All' : filters.priority}`;
       doc.text(filterText, pageWidth / 2, 30, { align: 'center' });
-      
+
       // Add generation date
       const dateText = `Generated on: ${new Date().toLocaleString()}`;
       doc.text(dateText, pageWidth / 2, 36, { align: 'center' });
-      
+
       // Reset text color
       doc.setTextColor(0, 0, 0);
-      
+
       // Add statistics summary
       let yPosition = 50;
-      
+
       if (stats) {
         doc.setFillColor(245, 245, 245);
         doc.roundedRect(14, yPosition, pageWidth - 28, 40, 3, 3, 'F');
-        
+
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(51, 51, 51);
         doc.text('Summary Statistics', 20, yPosition + 10);
-        
+
         doc.setFontSize(10);
         doc.setFont(undefined, 'normal');
         doc.setTextColor(85, 85, 85);
-        
+
         const col1X = 20;
         const col2X = pageWidth / 2;
         const col3X = pageWidth - 60;
-        
+
         doc.text(`Total Tickets: ${stats.totalTickets}`, col1X, yPosition + 20);
         doc.text(`Open: ${stats.openTickets}`, col2X, yPosition + 20);
         doc.text(`Resolved: ${stats.resolvedTickets}`, col3X, yPosition + 20);
-        
+
         doc.text(`In Progress: ${stats.inProgressTickets}`, col1X, yPosition + 28);
         doc.text(`Closed: ${stats.closedTickets}`, col2X, yPosition + 28);
         doc.text(`Recent (7 days): ${stats.recentTickets}`, col3X, yPosition + 28);
-        
+
         yPosition += 50;
       }
-      
+
       // Prepare table data
       const tableData = tickets.map((ticket, index) => [
         index + 1,
@@ -187,7 +187,7 @@ const AdminSupportTickets = () => {
         ticket.status.toUpperCase(),
         new Date(ticket.createdAt).toLocaleDateString()
       ]);
-      
+
       // Add table
       autoTable(doc, {
         startY: yPosition,
@@ -220,7 +220,7 @@ const AdminSupportTickets = () => {
           8: { cellWidth: 22, halign: 'center' }
         },
         margin: { top: 10, left: 14, right: 14 },
-        didDrawPage: function(data) {
+        didDrawPage: function (data) {
           // Footer
           doc.setFontSize(8);
           doc.setTextColor(128, 128, 128);
@@ -232,72 +232,72 @@ const AdminSupportTickets = () => {
           );
         }
       });
-      
+
       // Add detailed tickets section
       if (tickets.length > 0) {
         doc.addPage();
         yPosition = 20;
-        
+
         doc.setFontSize(16);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(51, 51, 51);
         doc.text('Detailed Ticket Information', 20, yPosition);
-        
+
         yPosition += 10;
-        
+
         tickets.forEach((ticket, index) => {
           // Check if we need a new page
           if (yPosition > pageHeight - 70) {
             doc.addPage();
             yPosition = 20;
           }
-          
+
           // Ticket box
           doc.setFillColor(245, 248, 250);
           doc.roundedRect(14, yPosition, pageWidth - 28, 60, 2, 2, 'F');
-          
+
           // Ticket ID and subject
           doc.setFontSize(11);
           doc.setFont(undefined, 'bold');
           doc.setTextColor(51, 51, 51);
           doc.text(`${index + 1}. #${ticket._id.slice(-6)} - ${ticket.subject}`, 20, yPosition + 8);
-          
+
           // Customer info
           doc.setFontSize(9);
           doc.setFont(undefined, 'normal');
           doc.setTextColor(85, 85, 85);
           doc.text(`Customer: ${ticket.customerName || ticket.user?.name || 'N/A'}`, 20, yPosition + 16);
           doc.text(`Email: ${ticket.customerEmail || ticket.user?.email || 'N/A'}`, 20, yPosition + 23);
-          
+
           // Ticket details
           doc.text(`Category: ${ticket.category.toUpperCase()}`, 20, yPosition + 30);
           doc.text(`Priority: ${ticket.priority.toUpperCase()}`, 80, yPosition + 30);
           doc.text(`Status: ${ticket.status.toUpperCase()}`, 130, yPosition + 30);
-          
+
           // Date
           doc.text(`Created: ${new Date(ticket.createdAt).toLocaleDateString()}`, 20, yPosition + 37);
-          
+
           // Description
           doc.setFontSize(8);
           doc.setTextColor(68, 68, 68);
           const splitDescription = doc.splitTextToSize(ticket.description, pageWidth - 48);
           doc.text(splitDescription.slice(0, 2), 20, yPosition + 45);
-          
+
           // Replies count
           if (ticket.replies && ticket.replies.length > 0) {
             doc.setFontSize(8);
             doc.setTextColor(139, 195, 74);
             doc.text(`${ticket.replies.length} ${ticket.replies.length === 1 ? 'Reply' : 'Replies'}`, 20, yPosition + 56);
           }
-          
+
           yPosition += 68;
         });
       }
-      
+
       // Save the PDF
       const fileName = `support-tickets-${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
-      
+
       toast.success('PDF exported successfully!');
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -438,15 +438,15 @@ const AdminSupportTickets = () => {
                       <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status]} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#262626', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#262626',
                       border: '1px solid #404040',
                       borderRadius: '8px',
                       color: '#fff'
                     }}
                   />
-                  <Legend 
+                  <Legend
                     wrapperStyle={{ color: '#fff' }}
                     formatter={(value) => <span style={{ color: '#d4d4d4' }}>{value}</span>}
                   />
@@ -478,15 +478,15 @@ const AdminSupportTickets = () => {
                       <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#262626', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#262626',
                       border: '1px solid #404040',
                       borderRadius: '8px',
                       color: '#fff'
                     }}
                   />
-                  <Legend 
+                  <Legend
                     wrapperStyle={{ color: '#fff' }}
                     formatter={(value) => <span style={{ color: '#d4d4d4' }}>{value}</span>}
                   />
@@ -518,15 +518,15 @@ const AdminSupportTickets = () => {
                       <Cell key={`cell-${index}`} fill={PRIORITY_COLORS[entry.name.toLowerCase()]} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#262626', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#262626',
                       border: '1px solid #404040',
                       borderRadius: '8px',
                       color: '#fff'
                     }}
                   />
-                  <Legend 
+                  <Legend
                     wrapperStyle={{ color: '#fff' }}
                     formatter={(value) => <span style={{ color: '#d4d4d4' }}>{value}</span>}
                   />
@@ -555,7 +555,7 @@ const AdminSupportTickets = () => {
             <option value="resolved">Resolved</option>
             <option value="closed">Closed</option>
           </select>
-          
+
           <select
             value={filters.category}
             onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value, page: 1 }))}
@@ -722,14 +722,14 @@ const StatsCard = ({ title, value, icon }) => (
 );
 
 // Ticket Table Row Component
-const TicketTableRow = ({ 
-  ticket, 
-  onView, 
-  onReply, 
-  onDelete, 
+const TicketTableRow = ({
+  ticket,
+  onView,
+  onReply,
+  onDelete,
   onStatusUpdate,
-  getStatusColor, 
-  getPriorityColor 
+  getStatusColor,
+  getPriorityColor
 }) => {
   return (
     <tr className="hover:bg-neutral-800 transition-colors">
@@ -893,27 +893,23 @@ const TicketDetailsModal = ({ ticket, onClose, getStatusColor, getPriorityColor 
               {ticket.replies.map((reply, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-lg ${
-                    reply.authorType === 'admin'
+                  className={`p-4 rounded-lg ${reply.authorType === 'admin'
                       ? 'bg-lime-500/10 border border-lime-500/20'
                       : 'bg-neutral-800 border border-neutral-700'
-                  }`}
+                    }`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center space-x-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        reply.authorType === 'admin' ? 'bg-lime-500/20' : 'bg-neutral-700'
-                      }`}>
-                        <span className={`text-sm font-semibold ${
-                          reply.authorType === 'admin' ? 'text-lime-500' : 'text-white'
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${reply.authorType === 'admin' ? 'bg-lime-500/20' : 'bg-neutral-700'
                         }`}>
+                        <span className={`text-sm font-semibold ${reply.authorType === 'admin' ? 'text-lime-500' : 'text-white'
+                          }`}>
                           {reply.author.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div>
-                        <span className={`font-medium ${
-                          reply.authorType === 'admin' ? 'text-lime-500' : 'text-white'
-                        }`}>
+                        <span className={`font-medium ${reply.authorType === 'admin' ? 'text-lime-500' : 'text-white'
+                          }`}>
                           {reply.author}
                         </span>
                         <p className="text-xs text-neutral-400">
@@ -960,7 +956,7 @@ const TicketReplyModal = ({ ticket, onClose, onSuccess }) => {
         status: newStatus,
         adminReply: replyMessage
       });
-      
+
       if (response.data.success) {
         toast.success('Reply sent successfully');
         onSuccess();

@@ -1,6 +1,12 @@
 // pages/AboutUs.jsx
 import React from 'react';
 
+import kasunImg from "../assets/Kasun1.jpeg";
+import shehanImg from "../assets/Shehan.jpeg";
+import thiliniImg from "../assets/thilini.jpeg";
+import somiruwanImg from "../assets/Somiruwan.jpeg";
+
+
 // Hero Section
 function AboutHero() {
   return (
@@ -13,7 +19,7 @@ function AboutHero() {
           className="w-full h-full object-cover opacity-30"
         />
       </div>
-      
+
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center">
@@ -24,7 +30,7 @@ function AboutHero() {
             Passionate About <span className="text-lime-400">Outdoor Adventures</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            For over a decade, we've been helping outdoor enthusiasts gear up for their next adventure. 
+            For over a decade, we've been helping outdoor enthusiasts gear up for their next adventure.
             From weekend camping trips to month-long expeditions, we provide the quality equipment you need.
           </p>
         </div>
@@ -46,34 +52,30 @@ function CompanyStory() {
             </h2>
             <div className="space-y-4 text-gray-300">
               <p>
-                Founded in 2013 by avid outdoor enthusiasts Sarah and Mike Johnson, our company began 
-                with a simple mission: make quality camping equipment accessible to everyone. What started 
-                as a small rental service in their garage has grown into a trusted provider of both rental 
+                Founded in 2024 by avid outdoor enthusiasts Shehan Pathiraja, our company began
+                with a simple mission: make quality camping equipment accessible to everyone. What started
+                as a small rental service in their garage has grown into a trusted provider of both rental
                 and retail camping gear.
               </p>
               <p>
-                We understand that not everyone wants to invest in expensive equipment for occasional trips. 
-                That's why we pioneered the camping equipment rental model in our region, offering everything 
+                We understand that not everyone wants to invest in expensive equipment for occasional trips.
+                That's why we pioneered the camping equipment rental model in our region, offering everything
                 from basic tents to high-end mountaineering gear.
               </p>
               <p>
-                Today, we serve thousands of customers annually, from first-time campers to seasoned 
-                adventurers, helping them create unforgettable outdoor memories with reliable, 
+                Today, we serve hundreds of customers annually, from first-time campers to seasoned
+                adventurers, helping them create unforgettable outdoor memories with reliable,
                 well-maintained equipment.
               </p>
             </div>
           </div>
-          
+
           {/* Image */}
           <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1508872793789-4b8c498fb1b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
-              alt="Founders camping"
-              className="rounded-lg shadow-xl"
-            />
+
             <div className="absolute -bottom-6 -right-6 bg-lime-400 p-6 rounded-lg shadow-lg">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">10+</div>
+                <div className="text-2xl font-bold text-gray-900">2+</div>
                 <div className="text-sm text-gray-700 font-medium">Years Serving</div>
               </div>
             </div>
@@ -133,14 +135,14 @@ function MissionVisionValues() {
           <div className="text-center lg:text-left">
             <h3 className="text-2xl font-bold text-white mb-4">Our Mission</h3>
             <p className="text-gray-300 text-lg">
-              To democratize outdoor adventures by providing affordable access to premium camping equipment, 
+              To democratize outdoor adventures by providing affordable access to premium camping equipment,
               enabling everyone to explore nature safely and comfortably.
             </p>
           </div>
           <div className="text-center lg:text-left">
             <h3 className="text-2xl font-bold text-white mb-4">Our Vision</h3>
             <p className="text-gray-300 text-lg">
-              To be the leading provider of outdoor equipment solutions, inspiring a generation of 
+              To be the leading provider of outdoor equipment solutions, inspiring a generation of
               environmentally conscious adventurers to connect with nature.
             </p>
           </div>
@@ -169,9 +171,9 @@ function MissionVisionValues() {
 // Statistics Section
 function Statistics() {
   const stats = [
-    { number: '15,000+', label: 'Happy Customers' },
-    { number: '500+', label: 'Equipment Items' },
-    { number: '50+', label: 'Camping Locations Supported' },
+    { number: '1,000+', label: 'Happy Customers' },
+    { number: '100+', label: 'Equipment Items' },
+    { number: '10+', label: 'Camping Locations Supported' },
     { number: '98%', label: 'Customer Satisfaction' }
   ];
 
@@ -183,11 +185,11 @@ function Statistics() {
             Numbers That <span className="text-lime-400">Matter</span>
           </h2>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Over the years, we've built strong relationships with our customers and maintained 
+            Over the years, we've built strong relationships with our customers and maintained
             high standards that speak for themselves.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
@@ -209,28 +211,28 @@ function Statistics() {
 function TeamSection() {
   const teamMembers = [
     {
-      name: 'Sarah Johnson',
-      role: 'Co-Founder & CEO',
-      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b6c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80',
-      bio: 'Passionate mountaineer with 15+ years of outdoor experience. Sarah leads our company vision and customer experience.',
+      name: 'Shehan Pathiraja',
+      role: 'Founder',
+      image: shehanImg,
+      bio: 'Passionate mountaineer with 5+ years of outdoor experience. Shehan leads our company vision and customer experience.',
     },
     {
-      name: 'Mike Johnson',
-      role: 'Co-Founder & Operations Director',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80',
-      bio: 'Expert in outdoor gear and equipment maintenance. Mike ensures every piece of equipment meets our quality standards.',
+      name: 'Somiruwan Pathiraja',
+      role: 'Customer Relation Officer',
+      image: somiruwanImg,
+      bio: 'Expert in outdoor gear and equipment maintenance. Somiruwan ensures every piece of equipment meets our quality standards.',
     },
     {
-      name: 'Emily Chen',
-      role: 'Customer Experience Manager',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      bio: 'Dedicated to ensuring every customer has an amazing experience. Emily leads our support team and rental process.',
+      name: 'Thilini Pathiraja',
+      role: 'Coordinator',
+      image: thiliniImg,
+      bio: 'Coordinates rentals and customer support end-to-end, ensuring smooth bookings, timely pickups/returns, and a friendly experience for every customer.',
     },
     {
-      name: 'David Rodriguez',
-      role: 'Equipment Specialist',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80',
-      bio: 'Outdoor enthusiast and gear expert. David helps customers choose the perfect equipment for their adventures.',
+      name: 'Kasun Indrajith',
+      role: 'Digital Media Consultant',
+      image: kasunImg,
+      bio: 'Manages CampQuest’s digital presence across social platforms and web, creating content that showcases products, boosts engagement, and supports online sales and rentals.',
     }
   ];
 
@@ -245,7 +247,7 @@ function TeamSection() {
             Our passionate team of outdoor enthusiasts is here to help you make the most of your adventures.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {teamMembers.map((member, index) => (
             <div key={index} className="text-center">
@@ -311,10 +313,10 @@ function SustainabilitySection() {
               Committed to <span className="text-lime-400">Sustainability</span>
             </h2>
             <p className="text-gray-300 text-lg mb-8">
-              We believe in protecting the environments we love to explore. Our business model 
+              We believe in protecting the environments we love to explore. Our business model
               inherently supports sustainability by maximizing equipment utilization and reducing waste.
             </p>
-            
+
             <div className="space-y-6">
               {sustainabilityPoints.map((point, index) => (
                 <div key={index} className="flex items-start space-x-4">
@@ -329,7 +331,7 @@ function SustainabilitySection() {
               ))}
             </div>
           </div>
-          
+
           {/* Image */}
           <div>
             <img
@@ -353,7 +355,7 @@ function AboutCallToAction() {
           Ready to Start Your Adventure?
         </h2>
         <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-          Join thousands of satisfied customers who trust us with their outdoor adventures. 
+          Join thousands of satisfied customers who trust us with their outdoor adventures.
           Let us help you gear up for your next expedition.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import { feedbackSchema } from '../../utils/validationSchemas';
 import { Send, Star, MessageSquare, Shield, AlertCircle, Mountain } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../lib/axios';
 import toast from 'react-hot-toast';
 
 const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
@@ -112,8 +112,8 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.subject && formik.errors.subject
-                ? 'border-red-300 bg-red-50 focus:border-red-500'
-                : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
+              ? 'border-red-300 bg-red-50 focus:border-red-500'
+              : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
               }`}
             placeholder="Brief summary of your feedback (e.g., Great tent quality, Website loading issue)"
           />
@@ -137,8 +137,8 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
                 <label
                   key={cat.value}
                   className={`relative flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${formik.values.category === cat.value
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                     }`}
                 >
                   <input
@@ -197,8 +197,8 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
                     >
                       <Star
                         className={`w-8 h-8 ${star <= (hoveredStar || formik.values.rating)
-                            ? 'text-yellow-400 fill-current'
-                            : 'text-slate-300'
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-slate-300'
                           }`}
                       />
                     </button>
@@ -239,8 +239,8 @@ const FeedbackForm = ({ onSuccess, existingFeedback = null }) => {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 resize-none ${formik.touched.message && formik.errors.message
-                ? 'border-red-300 bg-red-50 focus:border-red-500'
-                : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
+              ? 'border-red-300 bg-red-50 focus:border-red-500'
+              : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
               }`}
             placeholder="Share your detailed feedback about our camping equipment and service:
 

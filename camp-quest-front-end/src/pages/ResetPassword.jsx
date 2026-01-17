@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Lock, Eye, EyeOff, ArrowLeft, Loader, CheckCircle } from 'lucide-react';
 import { useFormik } from 'formik';
 import { resetPasswordValidationSchema } from '../utils/authValidations';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const ResetPassword = () => {
@@ -37,12 +37,12 @@ const ResetPassword = () => {
           otp,
           newPassword: values.newPassword
         });
-        
+
         if (response.data.success) {
           toast.success(response.data.message);
-          navigate('/login', { 
-            state: { 
-              message: 'Password reset successful! Please log in with your new password.' 
+          navigate('/login', {
+            state: {
+              message: 'Password reset successful! Please log in with your new password.'
             }
           });
         }
@@ -110,9 +110,8 @@ const ResetPassword = () => {
                   value={formik.values.newPassword}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full pl-10 pr-12 py-3 bg-neutral-700 border rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500 ${
-                    formik.touched.newPassword && formik.errors.newPassword ? 'border-red-500' : 'border-neutral-600'
-                  }`}
+                  className={`w-full pl-10 pr-12 py-3 bg-neutral-700 border rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500 ${formik.touched.newPassword && formik.errors.newPassword ? 'border-red-500' : 'border-neutral-600'
+                    }`}
                   placeholder="Enter new password"
                 />
                 <button
@@ -129,7 +128,7 @@ const ResetPassword = () => {
                 <div className="mt-2">
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-neutral-700 rounded-full h-2">
-                      <div 
+                      <div
                         className={`h-full rounded-full transition-all ${getStrengthColor(passwordStrength)}`}
                         style={{ width: `${(passwordStrength / 5) * 100}%` }}
                       />
@@ -157,9 +156,8 @@ const ResetPassword = () => {
                   value={formik.values.confirmPassword}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full pl-10 pr-12 py-3 bg-neutral-700 border rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500 ${
-                    formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-neutral-600'
-                  }`}
+                  className={`w-full pl-10 pr-12 py-3 bg-neutral-700 border rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500 ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-neutral-600'
+                    }`}
                   placeholder="Confirm new password"
                 />
                 <button
