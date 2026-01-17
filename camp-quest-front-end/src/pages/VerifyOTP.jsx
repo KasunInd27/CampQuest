@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Shield, ArrowLeft, Loader, RefreshCw } from 'lucide-react';
 import { useFormik } from 'formik';
 import { verifyOTPValidationSchema } from '../utils/authValidations';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const VerifyOTP = () => {
@@ -51,10 +51,10 @@ const VerifyOTP = () => {
           email,
           otp: values.otp
         });
-        
+
         if (response.data.success) {
           toast.success(response.data.message);
-          navigate('/reset-password', { 
+          navigate('/reset-password', {
             state: { email, otp: values.otp }
           });
         }
@@ -68,11 +68,11 @@ const VerifyOTP = () => {
 
   const handleOTPChange = (index, value) => {
     if (value.length > 1) return;
-    
+
     const newOTP = formik.values.otp.split('');
     newOTP[index] = value;
     const otpString = newOTP.join('');
-    
+
     formik.setFieldValue('otp', otpString);
 
     // Auto-focus next input
@@ -91,7 +91,7 @@ const VerifyOTP = () => {
     setResendLoading(true);
     try {
       const response = await axios.post('/users/forgot-password', { email });
-      
+
       if (response.data.success) {
         toast.success('OTP resent successfully');
         setTimeLeft(600); // Reset timer
@@ -146,9 +146,8 @@ const VerifyOTP = () => {
                     value={digit.trim()}
                     onChange={(e) => handleOTPChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className={`w-12 h-12 text-center text-xl font-bold bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.otp && formik.errors.otp ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-12 h-12 text-center text-xl font-bold bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.otp && formik.errors.otp ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                   />
                 ))}
               </div>

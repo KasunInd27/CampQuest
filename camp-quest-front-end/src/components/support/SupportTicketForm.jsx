@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import { supportTicketSchema } from '../../utils/validationSchemas';
 import { Send, Upload, X, FileText, AlertCircle, Ticket, Mountain } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../lib/axios';
 import toast from 'react-hot-toast';
 
 const SupportTicketForm = ({ onSuccess }) => {
@@ -143,8 +143,8 @@ const SupportTicketForm = ({ onSuccess }) => {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.subject && formik.errors.subject
-                ? 'border-red-300 bg-red-50 focus:border-red-500'
-                : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
+              ? 'border-red-300 bg-red-50 focus:border-red-500'
+              : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
               }`}
             placeholder="Brief description of your issue (e.g., Damaged tent rental #12345)"
           />
@@ -169,8 +169,8 @@ const SupportTicketForm = ({ onSuccess }) => {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.category && formik.errors.category
-                  ? 'border-red-300 bg-red-50 focus:border-red-500'
-                  : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
+                ? 'border-red-300 bg-red-50 focus:border-red-500'
+                : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
                 }`}
             >
               <option value="">Select a category</option>
@@ -195,8 +195,8 @@ const SupportTicketForm = ({ onSuccess }) => {
                 <label
                   key={priority.value}
                   className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${formik.values.priority === priority.value
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                     }`}
                 >
                   <input
@@ -239,8 +239,8 @@ const SupportTicketForm = ({ onSuccess }) => {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-500/20 transition-all duration-200 ${formik.touched.description && formik.errors.description
-                ? 'border-red-300 bg-red-50 focus:border-red-500'
-                : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
+              ? 'border-red-300 bg-red-50 focus:border-red-500'
+              : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 focus:border-green-500'
               }`}
             placeholder="Please provide detailed information about your issue:
 • Equipment details (model, rental dates, condition)

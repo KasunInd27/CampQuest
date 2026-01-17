@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Calendar, Star, Package, Download } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';

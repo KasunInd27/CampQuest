@@ -72,7 +72,7 @@ router.delete('/admin/orders/:id', protect, adminOnly, deleteAdminOrder);
 // General Admin/Base routes
 router.get('/', protect, adminOnly, getOrders);
 router.get('/stats', protect, adminOnly, getOrderStats);
-router.get('/:id', protect, adminOnly, getOrder);
+router.get('/:id', protect, getOrder);
 router.put('/:id/status', protect, adminOnly, updateOrderStatus);
 router.put('/:id/cancel', protect, adminOnly, cancelOrder);
 

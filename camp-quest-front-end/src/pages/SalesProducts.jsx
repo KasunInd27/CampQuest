@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Package, Tag, Upload, X, Eye, Download } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import { salesProductValidationSchema } from '../utils/productValidations';
@@ -32,7 +32,7 @@ const SalesProducts = () => {
     onSubmit: async (values) => {
       try {
         const submitData = new FormData();
-        
+
         // Convert features string to array
         const processedValues = {
           ...values,
@@ -64,7 +64,7 @@ const SalesProducts = () => {
           });
           toast.success('Product created successfully');
         }
-        
+
         resetForm();
         fetchProducts();
       } catch (error) {
@@ -416,7 +416,7 @@ const SalesProducts = () => {
             <h2 className="text-xl font-bold text-white mb-4">
               {editingProduct ? 'Edit Product' : 'Add New Product'}
             </h2>
-            
+
             <form onSubmit={formik.handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -429,9 +429,8 @@ const SalesProducts = () => {
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                     placeholder="Product name"
                   />
                   {formik.touched.name && formik.errors.name && (
@@ -449,9 +448,8 @@ const SalesProducts = () => {
                   value={formik.values.description}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                    formik.touched.description && formik.errors.description ? 'border-red-500' : 'border-neutral-600'
-                  }`}
+                  className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.description && formik.errors.description ? 'border-red-500' : 'border-neutral-600'
+                    }`}
                   placeholder="Product description"
                   rows="3"
                 />
@@ -472,9 +470,8 @@ const SalesProducts = () => {
                     value={formik.values.price}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.price && formik.errors.price ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.price && formik.errors.price ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                     placeholder="0.00"
                   />
                   {formik.touched.price && formik.errors.price && (
@@ -492,9 +489,8 @@ const SalesProducts = () => {
                     value={formik.values.stock}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.stock && formik.errors.stock ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.stock && formik.errors.stock ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                     placeholder="0"
                   />
                   {formik.touched.stock && formik.errors.stock && (
@@ -699,11 +695,10 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
             <div className="flex-1">
               <h3 className="font-semibold text-white truncate">{product.name}</h3>
             </div>
-            <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-              product.isActive 
-                ? 'bg-lime-500/20 text-lime-500' 
+            <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${product.isActive
+                ? 'bg-lime-500/20 text-lime-500'
                 : 'bg-neutral-700 text-neutral-400'
-            }`}>
+              }`}>
               {product.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>

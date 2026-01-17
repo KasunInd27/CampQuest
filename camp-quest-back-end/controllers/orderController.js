@@ -151,21 +151,19 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    // Ensure customer has userId - this is crucial!
-    const userId = req.user?._id || orderData.customer?.userId;
-
-    if (!userId) {
+    // Force customer.userId to be the authenticated user ID for security and persistence
+    if (!req.user || !req.user._id) {
       await session.abortTransaction();
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
-        message: 'Customer user ID is required'
+        message: 'Authentication required to place an order'
       });
     }
 
-    // Update orderData with the resolved userId
+    // Always override any userId coming from the client
     orderData.customer = {
-      ...orderData.customer,
-      userId: userId
+      ...(orderData.customer || {}),
+      userId: req.user._id
     };
 
     // Validate stock availability before creating order
@@ -767,6 +765,19 @@ export const getOrder = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
+      });
+    }
+
+    // Access Control: Admin can see everything, users can see their own
+    // account for both populated and unpopulated userId fields
+    const orderUserId = order.customer?.userId?._id || order.customer?.userId;
+    const isOwner = orderUserId && orderUserId.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You can only view your own orders.'
       });
     }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Package, Tag, Upload, X, Eye, Download } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import { rentalProductValidationSchema } from '../utils/productValidations';
@@ -35,7 +35,7 @@ const RentalProducts = () => {
     onSubmit: async (values) => {
       try {
         const submitData = new FormData();
-        
+
         // Convert features string to array
         const processedValues = {
           ...values,
@@ -67,7 +67,7 @@ const RentalProducts = () => {
           });
           toast.success('Product created successfully');
         }
-        
+
         resetForm();
         fetchProducts();
       } catch (error) {
@@ -158,15 +158,15 @@ const RentalProducts = () => {
 
   const exportToPDF = () => {
     const doc = new jsPDF();
-    
+
     // Add title
     doc.setFontSize(18);
     doc.text('Rental Products Report', 14, 22);
-    
+
     // Add generated date
     doc.setFontSize(11);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
-    
+
     // Prepare table data
     const tableData = filteredProducts.map(product => [
       product.name,
@@ -178,7 +178,7 @@ const RentalProducts = () => {
       product.condition,
       product.availabilityStatus
     ]);
-    
+
     // Add table using autoTable
     autoTable(doc, {
       head: [['Name', 'Category', 'Daily Rate', 'Weekly Rate', 'Total Qty', 'Available', 'Condition', 'Status']],
@@ -187,7 +187,7 @@ const RentalProducts = () => {
       styles: { fontSize: 8 },
       headStyles: { fillColor: [132, 204, 22] }, // lime-500
     });
-    
+
     // Save the PDF
     doc.save(`rental-products-${new Date().toISOString().split('T')[0]}.pdf`);
     toast.success('PDF exported successfully');
@@ -271,7 +271,7 @@ const RentalProducts = () => {
             <h2 className="text-xl font-bold text-white mb-4">
               {editingProduct ? 'Edit Rental Product' : 'Add New Rental Product'}
             </h2>
-            
+
             <form onSubmit={formik.handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -284,9 +284,8 @@ const RentalProducts = () => {
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                     placeholder="Product name"
                   />
                   {formik.touched.name && formik.errors.name && (
@@ -304,9 +303,8 @@ const RentalProducts = () => {
                   value={formik.values.description}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                    formik.touched.description && formik.errors.description ? 'border-red-500' : 'border-neutral-600'
-                  }`}
+                  className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.description && formik.errors.description ? 'border-red-500' : 'border-neutral-600'
+                    }`}
                   placeholder="Product description"
                   rows="3"
                 />
@@ -327,9 +325,8 @@ const RentalProducts = () => {
                     value={formik.values.dailyRate}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.dailyRate && formik.errors.dailyRate ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.dailyRate && formik.errors.dailyRate ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                     placeholder="0.00"
                   />
                   {formik.touched.dailyRate && formik.errors.dailyRate && (
@@ -348,9 +345,8 @@ const RentalProducts = () => {
                     value={formik.values.weeklyRate}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.weeklyRate && formik.errors.weeklyRate ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.weeklyRate && formik.errors.weeklyRate ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                     placeholder="0.00"
                   />
                   {formik.touched.weeklyRate && formik.errors.weeklyRate && (
@@ -370,9 +366,8 @@ const RentalProducts = () => {
                     value={formik.values.quantity}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${
-                      formik.touched.quantity && formik.errors.quantity ? 'border-red-500' : 'border-neutral-600'
-                    }`}
+                    className={`w-full px-3 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.quantity && formik.errors.quantity ? 'border-red-500' : 'border-neutral-600'
+                      }`}
                     placeholder="0"
                   />
                   {formik.touched.quantity && formik.errors.quantity && (

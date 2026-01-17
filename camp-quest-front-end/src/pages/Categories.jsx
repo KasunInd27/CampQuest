@@ -1,7 +1,7 @@
 // pages/Categories.jsx
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Package, Tag, Calendar, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -296,16 +296,15 @@ const CategoryCard = ({ category, onEdit, onDelete }) => {
           </div>
           <div>
             <h3 className="font-semibold text-white">{category.name}</h3>
-            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-              category.isActive 
-                ? 'bg-lime-500/20 text-lime-500' 
+            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${category.isActive
+                ? 'bg-lime-500/20 text-lime-500'
                 : 'bg-neutral-700 text-neutral-400'
-            }`}>
+              }`}>
               {category.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
         </div>
-        
+
         <div className="flex gap-1">
           <button
             onClick={() => onEdit(category)}

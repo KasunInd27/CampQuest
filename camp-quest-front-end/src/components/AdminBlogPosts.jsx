@@ -1,20 +1,20 @@
 // pages/AdminBlogPosts.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  X, 
-  Eye, 
-  Star, 
-  Heart, 
+import {
+  Plus,
+  Edit,
+  Trash2,
+  X,
+  Eye,
+  Star,
+  Heart,
   MessageCircle,
   TrendingUp,
   BarChart3
 } from 'lucide-react';
 import { useFormik } from 'formik';
 import { blogPostSchema, blogPostUpdateSchema, blogCategories } from '../utils/blogValidationSchemas';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const AdminBlogPosts = () => {
@@ -36,7 +36,7 @@ const AdminBlogPosts = () => {
     try {
       setLoading(true);
       const response = await axios.get('/blog-posts?status=all&limit=100');
-      
+
       if (response.data.success) {
         setBlogPosts(response.data.blogPosts);
       }
@@ -85,7 +85,7 @@ const AdminBlogPosts = () => {
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     formik.setFieldValue('image', file);
-    
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -136,14 +136,14 @@ const AdminBlogPosts = () => {
         formData.append('category', values.category);
         formData.append('publishedDate', values.publishedDate);
         formData.append('status', values.status);
-        
+
         if (values.image) {
           formData.append('image', values.image);
         }
 
         const url = editingPost ? `/blog-posts/${editingPost._id}` : '/blog-posts';
         const method = editingPost ? 'put' : 'post';
-        
+
         const response = await axios[method](url, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -204,23 +204,23 @@ const AdminBlogPosts = () => {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard 
-            title="Total Posts" 
+          <StatsCard
+            title="Total Posts"
             value={stats.totalPosts}
             icon={<BarChart3 className="w-6 h-6 text-lime-500" />}
           />
-          <StatsCard 
-            title="Published" 
+          <StatsCard
+            title="Published"
             value={stats.publishedPosts}
             icon={<TrendingUp className="w-6 h-6 text-green-500" />}
           />
-          <StatsCard 
-            title="Drafts" 
+          <StatsCard
+            title="Drafts"
             value={stats.draftPosts}
             icon={<Edit className="w-6 h-6 text-yellow-500" />}
           />
-          <StatsCard 
-            title="Recent (30 days)" 
+          <StatsCard
+            title="Recent (30 days)"
             value={stats.recentPosts}
             icon={<Star className="w-6 h-6 text-blue-500" />}
           />
@@ -246,7 +246,7 @@ const AdminBlogPosts = () => {
       <div className="bg-neutral-900 rounded-lg border border-neutral-700">
         <div className="p-6">
           <h2 className="text-lg font-semibold text-white mb-4">All Blog Posts</h2>
-          
+
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-500"></div>
@@ -329,18 +329,17 @@ const BlogPostCard = ({ post, onEdit, onDelete, onViewDetails, formatDate, getCa
           </span>
           <span>•</span>
           <span>{formatDate(post.publishedDate)}</span>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            post.status === 'published' 
-              ? 'bg-lime-500/20 text-lime-500' 
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${post.status === 'published'
+              ? 'bg-lime-500/20 text-lime-500'
               : 'bg-yellow-400/20 text-yellow-400'
-          }`}>
+            }`}>
             {post.status}
           </span>
           <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getCategoryColor(post.category)}`}>
             {post.category}
           </span>
         </div>
-        
+
         {/* Interaction Stats */}
         {post.stats && (
           <div className="flex items-center gap-4 text-sm">
@@ -363,7 +362,7 @@ const BlogPostCard = ({ post, onEdit, onDelete, onViewDetails, formatDate, getCa
         )}
       </div>
     </div>
-    
+
     <div className="flex items-center space-x-2 ml-4">
       <button
         onClick={onViewDetails}
@@ -426,11 +425,10 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   value={formik.values.title}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-                    formik.touched.title && formik.errors.title
+                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.title && formik.errors.title
                       ? 'border-red-500'
                       : 'border-neutral-600'
-                  }`}
+                    }`}
                   placeholder="Enter blog post title"
                 />
                 {formik.touched.title && formik.errors.title && (
@@ -450,11 +448,10 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   value={formik.values.author}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-                    formik.touched.author && formik.errors.author
+                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.author && formik.errors.author
                       ? 'border-red-500'
                       : 'border-neutral-600'
-                  }`}
+                    }`}
                   placeholder="Enter author name"
                 />
                 {formik.touched.author && formik.errors.author && (
@@ -473,11 +470,10 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   value={formik.values.category}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-                    formik.touched.category && formik.errors.category
+                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.category && formik.errors.category
                       ? 'border-red-500'
                       : 'border-neutral-600'
-                  }`}
+                    }`}
                 >
                   <option value="">Select a category</option>
                   {blogCategories.map((category) => (
@@ -503,11 +499,10 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   value={formik.values.publishedDate}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-                    formik.touched.publishedDate && formik.errors.publishedDate
+                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.publishedDate && formik.errors.publishedDate
                       ? 'border-red-500'
                       : 'border-neutral-600'
-                  }`}
+                    }`}
                 />
                 {formik.touched.publishedDate && formik.errors.publishedDate && (
                   <p className="mt-1 text-sm text-red-400">{formik.errors.publishedDate}</p>
@@ -525,11 +520,10 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   value={formik.values.status}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-                    formik.touched.status && formik.errors.status
+                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.status && formik.errors.status
                       ? 'border-red-500'
                       : 'border-neutral-600'
-                  }`}
+                    }`}
                 >
                   <option value="published">Published</option>
                   <option value="draft">Draft</option>
@@ -552,16 +546,15 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                   name="image"
                   accept="image/*"
                   onChange={onImageChange}
-                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-lime-500 file:text-neutral-900 hover:file:bg-lime-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-                    formik.touched.image && formik.errors.image
+                  className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-lime-500 file:text-neutral-900 hover:file:bg-lime-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.image && formik.errors.image
                       ? 'border-red-500'
                       : 'border-neutral-600'
-                  }`}
+                    }`}
                 />
                 {formik.touched.image && formik.errors.image && (
                   <p className="mt-1 text-sm text-red-400">{formik.errors.image}</p>
                 )}
-                
+
                 {imagePreview && (
                   <div className="mt-4">
                     <p className="text-sm text-neutral-400 mb-2">Image Preview:</p>
@@ -587,11 +580,10 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                 value={formik.values.content}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors resize-none ${
-                  formik.touched.content && formik.errors.content
+                className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors resize-none ${formik.touched.content && formik.errors.content
                     ? 'border-red-500'
                     : 'border-neutral-600'
-                }`}
+                  }`}
                 placeholder="Write your blog post content here..."
               />
               {formik.touched.content && formik.errors.content && (
@@ -613,8 +605,8 @@ const BlogPostModal = ({ isOpen, onClose, formik, editingPost, imagePreview, onI
                 disabled={formik.isSubmitting}
                 className="px-6 py-3 bg-lime-500 text-neutral-900 rounded-lg hover:bg-lime-400 focus:outline-none focus:ring-4 focus:ring-lime-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
-                {formik.isSubmitting 
-                  ? (editingPost ? 'Updating...' : 'Creating...') 
+                {formik.isSubmitting
+                  ? (editingPost ? 'Updating...' : 'Creating...')
                   : (editingPost ? 'Update Post' : 'Create Post')
                 }
               </button>
@@ -703,11 +695,10 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
         <div className="flex border-b border-neutral-700">
           <button
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 px-6 py-3 font-medium transition-colors ${
-              activeTab === 'stats'
+            className={`flex-1 px-6 py-3 font-medium transition-colors ${activeTab === 'stats'
                 ? 'text-lime-500 border-b-2 border-lime-500 bg-neutral-900/50'
                 : 'text-neutral-400 hover:text-white hover:bg-neutral-900/30'
-            }`}
+              }`}
           >
             <div className="flex items-center justify-center space-x-2">
               <BarChart3 className="w-5 h-5" />
@@ -716,11 +707,10 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
           </button>
           <button
             onClick={() => setActiveTab('comments')}
-            className={`flex-1 px-6 py-3 font-medium transition-colors ${
-              activeTab === 'comments'
+            className={`flex-1 px-6 py-3 font-medium transition-colors ${activeTab === 'comments'
                 ? 'text-lime-500 border-b-2 border-lime-500 bg-neutral-900/50'
                 : 'text-neutral-400 hover:text-white hover:bg-neutral-900/30'
-            }`}
+              }`}
           >
             <div className="flex items-center justify-center space-x-2">
               <MessageCircle className="w-5 h-5" />
@@ -749,7 +739,7 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
                     {post.stats?.totalRatings || 0} rating{post.stats?.totalRatings !== 1 ? 's' : ''}
                   </p>
                 </div>
-                
+
                 <div className="p-6 bg-neutral-900 rounded-lg border border-neutral-700">
                   <div className="flex items-center justify-between mb-2">
                     <div>
@@ -760,7 +750,7 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
                   </div>
                   <p className="text-xs text-neutral-500">Unique users</p>
                 </div>
-                
+
                 <div className="p-6 bg-neutral-900 rounded-lg border border-neutral-700">
                   <div className="flex items-center justify-between mb-2">
                     <div>
@@ -783,10 +773,10 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
                   <div className="space-y-3">
                     {[5, 4, 3, 2, 1].map((rating) => {
                       const count = post.stats.ratingDistribution[rating] || 0;
-                      const percentage = post.stats.totalRatings > 0 
-                        ? (count / post.stats.totalRatings) * 100 
+                      const percentage = post.stats.totalRatings > 0
+                        ? (count / post.stats.totalRatings) * 100
                         : 0;
-                      
+
                       return (
                         <div key={rating} className="flex items-center space-x-3">
                           <div className="flex items-center w-20">
@@ -794,7 +784,7 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
                             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                           </div>
                           <div className="flex-1 h-4 bg-neutral-700 rounded-full overflow-hidden">
-                            <div 
+                            <div
                               className="h-full bg-gradient-to-r from-yellow-500 to-yellow-400 transition-all duration-500"
                               style={{ width: `${percentage}%` }}
                             />
@@ -848,20 +838,19 @@ const BlogDetailsModal = ({ post, isOpen, onClose }) => {
                       All Comments ({comments.length})
                     </h3>
                   </div>
-                  
+
                   {comments.map((comment) => (
                     <div key={comment._id} className="p-4 bg-neutral-900 rounded-lg border border-neutral-700 hover:border-neutral-600 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-1">
                             <h5 className="font-semibold text-white">{comment.name}</h5>
-                            <span className={`px-2 py-0.5 rounded-full text-xs ${
-                              comment.status === 'approved' 
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${comment.status === 'approved'
                                 ? 'bg-green-500/20 text-green-500'
                                 : comment.status === 'pending'
-                                ? 'bg-yellow-500/20 text-yellow-500'
-                                : 'bg-red-500/20 text-red-500'
-                            }`}>
+                                  ? 'bg-yellow-500/20 text-yellow-500'
+                                  : 'bg-red-500/20 text-red-500'
+                              }`}>
                               {comment.status}
                             </span>
                           </div>

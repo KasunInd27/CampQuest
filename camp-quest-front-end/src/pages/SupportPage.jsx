@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { MessageSquare, LifeBuoy, Send, Star, AlertCircle, CheckCircle } from 'lucide-react';
 import { useFormik } from 'formik';
 import { feedbackSchema, supportTicketSchema } from '../utils/validationSchemas';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const Support = () => {
@@ -26,22 +26,20 @@ const Support = () => {
         <div className="flex bg-neutral-800 rounded-lg p-1 mb-8">
           <button
             onClick={() => setActiveTab('ticket')}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'ticket'
+            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'ticket'
                 ? 'bg-lime-500 text-neutral-900'
                 : 'text-neutral-300 hover:text-white'
-            }`}
+              }`}
           >
             <LifeBuoy className="w-5 h-5 mr-2" />
             Support Ticket
           </button>
           <button
             onClick={() => setActiveTab('feedback')}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'feedback'
+            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'feedback'
                 ? 'bg-lime-500 text-neutral-900'
                 : 'text-neutral-300 hover:text-white'
-            }`}
+              }`}
           >
             <MessageSquare className="w-5 h-5 mr-2" />
             Feedback
@@ -126,11 +124,10 @@ const SupportTicketForm = () => {
             value={formik.values.subject}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-              formik.touched.subject && formik.errors.subject
+            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.subject && formik.errors.subject
                 ? 'border-red-500'
                 : 'border-neutral-600'
-            }`}
+              }`}
             placeholder="Brief description of your issue"
           />
           {formik.touched.subject && formik.errors.subject && (
@@ -145,11 +142,10 @@ const SupportTicketForm = () => {
             {categories.map((cat) => (
               <label
                 key={cat.value}
-                className={`relative flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
-                  formik.values.category === cat.value
+                className={`relative flex items-start p-4 border rounded-lg cursor-pointer transition-all ${formik.values.category === cat.value
                     ? 'border-lime-500 bg-lime-500/10'
                     : 'border-neutral-600 bg-neutral-700/50 hover:border-neutral-500'
-                }`}
+                  }`}
               >
                 <input
                   type="radio"
@@ -163,9 +159,8 @@ const SupportTicketForm = () => {
                   <span className="text-xl">{cat.icon}</span>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className={`font-medium ${
-                        formik.values.category === cat.value ? 'text-lime-500' : 'text-white'
-                      }`}>
+                      <span className={`font-medium ${formik.values.category === cat.value ? 'text-lime-500' : 'text-white'
+                        }`}>
                         {cat.label}
                       </span>
                       {formik.values.category === cat.value && (
@@ -190,11 +185,10 @@ const SupportTicketForm = () => {
             {priorities.map((priority) => (
               <label
                 key={priority.value}
-                className={`relative flex flex-col p-4 border rounded-lg cursor-pointer transition-all ${
-                  formik.values.priority === priority.value
+                className={`relative flex flex-col p-4 border rounded-lg cursor-pointer transition-all ${formik.values.priority === priority.value
                     ? 'border-lime-500 bg-lime-500/10'
                     : 'border-neutral-600 bg-neutral-700/50 hover:border-neutral-500'
-                }`}
+                  }`}
               >
                 <input
                   type="radio"
@@ -205,9 +199,8 @@ const SupportTicketForm = () => {
                   className="sr-only"
                 />
                 <div className="flex items-center justify-between mb-1">
-                  <span className={`font-medium ${
-                    formik.values.priority === priority.value ? 'text-lime-500' : priority.color
-                  }`}>
+                  <span className={`font-medium ${formik.values.priority === priority.value ? 'text-lime-500' : priority.color
+                    }`}>
                     {priority.label}
                   </span>
                   {formik.values.priority === priority.value && (
@@ -232,11 +225,10 @@ const SupportTicketForm = () => {
             value={formik.values.description}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors resize-none ${
-              formik.touched.description && formik.errors.description
+            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors resize-none ${formik.touched.description && formik.errors.description
                 ? 'border-red-500'
                 : 'border-neutral-600'
-            }`}
+              }`}
             placeholder="Please provide detailed information about your issue..."
           />
           {formik.touched.description && formik.errors.description && (
@@ -302,7 +294,7 @@ const FeedbackForm = () => {
   const getRatingText = (rating) => {
     const texts = {
       1: 'Very Dissatisfied',
-      2: 'Dissatisfied', 
+      2: 'Dissatisfied',
       3: 'Neutral',
       4: 'Satisfied',
       5: 'Very Satisfied'
@@ -336,11 +328,10 @@ const FeedbackForm = () => {
             value={formik.values.subject}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${
-              formik.touched.subject && formik.errors.subject
+            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors ${formik.touched.subject && formik.errors.subject
                 ? 'border-red-500'
                 : 'border-neutral-600'
-            }`}
+              }`}
             placeholder="Brief summary of your feedback"
           />
           {formik.touched.subject && formik.errors.subject && (
@@ -355,11 +346,10 @@ const FeedbackForm = () => {
             {categories.map((cat) => (
               <label
                 key={cat.value}
-                className={`relative flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
-                  formik.values.category === cat.value
+                className={`relative flex items-start p-4 border rounded-lg cursor-pointer transition-all ${formik.values.category === cat.value
                     ? 'border-lime-500 bg-lime-500/10'
                     : 'border-neutral-600 bg-neutral-700/50 hover:border-neutral-500'
-                }`}
+                  }`}
               >
                 <input
                   type="radio"
@@ -373,9 +363,8 @@ const FeedbackForm = () => {
                   <span className="text-xl">{cat.icon}</span>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className={`font-medium ${
-                        formik.values.category === cat.value ? 'text-lime-500' : 'text-white'
-                      }`}>
+                      <span className={`font-medium ${formik.values.category === cat.value ? 'text-lime-500' : 'text-white'
+                        }`}>
                         {cat.label}
                       </span>
                       {formik.values.category === cat.value && (
@@ -411,16 +400,15 @@ const FeedbackForm = () => {
                     className="p-2 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-lime-500 rounded-lg"
                   >
                     <Star
-                      className={`w-8 h-8 ${
-                        star <= (hoveredStar || formik.values.rating)
+                      className={`w-8 h-8 ${star <= (hoveredStar || formik.values.rating)
                           ? 'text-lime-500 fill-current'
                           : 'text-neutral-500'
-                      }`}
+                        }`}
                     />
                   </button>
                 ))}
               </div>
-              
+
               {formik.values.rating > 0 && (
                 <div className="text-center">
                   <p className="text-lg font-medium text-white">
@@ -447,11 +435,10 @@ const FeedbackForm = () => {
             value={formik.values.message}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors resize-none ${
-              formik.touched.message && formik.errors.message
+            className={`w-full px-4 py-3 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 transition-colors resize-none ${formik.touched.message && formik.errors.message
                 ? 'border-red-500'
                 : 'border-neutral-600'
-            }`}
+              }`}
             placeholder="Share your detailed feedback about our camping equipment and service..."
           />
           {formik.touched.message && formik.errors.message && (

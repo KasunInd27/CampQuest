@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useFormik } from 'formik';
 import { checkoutValidationSchema } from '../utils/checkoutValidations';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {

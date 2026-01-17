@@ -1,14 +1,12 @@
 // context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
-// Axios global config
-axios.defaults.baseURL = "http://localhost:5000/api";
-axios.defaults.withCredentials = true;
+// (Redundant configuration moved to lib/axios.js)
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -25,10 +23,6 @@ export const AuthProvider = ({ children }) => {
 
   // 🔁 Check auth on app load
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
     checkAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -36,23 +30,15 @@ export const AuthProvider = ({ children }) => {
   // 🔍 Check current auth session
   const checkAuth = async () => {
     try {
-      // If we have a token in localStorage but not in headers (e.g. reload), set it
-      const token = localStorage.getItem("token");
-      if (token && !axios.defaults.headers.common["Authorization"]) {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
-
       const { data } = await axios.get("/auth/me");
       if (data?.success && data?.user) {
         setUser(data.user);
       } else {
         setUser(null);
-        delete axios.defaults.headers.common["Authorization"];
         localStorage.removeItem("token");
       }
     } catch (error) {
       setUser(null);
-      delete axios.defaults.headers.common["Authorization"];
       localStorage.removeItem("token");
     } finally {
       setLoading(false);
@@ -69,13 +55,16 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (data?.success && data?.user) {
-        setUser(data.user);
-
-        // Optional: save JWT if backend returns it
         if (data.token) {
           localStorage.setItem("token", data.token);
+          // Set header immediately for subsequent requests (like checkAuth or fetching orders)
           axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
         }
+
+        setUser(data.user);
+
+        // Optionally refetch user info to ensure state is perfectly synchronized
+        await checkAuth();
 
         toast.success("Login successful!");
         navigate(
@@ -103,11 +92,14 @@ export const AuthProvider = ({ children }) => {
 
       // Backend returns: { token, user }
       if (data?.token && data?.user) {
-        setUser(data.user);
-
-        // Save JWT if you use it elsewhere
+        // Save JWT immediately
         localStorage.setItem("token", data.token);
         axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+
+        setUser(data.user);
+
+        // Synchronize state
+        await checkAuth();
 
         toast.success("Signed in with Google!");
         navigate(

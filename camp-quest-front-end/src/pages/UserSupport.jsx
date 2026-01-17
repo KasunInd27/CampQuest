@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, LifeBuoy, Edit, Trash2, Clock, CheckCircle, AlertCircle, Reply, Plus, X, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 const UserSupport = () => {
@@ -48,22 +48,20 @@ const UserSupport = () => {
         <div className="flex bg-neutral-800 rounded-lg p-1 mb-8">
           <button
             onClick={() => setActiveTab('tickets')}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'tickets'
+            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'tickets'
                 ? 'bg-lime-400 text-neutral-700'
                 : 'text-neutral-300 hover:text-white'
-            }`}
+              }`}
           >
             <LifeBuoy className="w-5 h-5 mr-2" />
             Support Tickets
           </button>
           <button
             onClick={() => setActiveTab('feedback')}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-              activeTab === 'feedback'
+            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'feedback'
                 ? 'bg-lime-400 text-neutral-700'
                 : 'text-neutral-300 hover:text-white'
-            }`}
+              }`}
           >
             <MessageSquare className="w-5 h-5 mr-2" />
             Feedback
@@ -209,7 +207,7 @@ const UserFeedbackList = ({ user }) => {
 
   const deleteFeedback = async (feedbackId) => {
     if (!window.confirm('Are you sure you want to delete this feedback?')) return;
-    
+
     try {
       const response = await axios.delete(`/feedback/${feedbackId}`);
       if (response.data.success) {
@@ -293,7 +291,7 @@ const TicketCard = ({ ticket, user, onReply, getStatusColor, getPriorityColor })
             <span>{new Date(ticket.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
-        
+
         <button
           onClick={() => onReply(ticket)}
           className="flex items-center px-4 py-2 bg-lime-400/10 text-lime-400 rounded-lg hover:bg-lime-400/20 transition-colors"
@@ -313,16 +311,14 @@ const TicketCard = ({ ticket, user, onReply, getStatusColor, getPriorityColor })
           {ticket.replies.slice(-2).map((reply, index) => (
             <div
               key={index}
-              className={`p-3 rounded-lg ${
-                reply.authorType === 'admin'
+              className={`p-3 rounded-lg ${reply.authorType === 'admin'
                   ? 'bg-lime-400/10 border border-lime-400/20'
                   : 'bg-neutral-700/50'
-              }`}
+                }`}
             >
               <div className="flex justify-between items-start mb-2">
-                <span className={`text-sm font-medium ${
-                  reply.authorType === 'admin' ? 'text-lime-400' : 'text-white'
-                }`}>
+                <span className={`text-sm font-medium ${reply.authorType === 'admin' ? 'text-lime-400' : 'text-white'
+                  }`}>
                   {reply.author}
                 </span>
                 <span className="text-xs text-neutral-400">
@@ -364,7 +360,7 @@ const FeedbackCard = ({ feedback, onEdit, onDelete }) => {
             </span>
           </div>
         </div>
-        
+
         <div className="flex space-x-2">
           <button
             onClick={() => onEdit(feedback)}
@@ -406,7 +402,7 @@ const ReplyModal = ({ ticket, user, onClose, onSuccess }) => {
         authorType: 'user',
         authorName: user.name || ticket.customerName
       });
-      
+
       if (response.data.success) {
         toast.success('Reply sent successfully');
         onSuccess();
@@ -449,16 +445,14 @@ const ReplyModal = ({ ticket, user, onClose, onSuccess }) => {
                 {ticket.replies.map((reply, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded-lg ${
-                      reply.authorType === 'admin'
+                    className={`p-3 rounded-lg ${reply.authorType === 'admin'
                         ? 'bg-lime-400/10 border border-lime-400/20'
                         : 'bg-neutral-700/50'
-                    }`}
+                      }`}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <span className={`text-sm font-medium ${
-                        reply.authorType === 'admin' ? 'text-lime-400' : 'text-white'
-                      }`}>
+                      <span className={`text-sm font-medium ${reply.authorType === 'admin' ? 'text-lime-400' : 'text-white'
+                        }`}>
                         {reply.author}
                       </span>
                       <span className="text-xs text-neutral-400">
@@ -537,7 +531,7 @@ const EditFeedbackModal = ({ feedback, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const response = await axios.put(`/feedback/${feedback._id}`, formData);
       if (response.data.success) {
@@ -590,11 +584,10 @@ const EditFeedbackModal = ({ feedback, onClose, onSuccess }) => {
               {categories.map((cat) => (
                 <label
                   key={cat.value}
-                  className={`relative flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
-                    formData.category === cat.value
+                  className={`relative flex items-center p-3 border rounded-lg cursor-pointer transition-all ${formData.category === cat.value
                       ? 'border-lime-400 bg-lime-400/10'
                       : 'border-neutral-600 bg-neutral-700/50 hover:border-neutral-500'
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -605,9 +598,8 @@ const EditFeedbackModal = ({ feedback, onClose, onSuccess }) => {
                     className="sr-only"
                   />
                   <span className="text-lg mr-3">{cat.icon}</span>
-                  <span className={`font-medium ${
-                    formData.category === cat.value ? 'text-lime-400' : 'text-white'
-                  }`}>
+                  <span className={`font-medium ${formData.category === cat.value ? 'text-lime-400' : 'text-white'
+                    }`}>
                     {cat.label}
                   </span>
                 </label>
@@ -629,11 +621,10 @@ const EditFeedbackModal = ({ feedback, onClose, onSuccess }) => {
                   className="p-2 transition-all duration-200 hover:scale-110 focus:outline-none"
                 >
                   <Star
-                    className={`w-8 h-8 ${
-                      star <= (hoveredStar || formData.rating)
+                    className={`w-8 h-8 ${star <= (hoveredStar || formData.rating)
                         ? 'text-lime-400 fill-current'
                         : 'text-neutral-500'
-                    }`}
+                      }`}
                   />
                 </button>
               ))}

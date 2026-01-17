@@ -1,14 +1,17 @@
 // Orders.jsx
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Package, Eye, Edit, X, Clock, CheckCircle, Truck, AlertCircle, Calendar, MapPin, Phone, Mail, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 const Orders = () => {
-  const { user, loading: authLoading, isAuthenticated } = useAuth();
+  const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Default to true to prevent "No Orders Only" flash
+  const [hasFetched, setHasFetched] = useState(false); // Track if initial fetch is done
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [editingOrder, setEditingOrder] = useState(null);
   const [cancellingOrder, setCancellingOrder] = useState(null);
@@ -19,28 +22,37 @@ const Orders = () => {
   const [orderStats, setOrderStats] = useState(null);
 
   useEffect(() => {
-    if (isAuthenticated && user?._id) {
+    // Only fetch when auth is fully loaded and user ID is available
+    if (!authLoading && isAuthenticated && user?._id) {
       fetchOrders();
       fetchOrderStats();
+    } else if (!authLoading && !isAuthenticated) {
+      setLoading(false);
+      setHasFetched(true);
     }
-  }, [statusFilter, user, isAuthenticated]);
+  }, [statusFilter, user?._id, isAuthenticated, authLoading, location.key]);
 
   const fetchOrders = async () => {
-    if (!user?._id) {
-      console.log('No user ID available');
-      return;
-    }
+    if (!user?._id) return;
 
-    setLoading(true);
     try {
-      const { data } = await axios.get(`/orders/user/orders?status=${statusFilter}`);
+      setLoading(true);
+      const { data } = await axios.get('/orders/user/orders', {
+        params: { status: statusFilter }
+      });
       setOrders(data.orders || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
-      toast.error(error.response?.data?.message || 'Failed to fetch orders');
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        toast.error('Session expired. Please login again.');
+        logout();
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to fetch orders');
+      }
       setOrders([]);
     } finally {
       setLoading(false);
+      setHasFetched(true);
     }
   };
 
@@ -156,8 +168,7 @@ const Orders = () => {
     { value: 'cancelled', label: 'Cancelled' }
   ];
 
-  // Show loading spinner while checking authentication
-  if (authLoading) {
+  if (authLoading || (loading && !hasFetched)) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
@@ -183,7 +194,7 @@ const Orders = () => {
     );
   }
 
-  if (loading && orders.length === 0) {
+  if (loading && orders.length === 0 && !hasFetched) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>

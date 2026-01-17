@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, Lock, CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 
@@ -11,7 +11,7 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('card');
-  
+
   const [cardData, setCardData] = useState({
     cardNumber: '',
     cardName: '',
@@ -102,7 +102,7 @@ const Payment = () => {
 
       // Get the order ID from response - handle different response structures
       let createdOrderId;
-      
+
       if (response.data.data && response.data.data._id) {
         createdOrderId = response.data.data._id;
       } else if (response.data.order && response.data.order._id) {
@@ -122,12 +122,12 @@ const Payment = () => {
       sessionStorage.removeItem('orderData');
 
       // Navigate to success page with order ID
-      navigate('/success', { 
-        state: { 
+      navigate('/success', {
+        state: {
           orderId: createdOrderId
-        } 
+        }
       });
-      
+
       toast.success('Payment successful!');
     } catch (error) {
       console.error('Payment error:', error);
@@ -159,7 +159,7 @@ const Payment = () => {
               <h2 className="text-xl font-semibold text-white mb-4">
                 Payment Method
               </h2>
-              
+
               <div className="space-y-3">
                 <label className="flex items-center p-4 bg-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-600 transition-colors">
                   <input
@@ -173,7 +173,7 @@ const Payment = () => {
                   <CreditCard className="mr-3 text-lime-500" size={20} />
                   <span className="text-white">Credit/Debit Card</span>
                 </label>
-                
+
                 <label className="flex items-center p-4 bg-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-600 transition-colors">
                   <input
                     type="radio"
@@ -194,7 +194,7 @@ const Payment = () => {
                 <h2 className="text-xl font-semibold text-white mb-4">
                   Card Information
                 </h2>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-300 mb-1">
@@ -285,7 +285,7 @@ const Payment = () => {
                     <div className="flex-1">
                       <p className="text-white text-sm">{item.name}</p>
                       <p className="text-neutral-400 text-xs">
-                        {item.type === 'sale' 
+                        {item.type === 'sale'
                           ? `Qty: ${item.quantity}`
                           : `${item.quantity} × ${item.rentalDays} days`
                         }

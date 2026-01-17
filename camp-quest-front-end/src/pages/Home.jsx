@@ -1,7 +1,7 @@
 // HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../lib/axios';
 import toast from 'react-hot-toast';
 
 // Hero Component
@@ -16,7 +16,7 @@ function Hero() {
           className="w-full h-full object-cover opacity-40"
         />
       </div>
-      
+
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -32,13 +32,13 @@ function Hero() {
               Rent or buy premium camping equipment for your next outdoor adventure. We've got everything you need.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link 
+              <Link
                 to="/rent"
                 className="px-8 py-3 bg-lime-500 text-gray-900 font-semibold rounded-lg hover:bg-lime-400 transition-colors text-center"
               >
                 Rent Equipment
               </Link>
-              <Link 
+              <Link
                 to="/shop"
                 className="px-8 py-3 border-2 border-lime-500 text-lime-500 font-semibold rounded-lg hover:bg-lime-500 hover:text-gray-900 transition-colors text-center"
               >
@@ -46,7 +46,7 @@ function Hero() {
               </Link>
             </div>
           </div>
-          
+
           {/* Product Image */}
           <div className="hidden lg:flex justify-end">
             <div className="bg-lime-500 p-2 rounded-lg shadow-2xl transform rotate-3">
@@ -175,7 +175,7 @@ function FeaturedProducts() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-red-400 mb-4">{error}</p>
-            <button 
+            <button
               onClick={fetchProducts}
               className="px-6 py-2 bg-lime-500 text-gray-900 rounded-lg hover:bg-lime-400 transition-colors"
             >
@@ -198,31 +198,28 @@ function FeaturedProducts() {
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setActiveTab('rent')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeTab === 'rent' 
-                  ? 'bg-lime-500 text-gray-900' 
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'rent'
+                  ? 'bg-lime-500 text-gray-900'
                   : 'text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               For Rent
             </button>
             <button
               onClick={() => setActiveTab('sale')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeTab === 'sale' 
-                  ? 'bg-lime-500 text-gray-900' 
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'sale'
+                  ? 'bg-lime-500 text-gray-900'
                   : 'text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               For Sale
             </button>
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeTab === 'all' 
-                  ? 'bg-lime-500 text-gray-900' 
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'all'
+                  ? 'bg-lime-500 text-gray-900'
                   : 'text-gray-600 hover:text-gray-900'
-              }`}
+                }`}
             >
               View All
             </button>
@@ -241,7 +238,7 @@ function FeaturedProducts() {
                 <div key={`${product.type}-${product._id}-${index}`} className="bg-neutral-900 border border-lime-500 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <img
-                      src={product.images && product.images.length > 0 
+                      src={product.images && product.images.length > 0
                         ? `/uploads/${product.type === 'rental' ? 'rental-products' : 'sales-products'}/${product.images[0]}`
                         : 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
                       }
@@ -251,11 +248,10 @@ function FeaturedProducts() {
                         e.target.src = 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
                       }}
                     />
-                    <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded ${
-                      product.type === 'rental' 
-                        ? 'bg-blue-100 text-blue-800' 
+                    <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded ${product.type === 'rental'
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-green-100 text-green-800'
-                    }`}>
+                      }`}>
                       {product.type === 'rental' ? 'RENTAL' : 'FOR SALE'}
                     </span>
                   </div>
@@ -287,7 +283,7 @@ function FeaturedProducts() {
 
             {/* Footer */}
             <div className="text-center">
-              <Link 
+              <Link
                 to={activeTab === 'rent' ? '/rent' : activeTab === 'sale' ? '/shop' : '/rent'}
                 className="px-8 py-3 border-2 border-lime-500 text-lime-500 font-semibold rounded-lg hover:border-lime-400 hover:text-lime-400 transition-colors"
               >
@@ -376,13 +372,13 @@ function CallToAction() {
           Whether you need to rent equipment for a weekend getaway or want to purchase quality gear for your outdoor lifestyle, we've got you covered.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link 
+          <Link
             to="/rent"
             className="px-8 py-3 bg-neutral-900 text-white font-semibold rounded-lg hover:bg-lime-400 transition-colors"
           >
             Browse Rental Equipment
           </Link>
-          <Link 
+          <Link
             to="/shop"
             className="px-8 py-3 border-2 border-neutral-900 text-black font-semibold rounded-lg hover:bg-lime-500 hover:text-gray-900 transition-colors"
           >
@@ -408,9 +404,9 @@ function BlogPreview() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await axios.get('/blog-posts?limit=4&page=1&status=published');
-      
+
       if (response.data.success) {
         setBlogPosts(response.data.blogPosts || []);
       }
@@ -467,11 +463,11 @@ function BlogPreview() {
           <h2 className="text-3xl font-bold text-white mb-4 sm:mb-0">
             Camping Tips & <span className="text-lime-500">Guides</span>
           </h2>
-          <Link 
-            to="/blog" 
+          <Link
+            to="/blog"
             className="flex items-center text-lime-600 hover:text-lime-500 font-medium transition-colors"
           >
-            View all articles 
+            View all articles
             <svg className="ml-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12,5 19,12 12,19"></polyline>
@@ -483,7 +479,7 @@ function BlogPreview() {
         {error ? (
           <div className="text-center py-12">
             <p className="text-red-400 mb-4">{error}</p>
-            <button 
+            <button
               onClick={fetchBlogPosts}
               className="px-6 py-2 bg-lime-500 text-gray-900 rounded-lg hover:bg-lime-400 transition-colors"
             >
@@ -523,11 +519,11 @@ function BlogPreview() {
                   <p className="text-white mb-4 line-clamp-3 text-sm">
                     {truncateContent(post.content)}
                   </p>
-                  <Link 
-                    to={`/blog/${post._id}`} 
+                  <Link
+                    to={`/blog/${post._id}`}
                     className="flex items-center text-lime-600 hover:text-lime-500 font-medium transition-colors text-sm"
                   >
-                    Read Article 
+                    Read Article
                     <svg className="ml-2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12"></line>
                       <polyline points="12,5 19,12 12,19"></polyline>
@@ -541,7 +537,7 @@ function BlogPreview() {
 
         {/* Mobile Footer */}
         <div className="text-center mt-12 sm:hidden">
-          <Link 
+          <Link
             to="/blog"
             className="px-8 py-3 border-2 border-lime-500 text-lime-500 font-semibold rounded-lg hover:border-lime-400 hover:text-lime-400 transition-colors"
           >
