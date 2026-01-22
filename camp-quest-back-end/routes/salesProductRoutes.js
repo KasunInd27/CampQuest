@@ -19,8 +19,8 @@ router.get('/stats', getSalesProductStats);
 router.get('/:id', getSalesProduct);
 
 // Protected routes (Admin only) - Made public for testing
-router.post('/', uploadSalesProductImages.array('images', 10), createSalesProduct);
-router.put('/:id', uploadSalesProductImages.array('images', 10), updateSalesProduct);
+router.post('/', createSalesProduct);
+router.put('/:id', updateSalesProduct);
 router.delete('/:id', deleteSalesProduct);
 
 export default router;

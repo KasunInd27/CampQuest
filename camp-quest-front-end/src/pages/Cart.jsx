@@ -130,7 +130,7 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateRentalDays, onRemove }) => {
       <div className="w-24 h-24 bg-neutral-700 rounded-lg overflow-hidden flex-shrink-0">
         {item.images && item.images.length > 0 ? (
           <img
-            src={`${BASE_URL}${imageUrl}`}
+            src={item.images?.[0]?.startsWith('http') ? item.images[0] : `${BASE_URL}${imageUrl}`}
             alt={item.name}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}

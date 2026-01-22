@@ -7,6 +7,8 @@ import { salesProductValidationSchema } from '../utils/productValidations';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+import { uploadImageToCloudinary } from '../lib/uploadImage';
+
 const SalesProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -31,37 +33,42 @@ const SalesProducts = () => {
     validationSchema: salesProductValidationSchema,
     onSubmit: async (values) => {
       try {
-        const submitData = new FormData();
+        setLoading(true);
+        let imageUrls = [];
 
-        // Convert features string to array
-        const processedValues = {
+        // 1. Upload new images to Cloudinary
+        if (selectedImages && selectedImages.length > 0) {
+          const uploadPromises = selectedImages.map(file => uploadImageToCloudinary(file));
+          const uploadResults = await Promise.all(uploadPromises);
+          imageUrls = uploadResults.map(res => res.url);
+        }
+
+        // 2. Combine with existing images if editing
+        if (editingProduct && editingProduct.images) {
+          // We need to keep existing images that weren't removed. 
+          // BUT the current UI logic (removeImage) only modifies selectedImages (new ones) or implicitly assumes we replace?
+          // Looking at previous logic: "updateData.images = [...(product.images || []), ...newImages];" in backend.
+          // In frontend "removeImage" filtered selectedImages.
+          // The "Current Images" section in UI (lines 596-608) just SHOWS them, didn't seem to have delete functionality?
+          // Wait, I need to check the UI code for removing existing images. 
+          // There is no UI to remove *existing* images in the form (only "selectedImages" which are new).
+          // So we should preserve existing images.
+          imageUrls = [...editingProduct.images, ...imageUrls];
+        }
+
+        // 3. Prepare JSON payload
+        const payload = {
           ...values,
-          features: values.features ? values.features.split('\n').filter(f => f.trim()) : []
+          features: values.features ? values.features.split('\n').filter(f => f.trim()) : [],
+          images: imageUrls
         };
 
-        // Append form data
-        Object.keys(processedValues).forEach(key => {
-          if (key === 'features') {
-            submitData.append(key, JSON.stringify(processedValues[key]));
-          } else {
-            submitData.append(key, processedValues[key]);
-          }
-        });
-
-        // Append images
-        selectedImages.forEach((image, index) => {
-          submitData.append('images', image);
-        });
-
+        // 4. Send JSON request
         if (editingProduct) {
-          await axios.put(`/sales-products/${editingProduct._id}`, submitData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
+          await axios.put(`/sales-products/${editingProduct._id}`, payload);
           toast.success('Product updated successfully');
         } else {
-          await axios.post('/sales-products', submitData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
+          await axios.post('/sales-products', payload);
           toast.success('Product created successfully');
         }
 
@@ -69,6 +76,9 @@ const SalesProducts = () => {
         fetchProducts();
       } catch (error) {
         toast.error(error.response?.data?.message || 'Failed to save product');
+        console.error("Save error:", error);
+      } finally {
+        setLoading(false);
       }
     }
   });
@@ -599,7 +609,7 @@ const SalesProducts = () => {
                       {editingProduct.images.map((image, index) => (
                         <img
                           key={index}
-                          src={`${BASE_URL}/uploads/sales-products/${image}`}
+                          src={image.startsWith('http') ? image : `${BASE_URL}/uploads/sales-products/${image}`}
                           alt={`Product ${index}`}
                           className="w-full h-20 object-cover rounded"
                         />
@@ -658,7 +668,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
         <div className="relative h-48 bg-neutral-800">
           {product.images && product.images.length > 0 ? (
             <img
-              src={`${BASE_URL}/uploads/sales-products/${product.images[0]}`}
+              src={product.images[0].startsWith('http') ? product.images[0] : `${BASE_URL}/uploads/sales-products/${product.images[0]}`}
               alt={product.name}
               className="w-full h-full object-cover rounded-t-lg"
             />
@@ -749,7 +759,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
                   {product.images.map((image, index) => (
                     <img
                       key={index}
-                      src={`${BASE_URL}/uploads/sales-products/${image}`}
+                      src={image.startsWith('http') ? image : `${BASE_URL}/uploads/sales-products/${image}`}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-32 object-cover rounded"
                     />

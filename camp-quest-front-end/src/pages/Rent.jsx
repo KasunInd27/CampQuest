@@ -236,7 +236,7 @@ const RentalProductCard = ({ product }) => {
       <div className="relative h-48 bg-neutral-700 rounded-t-lg overflow-hidden">
         {product.images && product.images.length > 0 && !imageError ? (
           <img
-            src={`${BASE_URL}/uploads/rental-products/${product.images[0]}`}
+            src={product.images[0].startsWith('http') ? product.images[0] : `${BASE_URL}/uploads/rental-products/${product.images[0]}`}
             alt={product.name}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}

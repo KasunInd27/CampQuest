@@ -9,10 +9,10 @@ import path from 'path';
 // @access  Public
 export const getSalesProducts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 50, search, category, priceMin, priceMax } = req.query;
-  
+
   // Build query
   let query = {};
-  
+
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },
@@ -20,11 +20,11 @@ export const getSalesProducts = asyncHandler(async (req, res) => {
       { brand: { $regex: search, $options: 'i' } }
     ];
   }
-  
+
   if (category) {
     query.category = category;
   }
-  
+
   if (priceMin || priceMax) {
     query.price = {};
     if (priceMin) query.price.$gte = parseFloat(priceMin);
@@ -125,8 +125,8 @@ export const createSalesProduct = asyncHandler(async (req, res) => {
       featuresArray = features.split('\n').filter(feature => feature.trim() !== '');
     }
 
-    // Handle uploaded images
-    const images = req.files ? req.files.map(file => file.filename) : [];
+    // Handle images (now URLs from Cloudinary)
+    const images = req.body.images || [];
 
     const productData = {
       name: name.trim(),
@@ -147,7 +147,7 @@ export const createSalesProduct = asyncHandler(async (req, res) => {
     }
 
     const product = await SalesProduct.create(productData);
-    
+
     // Populate the response
     await product.populate('category', 'name');
 
@@ -158,16 +158,9 @@ export const createSalesProduct = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating sales product:', error);
-    
-    // Delete uploaded files if product creation fails
-    if (req.files) {
-      req.files.forEach(file => {
-        fs.unlink(file.path, (err) => {
-          if (err) console.error('Error deleting file:', err);
-        });
-      });
-    }
-    
+
+    // (No local files to delete on error)
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -206,23 +199,9 @@ export const updateSalesProduct = asyncHandler(async (req, res) => {
       featuresArray = features.split('\n').filter(feature => feature.trim() !== '');
     }
 
-    // Handle uploaded images
-    const newImages = req.files ? req.files.map(file => file.filename) : [];
-
-    const updateData = {};
-    if (name !== undefined) updateData.name = name.trim();
-    if (description !== undefined) updateData.description = description.trim();
-    if (price !== undefined) updateData.price = parseFloat(price);
-    if (category !== undefined) updateData.category = category || null;
-    if (brand !== undefined) updateData.brand = brand.trim();
-    if (stock !== undefined) updateData.stock = parseInt(stock);
-    if (features !== undefined) updateData.features = featuresArray;
-    if (specifications !== undefined) updateData.specifications = specifications.trim();
-    if (isActive !== undefined) updateData.isActive = isActive;
-    
-    // Update images if new ones are uploaded
-    if (newImages.length > 0) {
-      updateData.images = [...(product.images || []), ...newImages];
+    // Update images if new ones are provided (replace existing)
+    if (req.body.images) {
+      updateData.images = req.body.images;
     }
 
     product = await SalesProduct.findByIdAndUpdate(
@@ -238,7 +217,7 @@ export const updateSalesProduct = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating sales product:', error);
-    
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -269,15 +248,7 @@ export const deleteSalesProduct = asyncHandler(async (req, res) => {
       });
     }
 
-    // Delete associated images
-    if (product.images && product.images.length > 0) {
-      product.images.forEach(image => {
-        const imagePath = path.join('uploads/sales-products', image);
-        fs.unlink(imagePath, (err) => {
-          if (err) console.error('Error deleting image:', err);
-        });
-      });
-    }
+    // (Cloud images are not deleted locally)
 
     await SalesProduct.findByIdAndDelete(req.params.id);
 

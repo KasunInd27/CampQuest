@@ -20,8 +20,8 @@ router.get('/stats', getRentalProductStats);
 router.get('/:id', getRentalProduct);
 
 // Protected routes (Admin only) - Made public for testing
-router.post('/', uploadRentalProductImages.array('images', 10), createRentalProduct);
-router.put('/:id', uploadRentalProductImages.array('images', 10), updateRentalProduct);
+router.post('/', createRentalProduct);
+router.put('/:id', updateRentalProduct);
 router.put('/:id/quantity', updateProductQuantity);
 router.delete('/:id', deleteRentalProduct);
 

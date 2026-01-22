@@ -20,8 +20,8 @@ router.get('/categories', getCategories);
 router.get('/:id', getBlogPostById);
 
 // Admin routes (no auth as requested)
-router.post('/', uploadBlogImages.single('image'), createBlogPost);
-router.put('/:id', uploadBlogImages.single('image'), updateBlogPost);
+router.post('/', createBlogPost);
+router.put('/:id', updateBlogPost);
 router.delete('/:id', deleteBlogPost);
 
 export default router;
