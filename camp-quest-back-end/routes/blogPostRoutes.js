@@ -11,7 +11,7 @@ import {
   getBlogStats,
   getCategories
 } from '../controllers/blogPostController.js';
-import { uploadBlogImages } from '../middleware/upload.js';
+
 
 // Public routes
 router.get('/', getAllBlogPosts);
