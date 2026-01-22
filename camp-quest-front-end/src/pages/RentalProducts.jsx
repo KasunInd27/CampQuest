@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 import { uploadImageToCloudinary } from '../lib/uploadImage';
+import { getValidImageUrl } from '../lib/imageHelper';
 
 const RentalProducts = () => {
   const [products, setProducts] = useState([]);
@@ -562,9 +563,9 @@ const RentalProductCard = ({ product, onEdit, onDelete }) => {
       <div className="bg-neutral-900 rounded-lg border border-neutral-700 hover:border-lime-500 transition-colors">
         {/* Product Image */}
         <div className="relative h-48 bg-neutral-800">
-          {product.images && product.images.length > 0 ? (
+          {getValidImageUrl(product, 'rental-products') ? (
             <img
-              src={product.images[0].startsWith('http') ? product.images[0] : `${BASE_URL}/uploads/rental-products/${product.images[0]}`}
+              src={getValidImageUrl(product, 'rental-products')}
               alt={product.name}
               className="w-full h-full object-cover rounded-t-lg"
             />
