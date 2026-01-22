@@ -18,6 +18,8 @@ import DashboardRoutes from './routes/dashboardRoutes.js';
 import blogInteractionRoutes from './routes/blogInteractionRoutes.js';
 import googleLoginRoutes from './routes/googleLoginRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import uploadRoutes from "./routes/uploadRoutes.js";
+
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -73,6 +75,8 @@ app.use('/api/dashboard', DashboardRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/blog-interactions', blogInteractionRoutes);
 app.use('/api/auth/google', googleLoginRoutes);
+app.use("/api/uploads", uploadRoutes);
+
 
 // ✅ Error handling middleware
 app.use((err, req, res, next) => {
