@@ -4,6 +4,7 @@ import { Search, Filter, ShoppingCart, Star, Package } from 'lucide-react';
 import axios, { BASE_URL } from '../lib/axios';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
+import { getValidImageUrl } from '../lib/imageHelper';
 
 // (API_BASE_URL redundant, using BASE_URL directly for images)
 
@@ -135,18 +136,12 @@ const ProductCard = ({ product, onAddToCart }) => {
     <div className="bg-neutral-800 rounded-lg  hover:shadow-xl transition-shadow">
       {/* Product Image */}
       <div className="relative h-48 bg-neutral-700">
-        {product.images && product.images.length > 0 ? (
-          <img
-            src={product.images[0].startsWith('http') ? product.images[0] : `${BASE_URL}/uploads/sales-products/${product.images[0]}`}
-            alt={product.name}
-            className="w-full h-full object-cover rounded-lg"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Package className="w-16 h-16 text-neutral-600" />
-          </div>
-        )}
+        <img
+          src={getValidImageUrl(product, 'sales-products')}
+          alt={product.name}
+          className="w-full h-full object-cover rounded-lg"
+          onError={() => setImageError(true)}
+        />
         {product.stock <= 5 && product.stock > 0 && (
           <span className="absolute top-2 right-2 bg-yellow-500 text-neutral-900 px-2 py-1 rounded text-xs font-bold">
             Low Stock

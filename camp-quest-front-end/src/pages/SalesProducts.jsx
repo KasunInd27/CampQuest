@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 import { uploadImageToCloudinary } from '../lib/uploadImage';
+import { getValidImageUrl } from '../lib/imageHelper';
 
 const SalesProducts = () => {
   const [products, setProducts] = useState([]);
@@ -657,7 +658,7 @@ const SalesProducts = () => {
   );
 };
 
-// Product Card Component
+// ProductCard Component
 const ProductCard = ({ product, onEdit, onDelete }) => {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -666,17 +667,11 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
       <div className="bg-neutral-900 rounded-lg border border-neutral-700 hover:border-lime-500 transition-colors">
         {/* Product Image */}
         <div className="relative h-48 bg-neutral-800">
-          {product.images && product.images.length > 0 ? (
-            <img
-              src={product.images[0].startsWith('http') ? product.images[0] : `${BASE_URL}/uploads/sales-products/${product.images[0]}`}
-              alt={product.name}
-              className="w-full h-full object-cover rounded-t-lg"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Package className="w-16 h-16 text-neutral-600" />
-            </div>
-          )}
+          <img
+            src={getValidImageUrl(product, 'sales-products')}
+            alt={product.name}
+            className="w-full h-full object-cover rounded-t-lg"
+          />
           <div className="absolute top-2 right-2 flex gap-1">
             <button
               onClick={() => setShowDetails(true)}

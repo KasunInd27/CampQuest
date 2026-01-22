@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
+import { getValidImageUrl } from '../lib/imageHelper';
 
 // Hero Component
 function Hero() {
@@ -238,17 +239,9 @@ function FeaturedProducts() {
                 <div key={`${product.type}-${product._id}-${index}`} className="bg-neutral-900 border border-lime-500 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <img
-                      src={product.images && product.images.length > 0
-                        ? (product.images[0].startsWith('http')
-                          ? product.images[0]
-                          : `${BASE_URL}/uploads/${product.type === 'rental' ? 'rental-products' : 'sales-products'}/${product.images[0]}`)
-                        : 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-                      }
+                      src={getValidImageUrl(product, product.type === 'rental' ? 'rental-products' : 'sales-products')}
                       alt={product.name}
                       className="w-full h-48 object-cover rounded-t-lg"
-                      onError={(e) => {
-                        e.target.src = 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
-                      }}
                     />
                     <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded ${product.type === 'rental'
                       ? 'bg-blue-100 text-blue-800'
