@@ -754,7 +754,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
                   {product.images.map((image, index) => (
                     <img
                       key={index}
-                      src={image.startsWith('http') ? image : `${BASE_URL}/uploads/sales-products/${image}`}
+                      src={resolveImageUrl(image, 'sales-products')}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-32 object-cover rounded"
                     />

@@ -4,7 +4,7 @@ import { Search, Filter, ShoppingCart, Star, Package } from 'lucide-react';
 import axios, { BASE_URL } from '../lib/axios';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
-import { getValidImageUrl } from '../lib/imageHelper';
+import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
 
 // (API_BASE_URL redundant, using BASE_URL directly for images)
 
@@ -137,7 +137,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       {/* Product Image */}
       <div className="relative h-48 bg-neutral-700">
         <img
-          src={getValidImageUrl(product, 'sales-products')}
+          src={resolveImageUrl(getValidImageUrl(product, 'sales-products'), 'sales-products')}
           alt={product.name}
           className="w-full h-full object-cover rounded-lg"
           onError={() => setImageError(true)}
