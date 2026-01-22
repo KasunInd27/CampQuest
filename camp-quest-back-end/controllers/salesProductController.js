@@ -1,5 +1,6 @@
 // controllers/salesProductController.js
 import SalesProduct from '../models/SalesProduct.js';
+import mongoose from 'mongoose';
 import asyncHandler from 'express-async-handler';
 import fs from 'fs';
 import path from 'path';
@@ -65,6 +66,13 @@ export const getSalesProducts = asyncHandler(async (req, res) => {
 // @access  Public
 export const getSalesProduct = asyncHandler(async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
     const product = await SalesProduct.findById(req.params.id)
       .populate('category', 'name')
       .populate('createdBy', 'name email');
@@ -184,6 +192,13 @@ export const updateSalesProduct = asyncHandler(async (req, res) => {
   try {
     const { name, description, price, category, brand, stock, features, specifications, isActive } = req.body;
 
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
     let product = await SalesProduct.findById(req.params.id);
 
     if (!product) {
@@ -194,10 +209,25 @@ export const updateSalesProduct = asyncHandler(async (req, res) => {
     }
 
     // Process features if provided
-    let featuresArray = [];
+    let featuresArray;
     if (features) {
       featuresArray = features.split('\n').filter(feature => feature.trim() !== '');
     }
+
+    const updateData = {
+      name: name?.trim(),
+      description: description?.trim(),
+      price: price ? parseFloat(price) : undefined,
+      category,
+      brand: brand?.trim(),
+      stock: stock ? parseInt(stock) : undefined,
+      features: featuresArray,
+      specifications: specifications?.trim(),
+      isActive
+    };
+
+    // Remove undefined fields
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
     // Update images if new ones are provided (replace existing)
     if (req.body.images) {
@@ -239,6 +269,13 @@ export const updateSalesProduct = asyncHandler(async (req, res) => {
 // @access  Private (Admin only)
 export const deleteSalesProduct = asyncHandler(async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
     const product = await SalesProduct.findById(req.params.id);
 
     if (!product) {

@@ -1,6 +1,7 @@
 // controllers/blogPostController.js - UPDATE the getAllBlogPosts and getBlogPostById functions
 
 import BlogPost from '../models/BlogPost.js';
+import mongoose from 'mongoose';
 import BlogRating from '../models/BlogRating.js';
 import BlogLike from '../models/BlogLike.js';
 import BlogComment from '../models/BlogComment.js';
@@ -100,6 +101,13 @@ export const getBlogPostById = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid blog post ID'
+      });
+    }
+
     const blogPost = await BlogPost.findById(id);
 
     if (!blogPost) {
@@ -195,6 +203,13 @@ export const updateBlogPost = async (req, res) => {
     const { id } = req.params;
     const { title, author, content, category, publishedDate, status } = req.body;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid blog post ID'
+      });
+    }
+
     const blogPost = await BlogPost.findById(id);
 
     if (!blogPost) {
@@ -245,6 +260,13 @@ export const updateBlogPost = async (req, res) => {
 export const deleteBlogPost = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid blog post ID'
+      });
+    }
 
     const blogPost = await BlogPost.findById(id);
 

@@ -10,7 +10,7 @@ import {
   updateProductQuantity
 } from '../controllers/rentalProductController.js';
 
-import { uploadRentalProductImages } from '../middleware/upload.js';
+
 
 const router = express.Router();
 

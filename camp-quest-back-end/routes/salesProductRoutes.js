@@ -9,7 +9,7 @@ import {
   getSalesProductStats
 } from '../controllers/salesProductController.js';
 
-import { uploadSalesProductImages } from '../middleware/upload.js';
+
 
 const router = express.Router();
 
