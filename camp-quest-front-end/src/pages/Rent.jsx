@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { getValidImageUrl } from '../lib/imageHelper';
+import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
 const Rent = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -237,7 +237,7 @@ const RentalProductCard = ({ product }) => {
       <div className="relative h-48 bg-neutral-700 rounded-t-lg overflow-hidden">
         {getValidImageUrl(product, 'rental-products') && !imageError ? (
           <img
-            src={getValidImageUrl(product, 'rental-products')}
+            src={resolveImageUrl(getValidImageUrl(product, 'rental-products'), 'rental-products')}
             alt={product.name}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}

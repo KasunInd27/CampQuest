@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
-import { getValidImageUrl } from '../lib/imageHelper';
+import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
 
 // Hero Component
 function Hero() {
@@ -491,7 +491,7 @@ function BlogPreview() {
               <div key={post._id} className="bg-neutral-900 border border-lime-500 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                 <div className="relative">
                   <img
-                    src={post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`}
+                    src={resolveImageUrl(post.image, 'blog-images')}
                     alt={post.title}
                     className="w-full h-48 object-cover rounded-t-lg"
                     onError={(e) => {

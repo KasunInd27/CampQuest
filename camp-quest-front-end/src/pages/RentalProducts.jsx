@@ -659,7 +659,7 @@ const RentalProductCard = ({ product, onEdit, onDelete }) => {
                   {product.images.map((image, index) => (
                     <img
                       key={index}
-                      src={image.startsWith('http') ? image : `${BASE_URL}/uploads/rental-products/${image}`}
+                      src={resolveImageUrl(image, 'rental-products')}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-32 object-cover rounded"
                     />
