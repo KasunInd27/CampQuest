@@ -17,6 +17,8 @@ import { blogPostSchema, blogPostUpdateSchema, blogCategories } from '../utils/b
 import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 
+import { uploadImageToCloudinary } from '../lib/uploadImage';
+
 const AdminBlogPosts = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +63,7 @@ const AdminBlogPosts = () => {
 
   const openModal = (post = null) => {
     setEditingPost(post);
-    setImagePreview(post ? `${BASE_URL}/uploads/blog-images/${post.image}` : null);
+    setImagePreview(post ? (post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`) : null);
     setShowModal(true);
   };
 
@@ -93,7 +95,7 @@ const AdminBlogPosts = () => {
       };
       reader.readAsDataURL(file);
     } else {
-      setImagePreview(editingPost ? `${BASE_URL}/uploads/blog-images/${editingPost.image}` : null);
+      setImagePreview(editingPost ? (editingPost.image.startsWith('http') ? editingPost.image : `${BASE_URL}/uploads/blog-images/${editingPost.image}`) : null);
     }
   };
 
@@ -123,32 +125,35 @@ const AdminBlogPosts = () => {
       category: editingPost?.category || '',
       publishedDate: editingPost ? new Date(editingPost.publishedDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
       status: editingPost?.status || 'published',
-      image: null
+      image: editingPost?.image || null
     },
     validationSchema: editingPost ? blogPostUpdateSchema : blogPostSchema,
     enableReinitialize: true,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
-        const formData = new FormData();
-        formData.append('title', values.title);
-        formData.append('author', values.author);
-        formData.append('content', values.content);
-        formData.append('category', values.category);
-        formData.append('publishedDate', values.publishedDate);
-        formData.append('status', values.status);
+        let imageUrl = values.image;
 
-        if (values.image) {
-          formData.append('image', values.image);
+        // 1. Upload new image if it's a File
+        if (values.image instanceof File) {
+          const uploadRes = await uploadImageToCloudinary(values.image);
+          imageUrl = uploadRes.url;
         }
+
+        // 2. Prepare JSON payload
+        const payload = {
+          title: values.title,
+          author: values.author,
+          content: values.content,
+          category: values.category,
+          publishedDate: values.publishedDate,
+          status: values.status,
+          image: imageUrl
+        };
 
         const url = editingPost ? `/blog-posts/${editingPost._id}` : '/blog-posts';
         const method = editingPost ? 'put' : 'post';
 
-        const response = await axios[method](url, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        const response = await axios[method](url, payload);
 
         if (response.data.success) {
           toast.success(`Blog post ${editingPost ? 'updated' : 'created'} successfully`);
@@ -314,7 +319,7 @@ const BlogPostCard = ({ post, onEdit, onDelete, onViewDetails, formatDate, getCa
   <div className="flex items-center justify-between p-4 bg-neutral-800 rounded-lg border border-neutral-700 hover:border-neutral-600 transition-colors">
     <div className="flex items-center space-x-4 flex-1">
       <img
-        src={`${BASE_URL}/uploads/blog-images/${post.image}`}
+        src={post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`}
         alt={post.title}
         className="w-20 h-20 object-cover rounded-lg"
         onError={(e) => {

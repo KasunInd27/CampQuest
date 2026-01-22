@@ -137,7 +137,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       <div className="relative h-48 bg-neutral-700">
         {product.images && product.images.length > 0 ? (
           <img
-            src={`${BASE_URL}/uploads/sales-products/${product.images}`}
+            src={product.images[0].startsWith('http') ? product.images[0] : `${BASE_URL}/uploads/sales-products/${product.images[0]}`}
             alt={product.name}
             className="w-full h-full object-cover rounded-lg"
             onError={() => setImageError(true)}

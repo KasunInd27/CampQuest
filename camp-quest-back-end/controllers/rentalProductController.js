@@ -8,10 +8,10 @@ import path from 'path';
 // @access  Public
 export const getRentalProducts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 50, search, category, availability, priceMin, priceMax } = req.query;
-  
+
   // Build query
   let query = {};
-  
+
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },
@@ -19,7 +19,7 @@ export const getRentalProducts = asyncHandler(async (req, res) => {
       { brand: { $regex: search, $options: 'i' } }
     ];
   }
-  
+
   if (category) {
     query.category = category;
   }
@@ -27,7 +27,7 @@ export const getRentalProducts = asyncHandler(async (req, res) => {
   if (availability) {
     query.availabilityStatus = availability;
   }
-  
+
   if (priceMin || priceMax) {
     query.dailyRate = {};
     if (priceMin) query.dailyRate.$gte = parseFloat(priceMin);
@@ -98,10 +98,10 @@ export const getRentalProduct = asyncHandler(async (req, res) => {
 // @access  Private (Admin only)
 export const createRentalProduct = asyncHandler(async (req, res) => {
   try {
-    const { 
+    const {
       name, description, dailyRate, weeklyRate,
-      category, brand, quantity, features, specifications, condition, 
-      availabilityStatus, isActive 
+      category, brand, quantity, features, specifications, condition,
+      availabilityStatus, isActive
     } = req.body;
 
     // Validation
@@ -132,8 +132,8 @@ export const createRentalProduct = asyncHandler(async (req, res) => {
       featuresArray = features.split('\n').filter(feature => feature.trim() !== '');
     }
 
-    // Handle uploaded images
-    const images = req.files ? req.files.map(file => file.filename) : [];
+    // Handle images (URLs)
+    const images = req.body.images || [];
 
     const productData = {
       name: name.trim(),
@@ -158,7 +158,7 @@ export const createRentalProduct = asyncHandler(async (req, res) => {
     }
 
     const product = await RentalProduct.create(productData);
-    
+
     // Populate the response
     await product.populate('category', 'name');
 
@@ -169,16 +169,9 @@ export const createRentalProduct = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating rental product:', error);
-    
-    // Delete uploaded files if product creation fails
-    if (req.files) {
-      req.files.forEach(file => {
-        fs.unlink(file.path, (err) => {
-          if (err) console.error('Error deleting file:', err);
-        });
-      });
-    }
-    
+
+    // (No local files to delete)
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -200,10 +193,10 @@ export const createRentalProduct = asyncHandler(async (req, res) => {
 // @access  Private (Admin only)
 export const updateRentalProduct = asyncHandler(async (req, res) => {
   try {
-    const { 
+    const {
       name, description, dailyRate, weeklyRate,
-      category, brand, quantity, features, specifications, condition, 
-      availabilityStatus, isActive 
+      category, brand, quantity, features, specifications, condition,
+      availabilityStatus, isActive
     } = req.body;
 
     let product = await RentalProduct.findById(req.params.id);
@@ -221,31 +214,9 @@ export const updateRentalProduct = asyncHandler(async (req, res) => {
       featuresArray = features.split('\n').filter(feature => feature.trim() !== '');
     }
 
-    // Handle uploaded images
-    const newImages = req.files ? req.files.map(file => file.filename) : [];
-
-    const updateData = {};
-    if (name !== undefined) updateData.name = name.trim();
-    if (description !== undefined) updateData.description = description.trim();
-    if (dailyRate !== undefined) updateData.dailyRate = parseFloat(dailyRate);
-    if (weeklyRate !== undefined) updateData.weeklyRate = weeklyRate ? parseFloat(weeklyRate) : undefined;
-    if (category !== undefined) updateData.category = category || null;
-    if (brand !== undefined) updateData.brand = brand.trim();
-    if (quantity !== undefined) {
-      updateData.quantity = parseInt(quantity);
-      // Update available quantity proportionally if not manually set
-      const quantityDiff = parseInt(quantity) - product.quantity;
-      updateData.availableQuantity = Math.max(0, product.availableQuantity + quantityDiff);
-    }
-    if (features !== undefined) updateData.features = featuresArray;
-    if (specifications !== undefined) updateData.specifications = specifications.trim();
-    if (condition !== undefined) updateData.condition = condition;
-    if (availabilityStatus !== undefined) updateData.availabilityStatus = availabilityStatus;
-    if (isActive !== undefined) updateData.isActive = isActive;
-    
-    // Update images if new ones are uploaded
-    if (newImages.length > 0) {
-      updateData.images = [...(product.images || []), ...newImages];
+    // Update images if provided
+    if (req.body.images) {
+      updateData.images = req.body.images;
     }
 
     product = await RentalProduct.findByIdAndUpdate(
@@ -261,7 +232,7 @@ export const updateRentalProduct = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating rental product:', error);
-    
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -301,7 +272,7 @@ export const updateProductQuantity = asyncHandler(async (req, res) => {
     }
 
     product.availableQuantity -= quantity;
-    
+
     // Update availability status if needed
     if (product.availableQuantity === 0) {
       product.availabilityStatus = 'unavailable';
@@ -338,15 +309,7 @@ export const deleteRentalProduct = asyncHandler(async (req, res) => {
       });
     }
 
-    // Delete associated images
-    if (product.images && product.images.length > 0) {
-      product.images.forEach(image => {
-        const imagePath = path.join('../camp-quest-front-end/public/uploads/rental-products', image);
-        fs.unlink(imagePath, (err) => {
-          if (err) console.error('Error deleting image:', err);
-        });
-      });
-    }
+    // (No local files to delete)
 
     await RentalProduct.findByIdAndDelete(req.params.id);
 

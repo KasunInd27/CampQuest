@@ -239,7 +239,9 @@ function FeaturedProducts() {
                   <div className="relative">
                     <img
                       src={product.images && product.images.length > 0
-                        ? `${BASE_URL}/uploads/${product.type === 'rental' ? 'rental-products' : 'sales-products'}/${product.images[0]}`
+                        ? (product.images[0].startsWith('http')
+                          ? product.images[0]
+                          : `${BASE_URL}/uploads/${product.type === 'rental' ? 'rental-products' : 'sales-products'}/${product.images[0]}`)
                         : 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
                       }
                       alt={product.name}
@@ -496,7 +498,7 @@ function BlogPreview() {
               <div key={post._id} className="bg-neutral-900 border border-lime-500 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                 <div className="relative">
                   <img
-                    src={`${BASE_URL}/uploads/blog-images/${post.image}`}
+                    src={post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`}
                     alt={post.title}
                     className="w-full h-48 object-cover rounded-t-lg"
                     onError={(e) => {

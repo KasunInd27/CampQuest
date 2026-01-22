@@ -7,6 +7,8 @@ import { rentalProductValidationSchema } from '../utils/productValidations';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+import { uploadImageToCloudinary } from '../lib/uploadImage';
+
 const RentalProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -34,37 +36,34 @@ const RentalProducts = () => {
     validationSchema: rentalProductValidationSchema,
     onSubmit: async (values) => {
       try {
-        const submitData = new FormData();
+        setLoading(true);
+        let imageUrls = [];
 
-        // Convert features string to array
-        const processedValues = {
+        // 1. Upload new images to Cloudinary
+        if (selectedImages && selectedImages.length > 0) {
+          const uploadPromises = selectedImages.map(file => uploadImageToCloudinary(file));
+          const uploadResults = await Promise.all(uploadPromises);
+          imageUrls = uploadResults.map(res => res.url);
+        }
+
+        // 2. Combine with existing images if editing
+        if (editingProduct && editingProduct.images) {
+          imageUrls = [...editingProduct.images, ...imageUrls];
+        }
+
+        // 3. Prepare JSON payload
+        const payload = {
           ...values,
-          features: values.features ? values.features.split('\n').filter(f => f.trim()) : []
+          features: values.features ? values.features.split('\n').filter(f => f.trim()) : [],
+          images: imageUrls
         };
 
-        // Append form data
-        Object.keys(processedValues).forEach(key => {
-          if (key === 'features') {
-            submitData.append(key, JSON.stringify(processedValues[key]));
-          } else {
-            submitData.append(key, processedValues[key]);
-          }
-        });
-
-        // Append images
-        selectedImages.forEach((image, index) => {
-          submitData.append('images', image);
-        });
-
+        // 4. Send JSON request
         if (editingProduct) {
-          await axios.put(`/rental-products/${editingProduct._id}`, submitData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
+          await axios.put(`/rental-products/${editingProduct._id}`, payload);
           toast.success('Product updated successfully');
         } else {
-          await axios.post('/rental-products', submitData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
+          await axios.post('/rental-products', payload);
           toast.success('Product created successfully');
         }
 
@@ -72,6 +71,9 @@ const RentalProducts = () => {
         fetchProducts();
       } catch (error) {
         toast.error(error.response?.data?.message || 'Failed to save product');
+        console.error("Save error:", error);
+      } finally {
+        setLoading(false);
       }
     }
   });
@@ -494,7 +496,7 @@ const RentalProducts = () => {
                       {editingProduct.images.map((image, index) => (
                         <img
                           key={index}
-                          src={`${BASE_URL}/uploads/rental-products/${image}`}
+                          src={image.startsWith('http') ? image : `${BASE_URL}/uploads/rental-products/${image}`}
                           alt={`Product ${index}`}
                           className="w-full h-20 object-cover rounded"
                         />
@@ -562,7 +564,7 @@ const RentalProductCard = ({ product, onEdit, onDelete }) => {
         <div className="relative h-48 bg-neutral-800">
           {product.images && product.images.length > 0 ? (
             <img
-              src={`${BASE_URL}/uploads/rental-products/${product.images[0]}`}
+              src={product.images[0].startsWith('http') ? product.images[0] : `${BASE_URL}/uploads/rental-products/${product.images[0]}`}
               alt={product.name}
               className="w-full h-full object-cover rounded-t-lg"
             />
@@ -656,7 +658,7 @@ const RentalProductCard = ({ product, onEdit, onDelete }) => {
                   {product.images.map((image, index) => (
                     <img
                       key={index}
-                      src={`${BASE_URL}/uploads/rental-products/${image}`}
+                      src={image.startsWith('http') ? image : `${BASE_URL}/uploads/rental-products/${image}`}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-32 object-cover rounded"
                     />

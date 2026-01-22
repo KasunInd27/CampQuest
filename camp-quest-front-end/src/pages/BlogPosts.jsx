@@ -275,7 +275,7 @@ const BlogCard = ({ post, onRead, formatDate, truncateContent, getCategoryColor 
     <div className="bg-neutral-800 rounded-xl border border-neutral-700 hover:border-neutral-600 transition-all duration-300 group overflow-hidden">
       <div className="relative h-48 w-full">
         <img
-          src={`${BASE_URL}/uploads/blog-images/${post.image}`}
+          src={post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`}
           alt={post.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
@@ -501,7 +501,7 @@ const BlogModal = ({ post, onClose, formatDate, getCategoryColor }) => {
         <div className="overflow-y-auto">
           <div className="relative h-64 md:h-80">
             <img
-              src={`${BASE_URL}/uploads/blog-images/${post.image}`}
+              src={post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`}
               alt={post.title}
               className="w-full h-full object-cover"
             />

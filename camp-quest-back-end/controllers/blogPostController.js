@@ -10,26 +10,26 @@ import fs from 'fs';
 // Get all blog posts with search and filter (UPDATED)
 export const getAllBlogPosts = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      status = 'published', 
-      category, 
+    const {
+      page = 1,
+      limit = 10,
+      status = 'published',
+      category,
       search,
       sortBy = 'publishedDate',
       sortOrder = 'desc'
     } = req.query;
-    
+
     let query = {};
-    
+
     if (status !== 'all') {
       query.status = status;
     }
-    
+
     if (category && category !== 'all') {
       query.category = category;
     }
-    
+
     if (search && search.trim() !== '') {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -37,15 +37,15 @@ export const getAllBlogPosts = async (req, res) => {
         { author: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     let sortOptions = {};
     sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
-    
+
     const blogPosts = await BlogPost.find(query)
       .sort(sortOptions)
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    
+
     // Add interaction stats to each blog post
     const blogPostsWithStats = await Promise.all(
       blogPosts.map(async (post) => {
@@ -71,9 +71,9 @@ export const getAllBlogPosts = async (req, res) => {
         };
       })
     );
-    
+
     const total = await BlogPost.countDocuments(query);
-    
+
     res.json({
       success: true,
       blogPosts: blogPostsWithStats,
@@ -99,9 +99,9 @@ export const getAllBlogPosts = async (req, res) => {
 export const getBlogPostById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const blogPost = await BlogPost.findById(id);
-    
+
     if (!blogPost) {
       return res.status(404).json({
         success: false,
@@ -125,7 +125,7 @@ export const getBlogPostById = async (req, res) => {
     ratings.forEach(r => {
       ratingDistribution[r.rating]++;
     });
-    
+
     res.json({
       success: true,
       blogPost: {
@@ -152,26 +152,26 @@ export const getBlogPostById = async (req, res) => {
 export const createBlogPost = async (req, res) => {
   try {
     const { title, author, content, category, publishedDate, status } = req.body;
-    
-    if (!req.file) {
+
+    if (!req.body.image) {
       return res.status(400).json({
         success: false,
-        message: 'Image is required'
+        message: 'Image URL is required'
       });
     }
-    
+
     const blogPost = new BlogPost({
       title,
       author,
       content,
       category,
-      image: req.file.filename,
+      image: req.body.image,
       publishedDate: publishedDate || new Date(),
       status: status || 'published'
     });
-    
+
     await blogPost.save();
-    
+
     res.status(201).json({
       success: true,
       message: 'Blog post created successfully',
@@ -179,15 +179,9 @@ export const createBlogPost = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating blog post:', error);
-    
-    // Delete uploaded file if blog post creation fails
-    if (req.file) {
-      const filePath = path.join(process.cwd(), '../camp-quest-front-end/public/uploads/blog-images', req.file.filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    }
-    
+
+    // (No local files to delete)
+
     res.status(400).json({
       success: false,
       message: error.message
@@ -200,16 +194,16 @@ export const updateBlogPost = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, author, content, category, publishedDate, status } = req.body;
-    
+
     const blogPost = await BlogPost.findById(id);
-    
+
     if (!blogPost) {
       return res.status(404).json({
         success: false,
         message: 'Blog post not found'
       });
     }
-    
+
     const updateData = {
       title,
       author,
@@ -218,23 +212,18 @@ export const updateBlogPost = async (req, res) => {
       publishedDate,
       status
     };
-    
-    // If new image is uploaded, update image and delete old one
-    if (req.file) {
-      // Delete old image
-      const oldImagePath = path.join(process.cwd(), '../camp-quest-front-end/public/uploads/blog-images', blogPost.image);
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-      }
-      updateData.image = req.file.filename;
+
+    // If new image URL is provided, update it
+    if (req.body.image) {
+      updateData.image = req.body.image;
     }
-    
+
     const updatedBlogPost = await BlogPost.findByIdAndUpdate(
       id,
       updateData,
       { new: true, runValidators: true }
     );
-    
+
     res.json({
       success: true,
       message: 'Blog post updated successfully',
@@ -242,15 +231,9 @@ export const updateBlogPost = async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating blog post:', error);
-    
-    // Delete uploaded file if update fails
-    if (req.file) {
-      const filePath = path.join(process.cwd(), '../camp-quest-front-end/public/uploads/blog-images', req.file.filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    }
-    
+
+    // (No local files to delete)
+
     res.status(400).json({
       success: false,
       message: error.message
@@ -262,24 +245,20 @@ export const updateBlogPost = async (req, res) => {
 export const deleteBlogPost = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const blogPost = await BlogPost.findById(id);
-    
+
     if (!blogPost) {
       return res.status(404).json({
         success: false,
         message: 'Blog post not found'
       });
     }
-    
-    // Delete associated image
-    const imagePath = path.join(process.cwd(), '../camp-quest-front-end/public/uploads/blog-images', blogPost.image);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-    }
-    
+
+    // (No local files to delete)
+
     await BlogPost.findByIdAndDelete(id);
-    
+
     res.json({
       success: true,
       message: 'Blog post deleted successfully'
@@ -299,21 +278,21 @@ export const getBlogStats = async (req, res) => {
     const totalPosts = await BlogPost.countDocuments();
     const publishedPosts = await BlogPost.countDocuments({ status: 'published' });
     const draftPosts = await BlogPost.countDocuments({ status: 'draft' });
-    
+
     // Recent posts (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const recentPosts = await BlogPost.countDocuments({
       createdAt: { $gte: thirtyDaysAgo }
     });
-    
+
     // Category breakdown
     const categoryStats = await BlogPost.aggregate([
       { $match: { status: 'published' } },
       { $group: { _id: '$category', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]);
-    
+
     res.json({
       success: true,
       stats: {
@@ -338,12 +317,12 @@ export const getCategories = async (req, res) => {
   try {
     const categories = [
       'gear reviews',
-      'camping tips', 
+      'camping tips',
       'camping recipes',
       'destinations & locations',
       'beginner guides'
     ];
-    
+
     res.json({
       success: true,
       categories
