@@ -1,6 +1,6 @@
 import axiosInstance from "./axios";
 
-export async function uploadImageToCloudinary(file) {
+export async function uploadImage(file) {
     const formData = new FormData();
     formData.append("image", file);
 
@@ -8,5 +8,5 @@ export async function uploadImageToCloudinary(file) {
         headers: { "Content-Type": "multipart/form-data" },
     });
 
-    return res.data; // { url, public_id }
+    return res.data; // { success: true, url: ... }
 }

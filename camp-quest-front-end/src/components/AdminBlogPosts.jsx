@@ -17,7 +17,8 @@ import { blogPostSchema, blogPostUpdateSchema, blogCategories } from '../utils/b
 import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 
-import { uploadImageToCloudinary } from '../lib/uploadImage';
+import { uploadImage } from '../lib/uploadImage';
+import { resolveImageUrl } from '../lib/imageHelper';
 
 const AdminBlogPosts = () => {
   const [blogPosts, setBlogPosts] = useState([]);
@@ -63,7 +64,7 @@ const AdminBlogPosts = () => {
 
   const openModal = (post = null) => {
     setEditingPost(post);
-    setImagePreview(post ? (post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`) : null);
+    setImagePreview(post ? resolveImageUrl(post.image, 'blog-images') : null);
     setShowModal(true);
   };
 
@@ -94,8 +95,9 @@ const AdminBlogPosts = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     } else {
-      setImagePreview(editingPost ? (editingPost.image.startsWith('http') ? editingPost.image : `${BASE_URL}/uploads/blog-images/${editingPost.image}`) : null);
+      setImagePreview(editingPost ? resolveImageUrl(editingPost.image, 'blog-images') : null);
     }
   };
 
@@ -135,7 +137,7 @@ const AdminBlogPosts = () => {
 
         // 1. Upload new image if it's a File
         if (values.image instanceof File) {
-          const uploadRes = await uploadImageToCloudinary(values.image);
+          const uploadRes = await uploadImage(values.image);
           imageUrl = uploadRes.url;
         }
 
@@ -319,7 +321,7 @@ const BlogPostCard = ({ post, onEdit, onDelete, onViewDetails, formatDate, getCa
   <div className="flex items-center justify-between p-4 bg-neutral-800 rounded-lg border border-neutral-700 hover:border-neutral-600 transition-colors">
     <div className="flex items-center space-x-4 flex-1">
       <img
-        src={post.image.startsWith('http') ? post.image : `${BASE_URL}/uploads/blog-images/${post.image}`}
+        src={resolveImageUrl(post.image, 'blog-images')}
         alt={post.title}
         className="w-20 h-20 object-cover rounded-lg"
         onError={(e) => {

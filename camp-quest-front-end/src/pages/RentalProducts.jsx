@@ -7,8 +7,8 @@ import { rentalProductValidationSchema } from '../utils/productValidations';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-import { uploadImageToCloudinary } from '../lib/uploadImage';
-import { getValidImageUrl } from '../lib/imageHelper';
+import { uploadImage } from '../lib/uploadImage';
+import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
 
 const RentalProducts = () => {
   const [products, setProducts] = useState([]);
@@ -42,7 +42,7 @@ const RentalProducts = () => {
 
         // 1. Upload new images to Cloudinary
         if (selectedImages && selectedImages.length > 0) {
-          const uploadPromises = selectedImages.map(file => uploadImageToCloudinary(file));
+          const uploadPromises = selectedImages.map(file => uploadImage(file));
           const uploadResults = await Promise.all(uploadPromises);
           imageUrls = uploadResults.map(res => res.url);
         }
@@ -497,7 +497,7 @@ const RentalProducts = () => {
                       {editingProduct.images.map((image, index) => (
                         <img
                           key={index}
-                          src={image.startsWith('http') ? image : `${BASE_URL}/uploads/rental-products/${image}`}
+                          src={resolveImageUrl(image, 'rental-products')}
                           alt={`Product ${index}`}
                           className="w-full h-20 object-cover rounded"
                         />

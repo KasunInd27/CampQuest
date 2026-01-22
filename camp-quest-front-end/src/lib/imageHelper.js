@@ -11,32 +11,31 @@ import { BASE_URL } from './axios';
  * @param {String} folderName - The local folder name fallback (e.g. 'rental-products', 'sales-products', 'blog-images')
  * @returns {String|null} - The unresolved full URL or null if no image found.
  */
+// Helper to process a potential image string (URL or filename) separately
+export const resolveImageUrl = (imgStr, folderName = 'rental-products') => {
+    if (!imgStr) return 'https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+    if (imgStr.startsWith('http') || imgStr.startsWith('data:')) return imgStr;
+    const cleanFilename = imgStr.startsWith('/') ? imgStr.slice(1) : imgStr;
+    return `${BASE_URL}/uploads/${folderName}/${cleanFilename}`;
+};
+
 export const getValidImageUrl = (product, folderName = 'rental-products') => {
     if (!product) return null;
 
-    // Helper to process a potential image string (URL or filename)
-    const processImageString = (imgStr) => {
-        if (!imgStr) return null;
-        if (imgStr.startsWith('http') || imgStr.startsWith('data:')) return imgStr;
-        // Remove leading slash if present in filename to avoid double slash
-        const cleanFilename = imgStr.startsWith('/') ? imgStr.slice(1) : imgStr;
-        return `${BASE_URL}/uploads/${folderName}/${cleanFilename}`;
-    };
-
     // 1. Check imageUrl (often explicit full URL)
     if (product.imageUrl) {
-        return processImageString(product.imageUrl);
+        return resolveImageUrl(product.imageUrl, folderName);
     }
 
     // 2. Check image (legacy string)
     if (product.image && typeof product.image === 'string') {
-        return processImageString(product.image);
+        return resolveImageUrl(product.image, folderName);
     }
 
     // 3. Check images array
     if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-        return processImageString(product.images[0]);
+        return resolveImageUrl(product.images[0], folderName);
     }
 
-    return null;
+    return resolveImageUrl(null); // Return fallback
 };
