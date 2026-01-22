@@ -1,23 +1,38 @@
-import cloudinary from "../config/cloudinary.js";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const uploadImage = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-        // Convert buffer to base64 for Cloudinary
-        const b64 = req.file.buffer.toString("base64");
-        const dataUri = `data:${req.file.mimetype};base64,${b64}`;
+        // Ensure media/img directory exists
+        const uploadDir = path.join(__dirname, '../media/img');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
 
-        const result = await cloudinary.uploader.upload(dataUri, {
-            folder: "campquest/products", // you can change folder name
-        });
+        // Generate safe filename (no 'rental', 'ad', etc.)
+        const ext = req.file.mimetype.split('/')[1] || 'jpg';
+        const filename = `img_${Date.now()}_${Math.random().toString(36).slice(2, 10)}.${ext}`;
+        const filepath = path.join(uploadDir, filename);
+
+        // Write buffer to disk
+        fs.writeFileSync(filepath, req.file.buffer);
+
+        // Construct full URL
+        const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+        const fileUrl = `${baseUrl}/media/img/${filename}`;
 
         return res.json({
-            url: result.secure_url,
-            public_id: result.public_id,
+            success: true,
+            url: fileUrl
         });
     } catch (err) {
-        console.error("Cloudinary upload error:", err);
+        console.error("Local upload error:", err);
         return res.status(500).json({ message: "Image upload failed" });
     }
 };
