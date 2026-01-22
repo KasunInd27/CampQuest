@@ -43,11 +43,20 @@ export const getRentalProducts = asyncHandler(async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
+    // Normalize images (ensure array)
+    const normalizedProducts = products.map(product => {
+      const p = product.toObject();
+      if (!Array.isArray(p.images)) {
+        p.images = p.image ? [p.image] : [];
+      }
+      return p;
+    });
+
     const total = await RentalProduct.countDocuments(query);
 
     res.status(200).json({
       success: true,
-      data: products,
+      data: normalizedProducts,
       pagination: {
         page: parseInt(page),
         pages: Math.ceil(total / limit),
