@@ -137,7 +137,11 @@ export const createRentalProduct = asyncHandler(async (req, res) => {
     // Process features if provided
     let featuresArray = [];
     if (features) {
-      featuresArray = features.split('\n').filter(feature => feature.trim() !== '');
+      if (Array.isArray(features)) {
+        featuresArray = features;
+      } else if (typeof features === 'string') {
+        featuresArray = features.split(/[\n,]+/).map(f => f.trim()).filter(f => f !== '');
+      }
     }
 
     // Handle images (URLs)
@@ -226,7 +230,11 @@ export const updateRentalProduct = asyncHandler(async (req, res) => {
     // Process features if provided
     let featuresArray;
     if (features) {
-      featuresArray = features.split('\n').filter(feature => feature.trim() !== '');
+      if (Array.isArray(features)) {
+        featuresArray = features;
+      } else if (typeof features === 'string') {
+        featuresArray = features.split(/[\n,]+/).map(f => f.trim()).filter(f => f !== '');
+      }
     }
 
     const updateData = {
