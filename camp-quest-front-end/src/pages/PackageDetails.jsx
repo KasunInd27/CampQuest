@@ -107,14 +107,14 @@ const PackageDetails = () => {
                                 What's Included
                             </h2>
                             {/* Scrollable List Container */}
-                            <div className="flex flex-col gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+                            <ul className="flex flex-col gap-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar w-full">
                                 {pkg.includes && pkg.includes.map((item, index) => (
-                                    <div key={index} className="flex items-start p-4 bg-neutral-800 rounded-lg border border-neutral-700 w-full">
-                                        <Check className="w-5 h-5 text-lime-500 mt-0.5 mr-3 flex-shrink-0" />
-                                        <span className="text-gray-300 font-medium">{item}</span>
-                                    </div>
+                                    <li key={index} className="flex items-center text-gray-300 w-full">
+                                        <Check className="w-5 h-5 text-lime-500 mr-3 flex-shrink-0" />
+                                        <span className="text-lg">{item}</span>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </div>
 
                         <div className="prose max-w-none text-gray-300">
