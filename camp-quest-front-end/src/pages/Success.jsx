@@ -166,7 +166,7 @@ const Success = () => {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
 
-      if (order.orderType === 'rental') {
+      if (order.orderType === 'rental' || order.orderType === 'package') {
         doc.text('PICKUP AT:', pageWidth / 2 + 10, yPos);
 
         doc.setFont('helvetica', 'normal');
@@ -249,7 +249,7 @@ const Success = () => {
       const total = order.totalAmount || 0;
       const deliveryfee = 450;
 
-      if (order.orderType === 'rental') {
+      if (order.orderType === 'rental' || order.orderType === 'package') {
         doc.setFillColor(245, 245, 245);
         doc.rect(totalsX - 10, finalY, 65, 18, 'F'); // Reduced height
 
@@ -263,7 +263,7 @@ const Success = () => {
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-        doc.text('This is a rental order. Items are collected from the shop.', totalsX - 10, finalY + 24);
+        doc.text(`This is a ${order.orderType} order. Items are collected from the shop.`, totalsX - 10, finalY + 24);
         doc.text('No delivery charges apply.', totalsX - 10, finalY + 28);
       } else {
         doc.setFillColor(245, 245, 245);
@@ -290,7 +290,7 @@ const Success = () => {
       }
 
       // ===== PAYMENT INFO =====
-      const paymentY = finalY + (order.orderType === 'rental' ? 38 : 42); // Optimized gap
+      const paymentY = finalY + ((order.orderType === 'rental' || order.orderType === 'package') ? 38 : 42); // Optimized gap
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
@@ -447,9 +447,9 @@ const Success = () => {
                   <span className="text-lime-500 font-bold text-lg">
                     LKR {order.totalAmount.toFixed(2)}
                   </span>
-                  {order.orderType === 'rental' && (
+                  {(order.orderType === 'rental' || order.orderType === 'package') && (
                     <p className="text-[10px] text-blue-400 italic mt-1">
-                      * This is a rental order. Items are collected from the shop. No delivery charges apply.
+                      * This is a {order.orderType} order. Items are collected from the shop. No delivery charges apply.
                     </p>
                   )}
                 </div>
@@ -504,12 +504,14 @@ const Success = () => {
 
             {/* Delivery Information / Pickup Info */}
             <div className="mt-6 pt-6 border-t border-neutral-600">
-              {order.orderType === 'rental' ? (
+              {(order.orderType === 'rental' || order.orderType === 'package') ? (
                 <>
                   <h3 className="text-white font-semibold mb-3">🏪 Pickup Required</h3>
                   <div className="bg-neutral-800 rounded p-4 text-neutral-300 text-sm border-l-4 border-yellow-500">
-                    <p className="font-semibold text-white mb-1">This is a rental order.</p>
-                    <p className="mb-2">Please collect your items from our shop. Delivery is not available for rentals.</p>
+                    <p className="font-semibold text-white mb-1">
+                      {order.orderType === 'package' ? 'This is a special package order.' : 'This is a rental order.'}
+                    </p>
+                    <p className="mb-2">Please collect your items from our shop. Delivery is not available for {order.orderType === 'package' ? 'packages' : 'rentals'}.</p>
                     <div className="mt-3 pt-3 border-t border-neutral-700">
                       <p className="text-neutral-400 text-xs uppercase tracking-wide mb-1">Pickup Location:</p>
                       <p className="text-white">CampQuest Store</p>

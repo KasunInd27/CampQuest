@@ -11,6 +11,7 @@ import {
   CalendarClock,
   Settings,
   FileText,
+  Folder,
 } from 'lucide-react'
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -96,6 +97,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 }`
               }
             >
+              <Folder size={18} />
               Categories
             </NavLink>
             <NavLink
