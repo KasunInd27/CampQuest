@@ -47,7 +47,7 @@ const PackageDetails = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white py-20 flex justify-center">
+            <div className="min-h-screen bg-neutral-900 py-20 flex justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lime-500"></div>
             </div>
         );
@@ -55,12 +55,12 @@ const PackageDetails = () => {
 
     if (error || !pkg) {
         return (
-            <div className="min-h-screen bg-white py-20 px-4 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Package Not Found</h2>
-                <p className="text-gray-600 mb-8">{error || "The package you're looking for doesn't exist."}</p>
+            <div className="min-h-screen bg-neutral-900 py-20 px-4 text-center">
+                <h2 className="text-2xl font-bold text-white mb-4">Package Not Found</h2>
+                <p className="text-gray-400 mb-8">{error || "The package you're looking for doesn't exist."}</p>
                 <button
                     onClick={() => navigate('/')}
-                    className="px-6 py-2 bg-lime-500 text-white rounded-lg hover:bg-lime-600 transition-colors"
+                    className="px-6 py-2 bg-lime-500 text-neutral-900 rounded-lg hover:bg-lime-400 transition-colors font-medium"
                 >
                     Return Home
                 </button>
@@ -69,7 +69,7 @@ const PackageDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-neutral-900 pt-24">
             {/* Hero Section */}
             <div className="relative h-[60vh] bg-neutral-900">
                 <img
@@ -102,32 +102,33 @@ const PackageDetails = () => {
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-12">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                            <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                                 <Package className="w-6 h-6 mr-3 text-lime-500" />
                                 What's Included
                             </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Scrollable List Container */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                                 {pkg.includes && pkg.includes.map((item, index) => (
-                                    <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
+                                    <div key={index} className="flex items-start p-4 bg-neutral-800 rounded-lg border border-neutral-700">
                                         <Check className="w-5 h-5 text-lime-500 mt-0.5 mr-3 flex-shrink-0" />
-                                        <span className="text-gray-700 font-medium">{item}</span>
+                                        <span className="text-gray-300 font-medium">{item}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="prose max-w-none text-gray-600">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Description</h3>
+                        <div className="prose max-w-none text-gray-300">
+                            <h3 className="text-xl font-bold text-white mb-4">Description</h3>
                             <p>{pkg.description}</p>
                         </div>
                     </div>
 
                     {/* Sidebar */}
                     <div className="lg:col-span-1">
-                        <div className="sticky top-24 bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
+                        <div className="sticky top-28 bg-neutral-800 border border-neutral-700 rounded-2xl shadow-xl p-8">
                             <div className="text-center mb-6">
-                                <p className="text-gray-500 mb-2">Package Price</p>
-                                <div className="text-4xl font-bold text-lime-600">
+                                <p className="text-gray-400 mb-2">Package Price</p>
+                                <div className="text-4xl font-bold text-lime-500">
                                     LKR {pkg.price.toLocaleString()}
                                 </div>
                             </div>
@@ -135,12 +136,12 @@ const PackageDetails = () => {
                             <div className="space-y-4">
                                 <button
                                     onClick={handleOrderNow}
-                                    className="w-full py-4 bg-lime-500 text-white font-bold text-lg rounded-xl hover:bg-lime-600 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                                    className="w-full py-4 bg-lime-500 text-neutral-900 font-bold text-lg rounded-xl hover:bg-lime-400 shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center"
                                 >
                                     Order This Package
                                 </button>
                                 <div className="text-center">
-                                    <p className="text-sm text-gray-400 mt-4">
+                                    <p className="text-sm text-gray-500 mt-4">
                                         Secure checkout • Instant confirmation
                                     </p>
                                 </div>
