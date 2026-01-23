@@ -1,55 +1,45 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { v2 as cloudinary } from 'cloudinary';
+import stream from 'stream';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Cloudinary configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 export const uploadImage = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-        // Ensure media/img directory exists
-        const uploadDir = path.join(__dirname, '../media/img');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+        // Create a buffer stream from the uploaded file buffer
+        const bufferStream = new stream.PassThrough();
+        bufferStream.end(req.file.buffer);
 
-        // Generate safe filename (no 'rental', 'ad', etc.)
-        const ext = req.file.mimetype.split('/')[1] || 'jpg';
-        const filename = `img_${Date.now()}_${Math.random().toString(36).slice(2, 10)}.${ext}`;
-        const filepath = path.join(uploadDir, filename);
+        // Upload to Cloudinary using upload_stream
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: 'campquest', // Optional: Organize uploads in a folder
+                resource_type: 'auto'
+            },
+            (error, result) => {
+                if (error) {
+                    console.error("Cloudinary upload error:", error);
+                    return res.status(500).json({ message: "Image upload failed: " + error.message });
+                }
 
-        // Write buffer to disk
-        fs.writeFileSync(filepath, req.file.buffer);
+                return res.json({
+                    success: true,
+                    url: result.secure_url
+                });
+            }
+        );
 
-        // Construct full URL
-        // Construct full URL
-        // STRICT: User requires NEVER returning localhost default in production context without env var,
-        // but for safety in dev we might need a fallback.
-        // However, user instruction is specific: "Response must be: { url: `${process.env.BASE_URL}/media/img/${filename}` }"
-        // I will assume they will set BASE_URL.
-        const baseUrl = process.env.BASE_URL;
-        if (!baseUrl) {
-            console.warn("BASE_URL env var not set! Images may not load correctly.");
-        }
+        // Pipe the buffer stream to the upload stream
+        bufferStream.pipe(uploadStream);
 
-        // If no BASE_URL is set, we can't reliably guess the public URL in production.
-        // Fallback to empty string or relative path might be better than localhost if we want to avoid mixed content,
-        // but relative path won't work if backend is on different domain.
-        // I will fallback to a placeholder or keep localhost ONLY if we are sure it's dev, but user said "NEVER returns localhost".
-        // Use a safe default for dev only if explicitly needed? No, user said NEVER.
-        // I will just use the env var or empty string to force them to set it.
-        const effectiveBaseUrl = baseUrl || 'https://campquest-lwsl.onrender.com'; // Hardcoded fallback to their prod URL as requested by context of "Production bug" to be safe?
-
-        const fileUrl = `${effectiveBaseUrl}/media/img/${filename}`;
-
-        return res.json({
-            success: true,
-            url: fileUrl
-        });
     } catch (err) {
-        console.error("Local upload error:", err);
-        return res.status(500).json({ message: "Image upload failed" });
+        console.error("Upload controller error:", err);
+        return res.status(500).json({ message: "Image upload processing failed" });
     }
 };
