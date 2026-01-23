@@ -12,90 +12,135 @@ const orderSchema = new mongoose.Schema({
     required: true,
     default: 'sales'
   },
-  // ...
-  productModel: {
-    type: String,
-    enum: ['SalesProduct', 'RentalProduct', 'SpecialPackage']
+  customer: {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true
+    },
+    phone: {
+      type: String,
+      required: true
+    }
   },
-  name: String,
-  type: {
-    type: String,
-    enum: ['sale', 'rental', 'package'],
-    required: true
+  deliveryAddress: {
+    address: {
+      type: String,
+      required: function () { return this.orderType === 'sales'; }
+    },
+    city: {
+      type: String,
+      required: function () { return this.orderType === 'sales'; }
+    },
+    state: {
+      type: String,
+      required: function () { return this.orderType === 'sales'; }
+    },
+    postalCode: {
+      type: String,
+      required: function () { return this.orderType === 'sales'; }
+    },
+    country: {
+      type: String,
+      default: 'LK'
+    }
   },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  price: {
-    type: Number,
-    required: true
-  },
-  rentalDays: Number, // Only for rental items
-  rentalStartDate: Date, // Only for rental items
-  rentalEndDate: Date, // Only for rental items
-  subtotal: {
-    type: Number,
-    required: true
-  }
-}],
+  items: [{
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: 'items.productModel'
+    },
+    productModel: {
+      type: String,
+      enum: ['SalesProduct', 'RentalProduct', 'SpecialPackage']
+    },
+    name: String,
+    type: {
+      type: String,
+      enum: ['sale', 'rental', 'package'],
+      required: true
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+    price: {
+      type: Number,
+      required: true
+    },
+    rentalDays: Number, // Only for rental items
+    rentalStartDate: Date, // Only for rental items
+    rentalEndDate: Date, // Only for rental items
+    subtotal: {
+      type: Number,
+      required: true
+    }
+  }],
   rentalDetails: {
-  startDate: Date,
-  endDate: Date,
-  returnDate: Date,
-  status: {
-    type: String,
-    enum: ['pending', 'active', 'returned', 'overdue'],
-    default: 'pending'
-  }
-},
-  paymentDetails: {
-  method: {
-    type: String,
-    enum: ['card', 'paypal', 'cash', 'slip'],
-    required: true
+    startDate: Date,
+    endDate: Date,
+    returnDate: Date,
+    status: {
+      type: String,
+      enum: ['pending', 'active', 'returned', 'overdue'],
+      default: 'pending'
+    }
   },
-  transactionId: String,
-  amount: {
+  paymentDetails: {
+    method: {
+      type: String,
+      enum: ['card', 'paypal', 'cash', 'slip'],
+      required: true
+    },
+    transactionId: String,
+    amount: {
+      type: Number,
+      required: true
+    }
+  },
+  paymentSlip: {
+    fileName: String,
+    fileUrl: String,
+    mimeType: String,
+    size: Number,
+    uploadedAt: Date
+  },
+  totalAmount: {
     type: Number,
     required: true
-  }
-},
-  paymentSlip: {
-  fileName: String,
-  fileUrl: String,
-  mimeType: String,
-  size: Number,
-  uploadedAt: Date
-},
-  totalAmount: {
-  type: Number,
-  required: true
-},
+  },
   tax: {
-  type: Number,
-  default: 0
-},
+    type: Number,
+    default: 0
+  },
   shippingCost: {
-  type: Number,
-  default: 0
-},
+    type: Number,
+    default: 0
+  },
   status: {
-  type: String,
-  enum: ['pending', 'processing', 'shipped', 'delivered', 'completed', 'cancelled', 'returned'],
-  default: 'pending'
-},
+    type: String,
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'completed', 'cancelled', 'returned'],
+    default: 'pending'
+  },
   paymentStatus: {
-  type: String,
-  enum: ['pending', 'verification_pending', 'completed', 'failed', 'refunded'],
-  default: 'pending'
-},
+    type: String,
+    enum: ['pending', 'verification_pending', 'completed', 'failed', 'refunded'],
+    default: 'pending'
+  },
   priority: {
-  type: String,
-  enum: ['low', 'medium', 'high', 'urgent'],
-  default: 'medium'
-},
+    type: String,
+    enum: ['low', 'medium', 'high', 'urgent'],
+    default: 'medium'
+  },
   notes: String, // Customer notes
   adminNotes: String, // Internal admin notes (not visible to customer)
   trackingNumber: String,
