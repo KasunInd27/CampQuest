@@ -5,6 +5,47 @@ import { resolveImageUrl } from '../lib/imageHelper';
 import { Package, Check, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// Utility function to normalize includes list to array of strings
+const normalizeIncludesList = (includes) => {
+    let list = includes;
+
+    // Handle null/undefined
+    if (!list) return [];
+
+    // If it's already an array, use it
+    if (Array.isArray(list)) {
+        return list.map(item => String(item).trim()).filter(Boolean);
+    }
+
+    // If it's a string, try to parse it
+    if (typeof list === 'string') {
+        // Try JSON parse first
+        try {
+            const parsed = JSON.parse(list);
+            if (Array.isArray(parsed)) {
+                return parsed.map(item => String(item).trim()).filter(Boolean);
+            }
+        } catch (e) {
+            // Not JSON, continue
+        }
+
+        // Split by newline or comma
+        if (list.includes('\n')) {
+            list = list.split('\n');
+        } else if (list.includes(',')) {
+            list = list.split(',');
+        } else {
+            // Single item
+            list = [list];
+        }
+
+        return list.map(item => String(item).trim()).filter(Boolean);
+    }
+
+    // Fallback
+    return [];
+};
+
 const PackageDetails = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
@@ -21,7 +62,10 @@ const PackageDetails = () => {
             setLoading(true);
             const response = await axios.get(`/packages/${slug}`);
             if (response.data.success) {
-                setPkg(response.data.data);
+                const packageData = response.data.data;
+                console.log('Package includes (raw):', packageData.includes);
+                console.log('Package includes (type):', typeof packageData.includes);
+                setPkg(packageData);
             } else {
                 setError('Package not found');
             }
@@ -106,12 +150,12 @@ const PackageDetails = () => {
                                 <Package className="w-6 h-6 mr-3 text-lime-500" />
                                 What's Included
                             </h2>
-                            {/* Scrollable List Container */}
-                            <ul className="flex flex-col gap-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar w-full">
-                                {pkg.includes && pkg.includes.map((item, index) => (
-                                    <li key={index} className="flex items-center text-gray-300 w-full">
-                                        <Check className="w-5 h-5 text-lime-500 mr-3 flex-shrink-0" />
-                                        <span className="text-lg">{item}</span>
+                            {/* Scrollable List Container - Strict Vertical Layout */}
+                            <ul className="flex flex-col gap-3 max-h-80 overflow-y-auto pr-2 w-full list-none">
+                                {normalizeIncludesList(pkg.includes).map((item, index) => (
+                                    <li key={index} className="flex items-start w-full text-gray-300">
+                                        <Check className="w-5 h-5 text-lime-500 mr-3 mt-0.5 flex-shrink-0" />
+                                        <span className="text-base leading-relaxed block">{item}</span>
                                     </li>
                                 ))}
                             </ul>
