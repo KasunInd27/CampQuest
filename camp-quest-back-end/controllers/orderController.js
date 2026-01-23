@@ -170,6 +170,11 @@ export const createOrder = async (req, res) => {
 
     // Validate stock availability before creating order
     for (const item of orderData.items) {
+      // Skip package items - they don't have stock tracking
+      if (item.type === 'package') {
+        continue;
+      }
+
       let product;
       let quantityField;
       let Model;
@@ -204,10 +209,16 @@ export const createOrder = async (req, res) => {
     // Determine order type if not provided
     let orderType = orderData.orderType;
     if (!orderType) {
+      const hasPackageItems = orderData.items.some(item => item.type === 'package');
       const hasRentalItems = orderData.items.some(item =>
         item.type === 'rental' || item.rentalDays > 0
       );
-      orderType = hasRentalItems ? 'rental' : 'sales';
+
+      if (hasPackageItems) {
+        orderType = 'package';
+      } else {
+        orderType = hasRentalItems ? 'rental' : 'sales';
+      }
     }
 
     // Create the order with proper customer userId and orderType
@@ -228,8 +239,8 @@ export const createOrder = async (req, res) => {
       priority: orderData.priority || 'medium',
       notes: orderData.notes || '',
       adminNotes: orderData.adminNotes || '',
-      // Add rental details if it's a rental order
-      ...(orderType === 'rental' && orderData.rentalDetails && {
+      // Add rental details if it's a rental or package order
+      ...((orderType === 'rental' || orderType === 'package') && orderData.rentalDetails && {
         rentalDetails: orderData.rentalDetails
       })
     });
