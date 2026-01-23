@@ -19,6 +19,7 @@ import blogInteractionRoutes from './routes/blogInteractionRoutes.js';
 import googleLoginRoutes from './routes/googleLoginRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import uploadRoutes from "./routes/uploadRoutes.js";
+import packageRoutes from './routes/packageRoutes.js';
 
 
 import path from 'path';
@@ -77,6 +78,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/blog-interactions', blogInteractionRoutes);
 app.use('/api/auth/google', googleLoginRoutes);
 app.use("/api/uploads", uploadRoutes);
+app.use('/api/packages', packageRoutes);
 
 
 // ✅ Error handling middleware

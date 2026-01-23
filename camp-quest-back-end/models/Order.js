@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
   },
   orderType: {
     type: String,
-    enum: ['rental', 'sales'],
+    enum: ['rental', 'sales', 'package'],
     required: true,
     default: 'sales'
   },
@@ -60,12 +60,12 @@ const orderSchema = new mongoose.Schema({
     },
     productModel: {
       type: String,
-      enum: ['SalesProduct', 'RentalProduct']
+      enum: ['SalesProduct', 'RentalProduct', 'SpecialPackage']
     },
     name: String,
     type: {
       type: String,
-      enum: ['sale', 'rental'],
+      enum: ['sale', 'rental', 'package'],
       required: true
     },
     quantity: {
@@ -168,9 +168,9 @@ orderSchema.pre('save', function (next) {
   next();
 });
 
-// Virtual for determining if order is rental
+// Virtual for determining if order is rental or package
 orderSchema.virtual('isRental').get(function () {
-  return this.orderType === 'rental';
+  return this.orderType === 'rental' || this.orderType === 'package';
 });
 
 // Virtual for determining if order is sales

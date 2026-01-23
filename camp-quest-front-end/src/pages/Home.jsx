@@ -64,98 +64,42 @@ function Hero() {
   );
 }
 
-// Featured Products Component
-function FeaturedProducts() {
-  const [activeTab, setActiveTab] = useState('all');
-  const [rentalProducts, setRentalProducts] = useState([]);
-  const [salesProducts, setSalesProducts] = useState([]);
+// Special Packages Component
+function SpecialPackages() {
+  const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchProducts();
+    fetchPackages();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchPackages = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch both rental and sales products
-      const [rentalResponse, salesResponse] = await Promise.all([
-        axios.get('/rental-products?limit=4&page=1'),
-        axios.get('/sales-products?limit=4&page=1')
-      ]);
+      // Fetch active packages
+      const response = await axios.get('/packages');
 
-      if (rentalResponse.data.success) {
-        setRentalProducts(rentalResponse.data.data || []);
-      }
-
-      if (salesResponse.data.success) {
-        setSalesProducts(salesResponse.data.data || []);
+      if (response.data.success) {
+        setPackages(response.data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('Failed to load products');
-      toast.error('Failed to load products');
+      console.error('Error fetching packages:', error);
+      setError('Failed to load packages');
+      toast.error('Failed to load packages');
     } finally {
       setLoading(false);
     }
   };
 
-  const getFilteredProducts = () => {
-    switch (activeTab) {
-      case 'rent':
-        return rentalProducts.map(product => ({
-          ...product,
-          type: 'rental',
-          displayPrice: `LKR: ${product.dailyRate}/day`,
-          buttonText: 'Rent Now'
-        }));
-      case 'sale':
-        return salesProducts.map(product => ({
-          ...product,
-          type: 'sales',
-          displayPrice: `LKR: ${product.price}`,
-          buttonText: 'Add to Cart'
-        }));
-      case 'all':
-      default:
-        const rental = rentalProducts.slice(0, 2).map(product => ({
-          ...product,
-          type: 'rental',
-          displayPrice: `LKR: ${product.dailyRate}/day`,
-          buttonText: 'Rent Now'
-        }));
-        const sales = salesProducts.slice(0, 2).map(product => ({
-          ...product,
-          type: 'sales',
-          displayPrice: `LKR: ${product.price}`,
-          buttonText: 'Add to Cart'
-        }));
-        return [...rental, ...sales];
-    }
+  const getFilteredPackages = () => {
+    // Show top 4 packages
+    return packages.slice(0, 4);
   };
 
-  const filteredProducts = getFilteredProducts();
-
-  const renderStars = (rating = 4.5) => {
-    return [...Array(5)].map((_, i) => (
-      <svg
-        key={i}
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill={i < Math.floor(rating) ? '#fbbf24' : 'none'}
-        stroke={i < Math.floor(rating) ? '#fbbf24' : '#d1d5db'}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"></polygon>
-      </svg>
-    ));
-  };
+  const filteredPackages = getFilteredPackages();
 
   if (loading) {
     return (
@@ -163,7 +107,7 @@ function FeaturedProducts() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lime-500 mx-auto"></div>
-            <p className="text-white mt-4">Loading products...</p>
+            <p className="text-white mt-4">Loading packages...</p>
           </div>
         </div>
       </section>
@@ -177,7 +121,7 @@ function FeaturedProducts() {
           <div className="text-center">
             <p className="text-red-400 mb-4">{error}</p>
             <button
-              onClick={fetchProducts}
+              onClick={fetchPackages}
               className="px-6 py-2 bg-lime-500 text-gray-900 rounded-lg hover:bg-lime-400 transition-colors"
             >
               Try Again
@@ -194,98 +138,65 @@ function FeaturedProducts() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12">
           <h2 className="text-3xl font-bold text-white mb-4 sm:mb-0">
-            Featured Equipment
+            Special Packages
           </h2>
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setActiveTab('rent')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'rent'
-                ? 'bg-lime-500 text-gray-900'
-                : 'text-gray-600 hover:text-gray-900'
-                }`}
-            >
-              For Rent
-            </button>
-            <button
-              onClick={() => setActiveTab('sale')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'sale'
-                ? 'bg-lime-500 text-gray-900'
-                : 'text-gray-600 hover:text-gray-900'
-                }`}
-            >
-              For Sale
-            </button>
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'all'
-                ? 'bg-lime-500 text-gray-900'
-                : 'text-gray-600 hover:text-gray-900'
-                }`}
-            >
-              View All
-            </button>
-          </div>
+          <Link
+            to="/shop" // Or distinct packages page if we had one, but standard shop/rent or just linking to generic Rent is fine or omitting 'View All' if packages are few. 
+            // Request says: "Clicking 'View Package Detail' navigates to /packages/:slug". 
+            // Buttons on card: 1) "View Package Detail", 2) "Order Now"
+            className="hidden sm:block px-4 py-2 text-sm font-medium text-lime-500 border border-lime-500 rounded-md hover:bg-lime-500 hover:text-gray-900 transition-colors">
+            View All Equipment
+          </Link>
         </div>
 
-        {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
+        {/* Packages Grid */}
+        {filteredPackages.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">No products available at the moment.</p>
+            <p className="text-gray-400 text-lg">No special packages available at the moment.</p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {filteredProducts.map((product, index) => (
-                <div key={`${product.type}-${product._id}-${index}`} className="bg-neutral-900 border border-lime-500 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <img
-                      src={getValidImageUrl(product, product.type === 'rental' ? 'rental-products' : 'sales-products')}
-                      alt={product.name}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded ${product.type === 'rental'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-green-100 text-green-800'
-                      }`}>
-                      {product.type === 'rental' ? 'RENTAL' : 'FOR SALE'}
-                    </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {filteredPackages.map((pkg, index) => (
+              <div key={pkg._id} className="bg-neutral-900 border border-lime-500 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col">
+                <div className="relative h-48">
+                  <img
+                    src={resolveImageUrl(pkg.imageUrl)}
+                    alt={pkg.name}
+                    className="w-full h-full object-cover rounded-t-lg"
+                  />
+                  <span className="absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded bg-purple-100 text-purple-800">
+                    PACKAGE
+                  </span>
+                </div>
+                <div className="p-4 flex-1 flex flex-col">
+                  <h3 className="font-semibold text-white mb-2 line-clamp-2 text-lg">
+                    {pkg.name}
+                  </h3>
+                  <p className="text-neutral-400 text-sm mb-4 line-clamp-2 flex-1">
+                    {pkg.description}
+                  </p>
+                  <div className="text-lg font-bold text-white mb-3">
+                    LKR {pkg.price.toLocaleString()}
                   </div>
-                  <div className="p-4">
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center">
-                        {renderStars(4.5)}
-                      </div>
-                      <span className="ml-2 text-sm text-white">
-                        (50+ reviews)
-                      </span>
-                    </div>
-                    <h3 className="font-semibold text-white mb-2 line-clamp-2">
-                      {product.name}
-                    </h3>
-                    <div className="text-lg font-bold text-white mb-3">
-                      {product.displayPrice}
-                    </div>
+                  <div className="flex flex-col gap-2 mt-auto">
                     <Link
-                      to={product.type === 'rental' ? `/rent/${product._id}` : `/shop/${product._id}`}
+                      to={`/packages/${pkg.slug || pkg._id}`}
+                      className="block w-full px-4 py-2 border border-lime-500 text-lime-500 font-semibold rounded-lg hover:bg-lime-500/10 transition-colors text-center"
+                    >
+                      View Package Detail
+                    </Link>
+                    <Link
+                      to="/checkout"
+                      state={{ package: pkg, orderType: 'package' }}
                       className="block w-full px-4 py-2 bg-lime-500 text-gray-900 font-semibold rounded-lg hover:bg-lime-400 transition-colors text-center"
                     >
-                      {product.buttonText}
+                      Order Now
                     </Link>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Footer */}
-            <div className="text-center">
-              <Link
-                to={activeTab === 'rent' ? '/rent' : activeTab === 'sale' ? '/shop' : '/rent'}
-                className="px-8 py-3 border-2 border-lime-500 text-lime-500 font-semibold rounded-lg hover:border-lime-400 hover:text-lime-400 transition-colors"
-              >
-                View All Equipment
-              </Link>
-            </div>
-          </>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </section>
@@ -549,7 +460,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <Hero />
-      <FeaturedProducts />
+      <SpecialPackages />
       <FeaturedCategories />
       <CallToAction />
       <BlogPreview />

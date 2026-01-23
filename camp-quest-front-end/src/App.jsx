@@ -8,6 +8,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import SupportPage from './pages/SupportPage';
 import { AdminLayout } from './components/AdminLayout';
+import PackageDetails from './pages/PackageDetails';
+import Packages from './pages/Packages';
 import Categories from './pages/Categories';
 import SalesProducts from './pages/SalesProducts';
 import RentalProducts from './pages/RentalProducts';
@@ -43,6 +45,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/packages/:slug" element={<PackageDetails />} />
         <Route path="/rent" element={<Rent />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
@@ -72,6 +75,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="packages" element={<Packages />} />
           <Route path="sales-products" element={<SalesProducts />} />
           <Route path="rental-products" element={<RentalProducts />} />
           <Route path="rental-orders" element={<RentalOrders />} />

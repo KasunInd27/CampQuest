@@ -1,5 +1,6 @@
 // pages/AboutUs.jsx
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import kasunImg from "../assets/Kasun1.jpeg";
 import shehanImg from "../assets/Shehan.jpeg";
@@ -359,12 +360,18 @@ function AboutCallToAction() {
           Let us help you gear up for your next expedition.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="px-8 py-3 bg-lime-400 text-gray-900 font-semibold rounded-lg hover:bg-lime-500 transition-colors">
+          <Link
+            to="/blog"
+            className="px-8 py-3 bg-lime-400 text-gray-900 font-semibold rounded-lg hover:bg-lime-500 transition-colors"
+          >
+            View Blog
+          </Link>
+          <Link
+            to="/rent"
+            className="px-8 py-3 border-2 border-lime-400 text-lime-400 font-semibold rounded-lg hover:bg-lime-400 hover:text-gray-900 transition-colors"
+          >
             Browse Equipment
-          </button>
-          <button className="px-8 py-3 border-2 border-lime-400 text-lime-400 font-semibold rounded-lg hover:bg-lime-400 hover:text-gray-900 transition-colors">
-            Contact Us
-          </button>
+          </Link>
         </div>
       </div>
     </section>

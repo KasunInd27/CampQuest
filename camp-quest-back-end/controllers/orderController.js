@@ -72,8 +72,10 @@ const updateProductQuantities = async (items) => {
       let quantityField;
       let Model;
 
-      // Determine if it's a sales or rental product
-      if (item.type === 'rental' || item.rentalDays > 0) {
+      // Determine if it's a sales, rental or package
+      if (item.type === 'package') {
+        continue; // No quantity to update for packages
+      } else if (item.type === 'rental' || item.rentalDays > 0) {
         Model = RentalProduct;
         productType = 'rental';
         quantityField = 'availableQuantity';
