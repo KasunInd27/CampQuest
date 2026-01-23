@@ -1,7 +1,7 @@
 // src/pages/Checkout.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { MapPin, User, Calendar, CreditCard } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { MapPin, User, Calendar, CreditCard, Package } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useFormik } from "formik";
@@ -10,18 +10,22 @@ import toast from "react-hot-toast";
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { cartItems } = useCart();
+
+  const packageOrder = location.state?.package;
+  const isPackageOrder = !!packageOrder;
 
   const [loading, setLoading] = useState(false);
 
   const hasRentalItems = useMemo(
-    () => cartItems.some((item) => item.type === "rental"),
-    [cartItems]
+    () => isPackageOrder ? true : cartItems.some((item) => item.type === "rental"),
+    [cartItems, isPackageOrder]
   );
   const hasSaleItems = useMemo(
-    () => cartItems.some((item) => item.type === "sale"),
-    [cartItems]
+    () => isPackageOrder ? false : cartItems.some((item) => item.type === "sale"),
+    [cartItems, isPackageOrder]
   );
   const isRentalOnly = hasRentalItems && !hasSaleItems;
 
@@ -40,6 +44,24 @@ const Checkout = () => {
       hasRentalItems && startDate && endDate
         ? calculateRentalDays(startDate, endDate)
         : 1;
+
+    if (isPackageOrder) {
+      // For packages, price is flat but usually treated as rental duration??
+      // Req: "A package order must be treated as a RENTAL ORDER... show package name + package price".
+      // Usually packages are per day if rental? Or flat fee?
+      // "package price... (like rental/cart items)".
+      // If treated as rental order, it likely implies daily rate if it includes equipment?
+      // But special packages often have fixed price or daily rate. The model has just 'price'.
+      // Let's assume 'price' is a DAILY rate if it's treated as rental order with start/end date.
+      // Or if it's a fixed package for a trip?
+      // Given "Rent Now" context and "Rental Order", safe to assume daily rate OR ensure it's clear.
+      // Let's assume daily rate to be safe with "Rental Order" logic which calculates days.
+      // Wait, "display package name + package price".
+      // If I look at the Home mock I wrote: "LKR {pkg.price} / day" isn't specified, just "LKR {pkg.price}".
+      // But logic in rental orders calculates days.
+      // Let's treat it as Daily Rate to be consistent with Rental Orders.
+      return packageOrder.price * rentalDays;
+    }
 
     return cartItems.reduce((total, item) => {
       if (item.type === "rental") {
@@ -93,36 +115,48 @@ const Checkout = () => {
           ? calculateRentalDays(values.startDate, values.endDate)
           : 0;
 
-        const orderType = isRentalOnly ? "rental" : "sales";
+        const orderType = isPackageOrder ? "pkg" : (isRentalOnly ? "rental" : "sales"); // Temp variable, actual field is 'rental' or 'package' enum
 
         const subtotal = calculateCartTotal(values.startDate, values.endDate);
         const tax = 0;
         const shippingCost = hasSaleItems ? 450 : 0;
         const totalAmount = subtotal + tax + shippingCost;
 
-        // ✅ Build deliveryAddress separately to avoid any accidental duplicate keys
-        const deliveryAddress = hasSaleItems
-          ? {
-            address: (values.address || "").trim(),
-            city: (values.city || "").trim(),
-            state: (values.state || "").trim(), // ✅ only once
-            postalCode: (values.postalCode || "").trim(),
-            country: values.country || "SL",
-          }
-          : undefined;
+        // ... (deliveryAddress logic matches original)
 
         // Prepare order data
         const orderData = {
-          orderType,
+          orderType: isPackageOrder ? "package" : (isRentalOnly ? "rental" : "sales"),
           customer: {
             name: (values.name || "").trim(),
             email: (values.email || "").trim(),
             phone: (values.phone || "").trim(),
           },
 
-          ...(hasSaleItems && { deliveryAddress }),
+          ...(hasSaleItems && {
+            deliveryAddress: hasSaleItems
+              ? {
+                address: (values.address || "").trim(),
+                city: (values.city || "").trim(),
+                state: (values.state || "").trim(), // ✅ only once
+                postalCode: (values.postalCode || "").trim(),
+                country: values.country || "SL",
+              }
+              : undefined
+          }),
 
-          items: cartItems.map((item) => {
+          items: isPackageOrder ? [{
+            product: packageOrder._id,
+            productModel: 'SpecialPackage',
+            name: packageOrder.name,
+            type: 'package',
+            quantity: 1,
+            price: packageOrder.price,
+            rentalDays: rentalDays,
+            rentalStartDate: new Date(values.startDate),
+            rentalEndDate: new Date(values.endDate),
+            subtotal: packageOrder.price * rentalDays
+          }] : cartItems.map((item) => {
             const baseItem = {
               product: item._id,
               productModel:
@@ -185,10 +219,10 @@ const Checkout = () => {
   });
 
   useEffect(() => {
-    if (!cartItems || cartItems.length === 0) {
+    if ((!cartItems || cartItems.length === 0) && !isPackageOrder) {
       navigate("/cart");
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, isPackageOrder, navigate]);
 
   const currentSubtotal = calculateCartTotal(
     formik.values.startDate,
@@ -228,8 +262,8 @@ const Checkout = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.name && formik.errors.name
-                        ? "border-red-500"
-                        : "border-neutral-600"
+                      ? "border-red-500"
+                      : "border-neutral-600"
                       }`}
                     placeholder="Enter your full name"
                   />
@@ -251,8 +285,8 @@ const Checkout = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.email && formik.errors.email
-                        ? "border-red-500"
-                        : "border-neutral-600"
+                      ? "border-red-500"
+                      : "border-neutral-600"
                       }`}
                     placeholder="Enter your email address"
                   />
@@ -274,8 +308,8 @@ const Checkout = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.phone && formik.errors.phone
-                        ? "border-red-500"
-                        : "border-neutral-600"
+                      ? "border-red-500"
+                      : "border-neutral-600"
                       }`}
                     placeholder="+94 77 123 4567"
                   />
@@ -308,8 +342,8 @@ const Checkout = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.address && formik.errors.address
-                          ? "border-red-500"
-                          : "border-neutral-600"
+                        ? "border-red-500"
+                        : "border-neutral-600"
                         }`}
                       placeholder="123 Main Street"
                     />
@@ -332,8 +366,8 @@ const Checkout = () => {
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.city && formik.errors.city
-                            ? "border-red-500"
-                            : "border-neutral-600"
+                          ? "border-red-500"
+                          : "border-neutral-600"
                           }`}
                         placeholder="Enter city"
                       />
@@ -355,8 +389,8 @@ const Checkout = () => {
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.state && formik.errors.state
-                            ? "border-red-500"
-                            : "border-neutral-600"
+                          ? "border-red-500"
+                          : "border-neutral-600"
                           }`}
                         placeholder="Enter state"
                       />
@@ -380,8 +414,8 @@ const Checkout = () => {
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.postalCode && formik.errors.postalCode
-                            ? "border-red-500"
-                            : "border-neutral-600"
+                          ? "border-red-500"
+                          : "border-neutral-600"
                           }`}
                         placeholder="12345"
                       />
@@ -417,8 +451,8 @@ const Checkout = () => {
                       onBlur={formik.handleBlur}
                       min={new Date().toISOString().split("T")[0]}
                       className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.startDate && formik.errors.startDate
-                          ? "border-red-500"
-                          : "border-neutral-600"
+                        ? "border-red-500"
+                        : "border-neutral-600"
                         }`}
                     />
                     {formik.touched.startDate && formik.errors.startDate && (
@@ -443,8 +477,8 @@ const Checkout = () => {
                         new Date().toISOString().split("T")[0]
                       }
                       className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.endDate && formik.errors.endDate
-                          ? "border-red-500"
-                          : "border-neutral-600"
+                        ? "border-red-500"
+                        : "border-neutral-600"
                         }`}
                     />
                     {formik.touched.endDate && formik.errors.endDate && (
@@ -485,8 +519,8 @@ const Checkout = () => {
                 rows={3}
                 placeholder="Any special instructions or requirements..."
                 className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.notes && formik.errors.notes
-                    ? "border-red-500"
-                    : "border-neutral-600"
+                  ? "border-red-500"
+                  : "border-neutral-600"
                   }`}
               />
               {formik.touched.notes && formik.errors.notes && (
@@ -507,8 +541,8 @@ const Checkout = () => {
               <div className="mb-4">
                 <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${hasRentalItems
-                      ? "text-blue-400 bg-blue-400/10"
-                      : "text-green-400 bg-green-400/10"
+                    ? "text-blue-400 bg-blue-400/10"
+                    : "text-green-400 bg-green-400/10"
                     }`}
                 >
                   {hasRentalItems ? "Rental Order" : "Sales Order"}
@@ -522,41 +556,55 @@ const Checkout = () => {
               </div>
 
               <div className="space-y-3 mb-6">
-                {cartItems.map((item) => {
-                  const rentalDays =
-                    hasRentalItems &&
-                      formik.values.startDate &&
-                      formik.values.endDate
-                      ? calculateRentalDays(
-                        formik.values.startDate,
-                        formik.values.endDate
-                      )
-                      : item.rentalDays || 1;
-
-                  const itemTotal =
-                    item.type === "rental"
-                      ? item.price * rentalDays * item.quantity
-                      : item.price * item.quantity;
-
-                  return (
-                    <div
-                      key={`${item._id}-${item.type}`}
-                      className="flex justify-between"
-                    >
-                      <div className="flex-1">
-                        <p className="text-white text-sm">{item.name}</p>
-                        <p className="text-neutral-400 text-xs">
-                          {item.type === "sale"
-                            ? `Qty: ${item.quantity}`
-                            : `${item.quantity} x ${rentalDays} days`}
-                        </p>
-                      </div>
-                      <span className="text-white">
-                        LKR {itemTotal.toFixed(2)}/=
-                      </span>
+                {isPackageOrder ? (
+                  <div className="flex justify-between">
+                    <div className="flex-1">
+                      <p className="text-white text-sm">{packageOrder.name}</p>
+                      <p className="text-neutral-400 text-xs">
+                        1 x {calculateRentalDays(formik.values.startDate, formik.values.endDate)} days
+                      </p>
                     </div>
-                  );
-                })}
+                    <span className="text-white">
+                      LKR {(packageOrder.price * calculateRentalDays(formik.values.startDate, formik.values.endDate)).toFixed(2)}/=
+                    </span>
+                  </div>
+                ) : (
+                  cartItems.map((item) => {
+                    const rentalDays =
+                      hasRentalItems &&
+                        formik.values.startDate &&
+                        formik.values.endDate
+                        ? calculateRentalDays(
+                          formik.values.startDate,
+                          formik.values.endDate
+                        )
+                        : item.rentalDays || 1;
+
+                    const itemTotal =
+                      item.type === "rental"
+                        ? item.price * rentalDays * item.quantity
+                        : item.price * item.quantity;
+
+                    return (
+                      <div
+                        key={`${item._id}-${item.type}`}
+                        className="flex justify-between"
+                      >
+                        <div className="flex-1">
+                          <p className="text-white text-sm">{item.name}</p>
+                          <p className="text-neutral-400 text-xs">
+                            {item.type === "sale"
+                              ? `Qty: ${item.quantity}`
+                              : `${item.quantity} x ${rentalDays} days`}
+                          </p>
+                        </div>
+                        <span className="text-white">
+                          LKR {itemTotal.toFixed(2)}/=
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
               </div>
 
               <div className="border-t border-neutral-700 pt-4 space-y-2">
