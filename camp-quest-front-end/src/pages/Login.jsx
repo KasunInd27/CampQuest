@@ -154,7 +154,10 @@ const Login = () => {
               <Mountain className="w-6 h-6" />
             </div>
             <div className="text-left">
-              <span className="text-xl font-bold block">CampGear</span>
+              <span className="text-xl font-bold block">
+                <span className="text-lime-500">Camp</span>
+                <span className="text-white">Quest</span>
+              </span>
               <span className="text-lime-500/80 text-xs">Smart Camping Solutions</span>
             </div>
           </Link>
@@ -199,10 +202,10 @@ const Login = () => {
                 onFocus={() => setFocusedInput('email')}
                 onBlur={handleBlur}
                 className={`block w-full pl-10 pr-3 py-3 border-2 ${errors.email && touched.email
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
-                    : focusedInput === 'email'
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
-                      : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
+                  ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                  : focusedInput === 'email'
+                    ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
+                    : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
                   } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Enter your email address"
               />
@@ -242,10 +245,10 @@ const Login = () => {
                 onFocus={() => setFocusedInput('password')}
                 onBlur={handleBlur}
                 className={`block w-full pl-10 pr-10 py-3 border-2 ${errors.password && touched.password
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
-                    : focusedInput === 'password'
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
-                      : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
+                  ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                  : focusedInput === 'password'
+                    ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
+                    : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
                   } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Enter your password"
               />
@@ -341,7 +344,7 @@ const Login = () => {
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
             <p className="text-neutral-600 text-xs">
-              New to CampGear?{' '}
+              New to CampQuest?{' '}
               <Link to="/register" className="font-semibold text-lime-500 hover:text-lime-500 transition-colors duration-200">
                 Join our community →
               </Link>
