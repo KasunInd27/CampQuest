@@ -103,8 +103,8 @@ const Orders = () => {
     const currentTime = new Date();
     const hoursDifference = (currentTime - orderTime) / (1000 * 60 * 60);
 
-    // Rentals cannot be edited
-    if (order.orderType === 'rental') return false;
+    // Rentals and packages cannot be edited
+    if (order.orderType === 'rental' || order.orderType === 'package') return false;
 
     return hoursDifference <= 24 && ['pending', 'processing'].includes(order.status);
   };
@@ -371,11 +371,14 @@ const OrderCard = ({ order, onView, onEdit, onCancel, canEdit, canCancel, getSta
             </div>
           </div>
 
-          {order.orderType === 'rental' ? (
+          {(order.orderType === 'rental' || order.orderType === 'package') ? (
             <>
               <div className="flex items-center text-sm text-yellow-500">
                 <MapPin className="w-4 h-4 mr-1" />
                 <span>Pickup at Shop</span>
+                <span className="ml-2 text-xs text-neutral-500 italic">
+                  ({order.orderType === 'package' ? 'Special Package' : 'Rental'} - Not editable)
+                </span>
               </div>
             </>
           ) : (
@@ -482,11 +485,13 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor, getStatusIcon }) =>
             </div>
 
             <div>
-              {order.orderType === 'rental' ? (
+              {(order.orderType === 'rental' || order.orderType === 'package') ? (
                 <>
                   <h3 className="text-lg font-semibold text-white mb-4">Pickup Information</h3>
                   <div className="bg-neutral-800 rounded-lg p-4 border border-yellow-500/30">
-                    <p className="text-yellow-500 font-medium mb-2">Pickup Required</p>
+                    <p className="text-yellow-500 font-medium mb-2">
+                      Pickup Required {order.orderType === 'package' && <span className="text-xs text-neutral-400">(Special Package - Not editable)</span>}
+                    </p>
                     <p className="text-sm text-neutral-300">
                       Please collect your items from our shop.
                     </p>
@@ -585,7 +590,7 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor, getStatusIcon }) =>
                   </div>
                   <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                     <p className="text-sm text-blue-400 italic">
-                      This is a rental order. Items are collected from the shop. No delivery charges apply.
+                      This is a {order.orderType} order. Items are collected from the shop. No delivery charges apply.
                     </p>
                   </div>
                 </div>

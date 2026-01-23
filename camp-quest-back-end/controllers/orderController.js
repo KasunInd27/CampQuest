@@ -689,6 +689,16 @@ export const updateOrderDeliveryDetails = async (req, res) => {
       });
     }
 
+    // Block editing of rental and package orders
+    if (order.orderType === 'rental' || order.orderType === 'package') {
+      return res.status(403).json({
+        success: false,
+        message: order.orderType === 'package'
+          ? 'Special Package orders cannot be edited.'
+          : 'Rental orders cannot be edited.'
+      });
+    }
+
     // Check if order is within 24 hours
     const orderTime = new Date(order.createdAt);
     const currentTime = new Date();
