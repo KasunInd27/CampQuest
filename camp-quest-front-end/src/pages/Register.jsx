@@ -79,9 +79,9 @@ const Register = () => {
     // Also validate confirmPassword when password changes
     if (name === 'password' && touched.confirmPassword && formData.confirmPassword) {
       try {
-        await validationSchema.validateAt('confirmPassword', { 
-          password: value, 
-          confirmPassword: formData.confirmPassword 
+        await validationSchema.validateAt('confirmPassword', {
+          password: value,
+          confirmPassword: formData.confirmPassword
         });
         setErrors(prev => {
           const newErrors = { ...prev };
@@ -109,7 +109,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Mark all fields as touched
     setTouched({
       name: true,
@@ -125,12 +125,12 @@ const Register = () => {
         ...formData,
         terms: agreedToTerms
       };
-      
+
       await validationSchema.validate(validationData, { abortEarly: false });
-      
+
       // Clear errors if validation passes
       setErrors({});
-      
+
       // Proceed with registration
       setLoading(true);
       await register(formData.name, formData.email, formData.password);
@@ -155,22 +155,22 @@ const Register = () => {
   const passwordStrength = () => {
     if (!formData.password) return 0;
     let strength = 0;
-    
+
     // Length check
     if (formData.password.length >= 8) strength++;
     if (formData.password.length >= 12) strength++;
-    
+
     // Character variety checks
     if (formData.password.match(/[a-z]/) && formData.password.match(/[A-Z]/)) strength++;
     if (formData.password.match(/[0-9]/)) strength++;
     if (formData.password.match(/[^a-zA-Z0-9]/)) strength++;
-    
+
     return Math.min(strength, 4);
   };
 
   const getPasswordStrengthText = () => {
     const strength = passwordStrength();
-    switch(strength) {
+    switch (strength) {
       case 0: return 'Very weak';
       case 1: return 'Weak';
       case 2: return 'Fair';
@@ -197,7 +197,10 @@ const Register = () => {
               <Mountain className="w-6 h-6" />
             </div>
             <div className="text-left">
-              <span className="text-xl font-bold block">CampGear</span>
+              <span className="text-xl font-bold block">
+                <span className="text-lime-500">Camp</span>
+                <span className="text-white">Quest</span>
+              </span>
               <span className="text-lime-500/80 text-xs">Smart Camping Solutions</span>
             </div>
           </Link>
@@ -206,7 +209,7 @@ const Register = () => {
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <div className="mb-6 text-center">
             <h2 className="text-xl font-bold text-neutral-900 mb-2">
-              Join CampGear
+              Join CampQuest
             </h2>
             <p className="text-neutral-600 text-sm">
               Create your account and start your outdoor adventure
@@ -218,7 +221,7 @@ const Register = () => {
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs flex items-start">
               <div className="flex-shrink-0 mr-2 mt-0.5">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
               {errors.submit}
@@ -228,9 +231,8 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name Input */}
             <div className="relative">
-              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-                focusedInput === 'name' ? 'text-lime-500' : errors.name && touched.name ? 'text-red-500' : 'text-neutral-400'
-              }`}>
+              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${focusedInput === 'name' ? 'text-lime-500' : errors.name && touched.name ? 'text-red-500' : 'text-neutral-400'
+                }`}>
                 <User className="w-4 h-4" />
               </div>
               <input
@@ -242,24 +244,22 @@ const Register = () => {
                 onChange={handleChange}
                 onFocus={() => setFocusedInput('name')}
                 onBlur={handleBlur}
-                className={`block w-full pl-10 pr-3 py-3 border-2 ${
-                  errors.name && touched.name 
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20' 
-                    : focusedInput === 'name' 
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500' 
-                      : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
-                } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
+                className={`block w-full pl-10 pr-3 py-3 border-2 ${errors.name && touched.name
+                  ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                  : focusedInput === 'name'
+                    ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
+                    : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
+                  } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Enter your full name"
               />
-              <label htmlFor="name" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${
-                focusedInput === 'name' ? 'text-lime-500' : errors.name && touched.name ? 'text-red-500' : 'text-neutral-600'
-              } transition-colors duration-200`}>
+              <label htmlFor="name" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${focusedInput === 'name' ? 'text-lime-500' : errors.name && touched.name ? 'text-red-500' : 'text-neutral-600'
+                } transition-colors duration-200`}>
                 Full Name
               </label>
               {errors.name && touched.name && (
                 <p className="mt-1 text-xs text-red-600 flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.name}
                 </p>
@@ -268,9 +268,8 @@ const Register = () => {
 
             {/* Email Input */}
             <div className="relative">
-              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-                focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-400'
-              }`}>
+              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-400'
+                }`}>
                 <Mail className="w-4 h-4" />
               </div>
               <input
@@ -282,24 +281,22 @@ const Register = () => {
                 onChange={handleChange}
                 onFocus={() => setFocusedInput('email')}
                 onBlur={handleBlur}
-                className={`block w-full pl-10 pr-3 py-3 border-2 ${
-                  errors.email && touched.email 
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20' 
-                    : focusedInput === 'email' 
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500' 
-                      : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
-                } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
+                className={`block w-full pl-10 pr-3 py-3 border-2 ${errors.email && touched.email
+                  ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                  : focusedInput === 'email'
+                    ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
+                    : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
+                  } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Enter your email address"
               />
-              <label htmlFor="email" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${
-                focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-600'
-              } transition-colors duration-200`}>
+              <label htmlFor="email" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${focusedInput === 'email' ? 'text-lime-500' : errors.email && touched.email ? 'text-red-500' : 'text-neutral-600'
+                } transition-colors duration-200`}>
                 Email Address
               </label>
               {errors.email && touched.email && (
                 <p className="mt-1 text-xs text-red-600 flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.email}
                 </p>
@@ -308,9 +305,8 @@ const Register = () => {
 
             {/* Password Input */}
             <div className="relative">
-              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-                focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-400'
-              }`}>
+              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-400'
+                }`}>
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -322,18 +318,16 @@ const Register = () => {
                 onChange={handleChange}
                 onFocus={() => setFocusedInput('password')}
                 onBlur={handleBlur}
-                className={`block w-full pl-10 pr-10 py-3 border-2 ${
-                  errors.password && touched.password 
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20' 
-                    : focusedInput === 'password' 
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500' 
-                      : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
-                } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
+                className={`block w-full pl-10 pr-10 py-3 border-2 ${errors.password && touched.password
+                  ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                  : focusedInput === 'password'
+                    ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
+                    : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
+                  } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Create a strong password"
               />
-              <label htmlFor="password" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${
-                focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-600'
-              } transition-colors duration-200`}>
+              <label htmlFor="password" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${focusedInput === 'password' ? 'text-lime-500' : errors.password && touched.password ? 'text-red-500' : 'text-neutral-600'
+                } transition-colors duration-200`}>
                 Password
               </label>
               <button
@@ -347,7 +341,7 @@ const Register = () => {
                   <Eye className="h-4 w-4" />
                 )}
               </button>
-              
+
               {/* Password Strength Indicator */}
               {formData.password && (
                 <div className="mt-2">
@@ -355,28 +349,26 @@ const Register = () => {
                     {[...Array(4)].map((_, i) => (
                       <div
                         key={i}
-                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                          i < passwordStrength()
-                            ? getPasswordStrengthColor()
-                            : 'bg-neutral-200'
-                        }`}
+                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < passwordStrength()
+                          ? getPasswordStrengthColor()
+                          : 'bg-neutral-200'
+                          }`}
                       />
                     ))}
                   </div>
-                  <p className={`text-xs mt-1 font-medium ${
-                    passwordStrength() <= 1 ? 'text-red-500' : 
-                    passwordStrength() === 2 ? 'text-yellow-600' : 
-                    'text-lime-500'
-                  }`}>
+                  <p className={`text-xs mt-1 font-medium ${passwordStrength() <= 1 ? 'text-red-500' :
+                    passwordStrength() === 2 ? 'text-yellow-600' :
+                      'text-lime-500'
+                    }`}>
                     Password strength: {getPasswordStrengthText()}
                   </p>
                 </div>
               )}
-              
+
               {errors.password && touched.password && (
                 <p className="mt-1 text-xs text-red-600 flex items-start">
                   <svg className="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   <span>{errors.password}</span>
                 </p>
@@ -414,9 +406,8 @@ const Register = () => {
 
             {/* Confirm Password Input */}
             <div className="relative">
-              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-                focusedInput === 'confirmPassword' ? 'text-lime-500' : errors.confirmPassword && touched.confirmPassword ? 'text-red-500' : 'text-neutral-400'
-              }`}>
+              <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${focusedInput === 'confirmPassword' ? 'text-lime-500' : errors.confirmPassword && touched.confirmPassword ? 'text-red-500' : 'text-neutral-400'
+                }`}>
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -428,18 +419,16 @@ const Register = () => {
                 onChange={handleChange}
                 onFocus={() => setFocusedInput('confirmPassword')}
                 onBlur={handleBlur}
-                className={`block w-full pl-10 pr-10 py-3 border-2 ${
-                  errors.confirmPassword && touched.confirmPassword 
-                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20' 
-                    : focusedInput === 'confirmPassword' 
-                      ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500' 
-                      : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
-                } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
+                className={`block w-full pl-10 pr-10 py-3 border-2 ${errors.confirmPassword && touched.confirmPassword
+                  ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/20'
+                  : focusedInput === 'confirmPassword'
+                    ? 'border-lime-500 bg-lime-50/30 focus:border-lime-500'
+                    : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 focus:border-lime-500'
+                  } rounded-lg text-sm text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-500/20 transition-all duration-200`}
                 placeholder="Confirm your password"
               />
-              <label htmlFor="confirmPassword" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${
-                focusedInput === 'confirmPassword' ? 'text-lime-500' : errors.confirmPassword && touched.confirmPassword ? 'text-red-500' : 'text-neutral-600'
-              } transition-colors duration-200`}>
+              <label htmlFor="confirmPassword" className={`absolute -top-2 left-8 px-1 bg-white text-xs font-semibold ${focusedInput === 'confirmPassword' ? 'text-lime-500' : errors.confirmPassword && touched.confirmPassword ? 'text-red-500' : 'text-neutral-600'
+                } transition-colors duration-200`}>
                 Confirm Password
               </label>
               <button
@@ -456,7 +445,7 @@ const Register = () => {
               {errors.confirmPassword && touched.confirmPassword && (
                 <p className="mt-1 text-xs text-red-600 flex items-center">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.confirmPassword}
                 </p>
@@ -488,9 +477,8 @@ const Register = () => {
                         });
                       }
                     }}
-                    className={`h-4 w-4 mt-0.5 ${
-                      errors.terms && touched.terms ? 'border-red-500 text-red-500' : 'text-lime-500'
-                    } focus:ring-lime-500 border-neutral-300 rounded transition-colors duration-200`}
+                    className={`h-4 w-4 mt-0.5 ${errors.terms && touched.terms ? 'border-red-500 text-red-500' : 'text-lime-500'
+                      } focus:ring-lime-500 border-neutral-300 rounded transition-colors duration-200`}
                   />
                 </div>
                 <label htmlFor="terms" className="ml-2 block text-xs text-neutral-600 leading-relaxed">
@@ -507,7 +495,7 @@ const Register = () => {
               {errors.terms && touched.terms && (
                 <p className="mt-1 text-xs text-red-600 flex items-center ml-6">
                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.terms}
                 </p>
@@ -530,7 +518,7 @@ const Register = () => {
                 </>
               ) : (
                 <>
-                  Join CampGear Community
+                  Join CampQuest Community
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
                 </>
               )}
