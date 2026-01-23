@@ -689,6 +689,16 @@ export const updateOrderDeliveryDetails = async (req, res) => {
       });
     }
 
+    // Block editing of rental and package orders
+    if (order.orderType === 'rental' || order.orderType === 'package') {
+      return res.status(403).json({
+        success: false,
+        message: order.orderType === 'package'
+          ? 'Special Package orders cannot be edited.'
+          : 'Rental orders cannot be edited.'
+      });
+    }
+
     // Check if order is within 24 hours
     const orderTime = new Date(order.createdAt);
     const currentTime = new Date();
@@ -889,9 +899,14 @@ export const getAdminOrders = async (req, res) => {
 
     let query = {};
 
-    // Filter by order type (rental/sales)
+    // Filter by order type (rental/sales/package)
+    // When fetching rental orders, also include package orders
     if (orderType && orderType !== 'all') {
-      query.orderType = orderType;
+      if (orderType === 'rental') {
+        query.orderType = { $in: ['rental', 'package'] };
+      } else {
+        query.orderType = orderType;
+      }
     }
 
     // Filter by status
@@ -954,7 +969,11 @@ export const getAdminOrderStats = async (req, res) => {
 
     let matchQuery = {};
     if (orderType && orderType !== 'all') {
-      matchQuery.orderType = orderType;
+      if (orderType === 'rental') {
+        matchQuery.orderType = { $in: ['rental', 'package'] };
+      } else {
+        matchQuery.orderType = orderType;
+      }
     }
 
     // Get status breakdown
