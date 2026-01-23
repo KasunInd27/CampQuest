@@ -899,9 +899,14 @@ export const getAdminOrders = async (req, res) => {
 
     let query = {};
 
-    // Filter by order type (rental/sales)
+    // Filter by order type (rental/sales/package)
+    // When fetching rental orders, also include package orders
     if (orderType && orderType !== 'all') {
-      query.orderType = orderType;
+      if (orderType === 'rental') {
+        query.orderType = { $in: ['rental', 'package'] };
+      } else {
+        query.orderType = orderType;
+      }
     }
 
     // Filter by status
@@ -964,7 +969,11 @@ export const getAdminOrderStats = async (req, res) => {
 
     let matchQuery = {};
     if (orderType && orderType !== 'all') {
-      matchQuery.orderType = orderType;
+      if (orderType === 'rental') {
+        matchQuery.orderType = { $in: ['rental', 'package'] };
+      } else {
+        matchQuery.orderType = orderType;
+      }
     }
 
     // Get status breakdown

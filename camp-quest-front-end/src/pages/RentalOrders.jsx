@@ -722,7 +722,14 @@ const OrderTableRow = ({
       </td>
       <td className="px-6 py-4">
         <div>
-          <div className="text-sm font-medium text-white">#{order.orderNumber}</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-white">#{order.orderNumber}</span>
+            {order.orderType === 'package' && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                Package
+              </span>
+            )}
+          </div>
           <div className="text-sm text-neutral-400">
             {new Date(order.createdAt).toLocaleDateString()}
           </div>
