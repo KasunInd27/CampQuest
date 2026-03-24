@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { getPendingAction, clearPendingAction } from "../utils/pendingActions";
 
 const AuthContext = createContext();
 
@@ -67,11 +68,18 @@ export const AuthProvider = ({ children }) => {
         await checkAuth();
 
         toast.success("Login successful!");
-        navigate(
-          data.user.role === "admin"
-            ? "/admin/dashboard"
-            : "/dashboard"
-        );
+        
+        const pending = getPendingAction();
+        if (pending && data.user.role !== "admin") {
+          clearPendingAction();
+          navigate(pending.returnPath, { state: pending.state });
+        } else {
+          navigate(
+            data.user.role === "admin"
+              ? "/admin/dashboard"
+              : "/dashboard"
+          );
+        }
 
         return data;
       }
@@ -102,11 +110,18 @@ export const AuthProvider = ({ children }) => {
         await checkAuth();
 
         toast.success("Signed in with Google!");
-        navigate(
-          data.user.role === "admin"
-            ? "/admin/dashboard"
-            : "/dashboard"
-        );
+
+        const pending = getPendingAction();
+        if (pending && data.user.role !== "admin") {
+          clearPendingAction();
+          navigate(pending.returnPath, { state: pending.state });
+        } else {
+          navigate(
+            data.user.role === "admin"
+              ? "/admin/dashboard"
+              : "/dashboard"
+          );
+        }
 
         return data;
       }
