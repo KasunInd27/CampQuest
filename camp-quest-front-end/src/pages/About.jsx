@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import kasunImg from "../assets/my_image.jpeg";
+import kasunImg from "../assets/my_image1.jpeg";
 import shehanImg from "../assets/Shehan.jpeg";
 import thiliniImg from "../assets/Thilini.jpeg";
 import somiruwanImg from "../assets/Somiruwan.jpeg";
