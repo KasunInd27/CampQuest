@@ -207,7 +207,7 @@ export default function Header() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className={`lg:hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+      <div className={`lg:hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[800px] overflow-y-auto opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
         <div className="bg-[#242424] border-t border-gray-700">
           {/* Mobile Navigation Links */}
           <div className="px-4 py-3 space-y-1">

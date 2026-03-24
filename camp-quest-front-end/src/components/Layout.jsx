@@ -9,7 +9,7 @@ const Layout = ({ children }) => {
   const hideHeaderFooter = ['/login', '/register'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       {!hideHeaderFooter && <Header />}
       <main className="flex-grow">
         {children}
