@@ -566,8 +566,34 @@ const SalesOrders = () => {
         </div>
       )}
 
-      {/* Orders Table */}
-      <div className="bg-neutral-900 rounded-lg overflow-hidden">
+      {/* === MOBILE CARD VIEW (visible on mobile, hidden on md+) === */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-lime-500"></div>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="text-center py-12 bg-neutral-900 rounded-xl">
+            <ShoppingCart className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
+            <p className="text-neutral-400">No sales orders found</p>
+          </div>
+        ) : (
+          orders.map((order) => (
+            <SalesOrderMobileCard
+              key={order._id}
+              order={order}
+              onView={() => handleViewOrder(order._id)}
+              onEdit={() => handleEditOrder(order)}
+              onDelete={() => handleDeleteOrder(order._id)}
+              getStatusColor={getStatusColor}
+              getPriorityColor={getPriorityColor}
+            />
+          ))
+        )}
+      </div>
+
+      {/* === DESKTOP TABLE VIEW (hidden on mobile, visible on md+) === */}
+      <div className="hidden md:block bg-neutral-900 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-neutral-800">
@@ -586,30 +612,14 @@ const SalesOrders = () => {
                     className="rounded border-neutral-600 bg-neutral-700 text-blue-500 focus:ring-blue-500"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Order
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Items
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Priority
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Payment
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Order</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Customer</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Items</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Priority</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Payment</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-800">
@@ -623,9 +633,7 @@ const SalesOrders = () => {
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-4 text-center text-neutral-400">
-                    No sales orders found
-                  </td>
+                  <td colSpan="8" className="px-6 py-4 text-center text-neutral-400">No sales orders found</td>
                 </tr>
               ) : (
                 orders.map((order) => (
@@ -680,6 +688,83 @@ const SalesOrders = () => {
           }}
         />
       )}
+    </div>
+  );
+};
+
+// ---- Mobile Card Component ----
+const SalesOrderMobileCard = ({ order, onView, onEdit, onDelete, getStatusColor, getPriorityColor }) => {
+  return (
+    <div className="bg-neutral-900 rounded-xl border border-neutral-700 overflow-hidden">
+      {/* Card Header */}
+      <div className="flex items-center justify-between px-4 py-3 bg-neutral-800 border-b border-neutral-700">
+        <div>
+          <p className="text-white font-semibold text-sm">#{order.orderNumber}</p>
+          <p className="text-neutral-400 text-xs">{new Date(order.createdAt).toLocaleDateString()}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+            {order.status}
+          </span>
+          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(order.priority)}`}>
+            {order.priority}
+          </span>
+        </div>
+      </div>
+      {/* Card Body */}
+      <div className="px-4 py-3 space-y-2">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-xs text-neutral-400">Customer</p>
+            <p className="text-white text-sm font-medium">{order.customer?.name || 'N/A'}</p>
+            <p className="text-neutral-400 text-xs">{order.customer?.phone || ''}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-neutral-400">Total</p>
+            <p className="text-lime-400 font-bold text-base">LKR {order.totalAmount?.toFixed(2)}</p>
+          </div>
+        </div>
+        {/* Items */}
+        {order.items && order.items.length > 0 && (
+          <div className="text-xs text-neutral-400 bg-neutral-800 rounded-lg px-3 py-2">
+            {order.items.length} item{order.items.length > 1 ? 's' : ''}: {order.items.slice(0, 2).map(i => i.name).join(', ')}{order.items.length > 2 ? '...' : ''}
+          </div>
+        )}
+        {/* Payment badge */}
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+            order.paymentStatus === 'completed' ? 'text-green-400 bg-green-400/10' :
+            order.paymentStatus === 'verification_pending' ? 'text-yellow-400 bg-yellow-400/10' :
+            'text-neutral-400 bg-neutral-400/10'
+          }`}>
+            {order.paymentStatus === 'verification_pending' ? 'Verify Slip' : order.paymentStatus}
+          </span>
+          {order.deliveryAddress?.city && (
+            <span className="text-xs text-neutral-400">📍 {order.deliveryAddress.city}</span>
+          )}
+        </div>
+      </div>
+      {/* Action Buttons */}
+      <div className="grid grid-cols-3 gap-px bg-neutral-700 border-t border-neutral-700">
+        <button
+          onClick={onView}
+          className="flex items-center justify-center gap-1.5 py-3 bg-neutral-800 text-blue-400 hover:bg-neutral-700 transition-colors text-sm font-medium"
+        >
+          <Eye size={15} /> View
+        </button>
+        <button
+          onClick={onEdit}
+          className="flex items-center justify-center gap-1.5 py-3 bg-neutral-800 text-lime-400 hover:bg-neutral-700 transition-colors text-sm font-medium"
+        >
+          <Edit size={15} /> Edit
+        </button>
+        <button
+          onClick={onDelete}
+          className="flex items-center justify-center gap-1.5 py-3 bg-neutral-800 text-red-400 hover:bg-neutral-700 transition-colors text-sm font-medium"
+        >
+          <Trash2 size={15} /> Delete
+        </button>
+      </div>
     </div>
   );
 };
