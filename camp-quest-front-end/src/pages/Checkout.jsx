@@ -1,0 +1,681 @@
+// src/pages/Checkout.jsx
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { MapPin, User, Calendar, CreditCard, Package } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { useFormik } from "formik";
+import { checkoutValidationSchema } from "../utils/checkoutValidations";
+import toast from "react-hot-toast";
+
+const Checkout = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const { cartItems } = useCart();
+
+  const packageOrder = location.state?.package;
+  const isPackageOrder = !!packageOrder;
+
+  const [loading, setLoading] = useState(false);
+
+  const hasRentalItems = useMemo(
+    () => isPackageOrder ? true : cartItems.some((item) => item.type === "rental"),
+    [cartItems, isPackageOrder]
+  );
+  const hasSaleItems = useMemo(
+    () => isPackageOrder ? false : cartItems.some((item) => item.type === "sale"),
+    [cartItems, isPackageOrder]
+  );
+  const isRentalOnly = hasRentalItems && !hasSaleItems;
+
+  // Calculate rental days
+  const calculateRentalDays = (startDate, endDate) => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+  };
+
+  // Calculate cart total with rental days
+  const calculateCartTotal = (startDate = null, endDate = null) => {
+    const rentalDays =
+      hasRentalItems && startDate && endDate
+        ? calculateRentalDays(startDate, endDate)
+        : 1;
+
+    if (isPackageOrder) {
+      // For packages, price is flat but usually treated as rental duration??
+      // Req: "A package order must be treated as a RENTAL ORDER... show package name + package price".
+      // Usually packages are per day if rental? Or flat fee?
+      // "package price... (like rental/cart items)".
+      // If treated as rental order, it likely implies daily rate if it includes equipment?
+      // But special packages often have fixed price or daily rate. The model has just 'price'.
+      // Let's assume 'price' is a DAILY rate if it's treated as rental order with start/end date.
+      // Or if it's a fixed package for a trip?
+      // Given "Rent Now" context and "Rental Order", safe to assume daily rate OR ensure it's clear.
+      // Let's assume daily rate to be safe with "Rental Order" logic which calculates days.
+      // Wait, "display package name + package price".
+      // If I look at the Home mock I wrote: "LKR {pkg.price} / day" isn't specified, just "LKR {pkg.price}".
+      // But logic in rental orders calculates days.
+      // Let's treat it as Daily Rate to be consistent with Rental Orders.
+      return packageOrder.price * rentalDays;
+    }
+
+    return cartItems.reduce((total, item) => {
+      if (item.type === "rental") {
+        return total + item.price * rentalDays * item.quantity;
+      }
+      return total + item.price * item.quantity;
+    }, 0);
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      // Personal Information
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: "",
+
+      // Delivery Information
+      address: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "SL",
+
+      // Rental Specific (if applicable)
+      startDate: "",
+      endDate: "",
+
+      // Additional
+      notes: "",
+    },
+    validationSchema: checkoutValidationSchema,
+    context: { hasRentalItems, hasSaleItems },
+    onSubmit: async (values) => {
+      setLoading(true);
+
+      try {
+        // Sales orders need delivery fields
+        if (
+          hasSaleItems &&
+          (!values.address ||
+            !values.city ||
+            !values.state ||
+            !values.postalCode)
+        ) {
+          toast.error("Please fill in all delivery address fields");
+          setLoading(false);
+          return;
+        }
+
+        const rentalDays = hasRentalItems
+          ? calculateRentalDays(values.startDate, values.endDate)
+          : 0;
+
+        const orderType = isPackageOrder ? "pkg" : (isRentalOnly ? "rental" : "sales"); // Temp variable, actual field is 'rental' or 'package' enum
+
+        const subtotal = calculateCartTotal(values.startDate, values.endDate);
+        const tax = 0;
+        const shippingCost = hasSaleItems ? 450 : 0;
+        const totalAmount = subtotal + tax + shippingCost;
+
+        // ... (deliveryAddress logic matches original)
+
+        // Prepare order data
+        const orderData = {
+          orderType: isPackageOrder ? "package" : (isRentalOnly ? "rental" : "sales"),
+          customer: {
+            name: (values.name || "").trim(),
+            email: (values.email || "").trim(),
+            phone: (values.phone || "").trim(),
+          },
+
+          ...(hasSaleItems && {
+            deliveryAddress: hasSaleItems
+              ? {
+                address: (values.address || "").trim(),
+                city: (values.city || "").trim(),
+                state: (values.state || "").trim(), // ✅ only once
+                postalCode: (values.postalCode || "").trim(),
+                country: values.country || "SL",
+              }
+              : undefined
+          }),
+
+          items: isPackageOrder ? [{
+            product: packageOrder._id,
+            productModel: 'SpecialPackage',
+            name: packageOrder.name,
+            type: 'package',
+            quantity: 1,
+            price: packageOrder.price,
+            rentalDays: rentalDays,
+            rentalStartDate: new Date(values.startDate),
+            rentalEndDate: new Date(values.endDate),
+            subtotal: packageOrder.price * rentalDays
+          }] : cartItems.map((item) => {
+            const baseItem = {
+              product: item._id,
+              productModel:
+                item.type === "rental" ? "RentalProduct" : "SalesProduct",
+              name: item.name,
+              type: item.type,
+              quantity: item.quantity,
+              price: item.price,
+            };
+
+            if (item.type === "rental" && hasRentalItems) {
+              baseItem.rentalDays = rentalDays;
+              baseItem.rentalStartDate = new Date(values.startDate);
+              baseItem.rentalEndDate = new Date(values.endDate);
+              baseItem.subtotal = item.price * rentalDays * item.quantity;
+            } else {
+              baseItem.subtotal = item.price * item.quantity;
+            }
+
+            return baseItem;
+          }),
+
+          ...(hasRentalItems && {
+            rentalDetails: {
+              startDate: new Date(values.startDate),
+              endDate: new Date(values.endDate),
+              status: "pending",
+            },
+          }),
+
+          paymentDetails: {
+            method: "card",
+            amount: totalAmount,
+          },
+
+          totalAmount,
+          tax,
+          shippingCost,
+          status: "pending",
+          paymentStatus: "pending",
+          priority: "medium",
+          notes: values.notes ? values.notes.trim() : "",
+        };
+
+        // Extra validation safety (sales only)
+        if (hasSaleItems && !orderData.deliveryAddress?.address) {
+          throw new Error("Address is missing from order data");
+        }
+
+        sessionStorage.setItem("orderData", JSON.stringify(orderData));
+        navigate("/payment-method");
+      } catch (error) {
+        toast.error("Something went wrong. Please try again.");
+        // eslint-disable-next-line no-console
+        console.error("Checkout error:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if ((!cartItems || cartItems.length === 0) && !isPackageOrder) {
+      navigate("/cart");
+    }
+  }, [cartItems, isPackageOrder, navigate]);
+
+  const currentSubtotal = calculateCartTotal(
+    formik.values.startDate,
+    formik.values.endDate
+  );
+  const currentTax = 0;
+  const currentShipping = hasSaleItems ? 450 : 0;
+  const currentTotal = currentSubtotal + currentTax + currentShipping;
+
+  return (
+    <div className="min-h-screen bg-neutral-900 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-white mb-8">Checkout</h1>
+
+        <form
+          onSubmit={formik.handleSubmit}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+        >
+          {/* Left Column */}
+          <div className="space-y-6">
+            {/* Personal Information */}
+            <div className="bg-neutral-800 rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <User size={20} />
+                Personal Information
+              </h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-300 mb-1">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.name && formik.errors.name
+                      ? "border-red-500"
+                      : "border-neutral-600"
+                      }`}
+                    placeholder="Enter your full name"
+                  />
+                  {formik.touched.name && formik.errors.name && (
+                    <p className="mt-1 text-sm text-red-400">
+                      {formik.errors.name}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-300 mb-1">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.email && formik.errors.email
+                      ? "border-red-500"
+                      : "border-neutral-600"
+                      }`}
+                    placeholder="Enter your email address"
+                  />
+                  {formik.touched.email && formik.errors.email && (
+                    <p className="mt-1 text-sm text-red-400">
+                      {formik.errors.email}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-300 mb-1">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.phone && formik.errors.phone
+                      ? "border-red-500"
+                      : "border-neutral-600"
+                      }`}
+                    placeholder="+94 77 123 4567"
+                  />
+                  {formik.touched.phone && formik.errors.phone && (
+                    <p className="mt-1 text-sm text-red-400">
+                      {formik.errors.phone}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Delivery Information */}
+            {!isRentalOnly && (
+              <div className="bg-neutral-800 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <MapPin size={20} />
+                  Delivery Information
+                </h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-300 mb-1">
+                      Street Address *
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formik.values.address}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.address && formik.errors.address
+                        ? "border-red-500"
+                        : "border-neutral-600"
+                        }`}
+                      placeholder="123 Main Street"
+                    />
+                    {formik.touched.address && formik.errors.address && (
+                      <p className="mt-1 text-sm text-red-400">
+                        {formik.errors.address}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-300 mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formik.values.city}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.city && formik.errors.city
+                          ? "border-red-500"
+                          : "border-neutral-600"
+                          }`}
+                        placeholder="Enter city"
+                      />
+                      {formik.touched.city && formik.errors.city && (
+                        <p className="mt-1 text-sm text-red-400">
+                          {formik.errors.city}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-300 mb-1">
+                        State *
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={formik.values.state}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.state && formik.errors.state
+                          ? "border-red-500"
+                          : "border-neutral-600"
+                          }`}
+                        placeholder="Enter state"
+                      />
+                      {formik.touched.state && formik.errors.state && (
+                        <p className="mt-1 text-sm text-red-400">
+                          {formik.errors.state}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-300 mb-1">
+                        Postal Code *
+                      </label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={formik.values.postalCode}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.postalCode && formik.errors.postalCode
+                          ? "border-red-500"
+                          : "border-neutral-600"
+                          }`}
+                        placeholder="12345"
+                      />
+                      {formik.touched.postalCode && formik.errors.postalCode && (
+                        <p className="mt-1 text-sm text-red-400">
+                          {formik.errors.postalCode}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Rental Dates */}
+            {hasRentalItems && (
+              <div className="bg-neutral-800 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <Calendar size={20} />
+                  Rental Period
+                </h2>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-300 mb-1">
+                      Start Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={formik.values.startDate}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      min={new Date().toISOString().split("T")[0]}
+                      className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.startDate && formik.errors.startDate
+                        ? "border-red-500"
+                        : "border-neutral-600"
+                        }`}
+                    />
+                    {formik.touched.startDate && formik.errors.startDate && (
+                      <p className="mt-1 text-sm text-red-400">
+                        {formik.errors.startDate}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-300 mb-1">
+                      End Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={formik.values.endDate}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      min={
+                        formik.values.startDate ||
+                        new Date().toISOString().split("T")[0]
+                      }
+                      className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.endDate && formik.errors.endDate
+                        ? "border-red-500"
+                        : "border-neutral-600"
+                        }`}
+                    />
+                    {formik.touched.endDate && formik.errors.endDate && (
+                      <p className="mt-1 text-sm text-red-400">
+                        {formik.errors.endDate}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {formik.values.startDate && formik.values.endDate && (
+                  <div className="mt-3 p-3 bg-neutral-700 rounded-lg">
+                    <p className="text-sm text-neutral-300">
+                      Rental Duration:{" "}
+                      <span className="text-lime-500 font-medium">
+                        {calculateRentalDays(
+                          formik.values.startDate,
+                          formik.values.endDate
+                        )}{" "}
+                        days
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Additional Notes */}
+            <div className="bg-neutral-800 rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Additional Notes
+              </h2>
+              <textarea
+                name="notes"
+                value={formik.values.notes}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                rows={3}
+                placeholder="Any special instructions or requirements..."
+                className={`w-full px-4 py-2 bg-neutral-700 border rounded-lg text-white focus:outline-none focus:border-lime-500 ${formik.touched.notes && formik.errors.notes
+                  ? "border-red-500"
+                  : "border-neutral-600"
+                  }`}
+              />
+              {formik.touched.notes && formik.errors.notes && (
+                <p className="mt-1 text-sm text-red-400">
+                  {formik.errors.notes}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div>
+            <div className="bg-neutral-800 rounded-lg p-6 sticky top-4">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                Order Summary
+              </h2>
+
+              <div className="mb-4">
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${hasRentalItems
+                    ? "text-blue-400 bg-blue-400/10"
+                    : "text-green-400 bg-green-400/10"
+                    }`}
+                >
+                  {hasRentalItems ? "Rental Order" : "Sales Order"}
+                </span>
+
+                {isRentalOnly && (
+                  <p className="mt-2 text-xs text-neutral-300 text-center">
+                    Rental items are not delivered. Please collect from our shop.
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3 mb-6">
+                {isPackageOrder ? (
+                  <div className="flex justify-between">
+                    <div className="flex-1">
+                      <p className="text-white text-sm">{packageOrder.name}</p>
+                      <p className="text-neutral-400 text-xs">
+                        1 x {calculateRentalDays(formik.values.startDate, formik.values.endDate)} days
+                      </p>
+                    </div>
+                    <span className="text-white">
+                      LKR {(packageOrder.price * calculateRentalDays(formik.values.startDate, formik.values.endDate)).toFixed(2)}/=
+                    </span>
+                  </div>
+                ) : (
+                  cartItems.map((item) => {
+                    const rentalDays =
+                      hasRentalItems &&
+                        formik.values.startDate &&
+                        formik.values.endDate
+                        ? calculateRentalDays(
+                          formik.values.startDate,
+                          formik.values.endDate
+                        )
+                        : item.rentalDays || 1;
+
+                    const itemTotal =
+                      item.type === "rental"
+                        ? item.price * rentalDays * item.quantity
+                        : item.price * item.quantity;
+
+                    return (
+                      <div
+                        key={`${item._id}-${item.type}`}
+                        className="flex justify-between"
+                      >
+                        <div className="flex-1">
+                          <p className="text-white text-sm">{item.name}</p>
+                          <p className="text-neutral-400 text-xs">
+                            {item.type === "sale"
+                              ? `Qty: ${item.quantity}`
+                              : `${item.quantity} x ${rentalDays} days`}
+                          </p>
+                        </div>
+                        <span className="text-white">
+                          LKR {itemTotal.toFixed(2)}/=
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              <div className="border-t border-neutral-700 pt-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Subtotal</span>
+                  <span className="text-white">
+                    LKR {currentSubtotal.toFixed(2)}/=
+                  </span>
+                </div>
+
+                {!isRentalOnly && (
+                  <div className="flex justify-between">
+                    <span className="text-neutral-400">Delivery Fee</span>
+                    <span className="text-white">
+                      LKR {currentShipping.toFixed(2)}/=
+                    </span>
+                  </div>
+                )}
+
+                <div className="border-t border-neutral-700 pt-2 flex justify-between text-lg font-bold">
+                  <span className="text-white">Total</span>
+                  <span className="text-lime-500">
+                    LKR {currentTotal.toFixed(2)}/=
+                  </span>
+                </div>
+              </div>
+
+              {hasRentalItems && formik.values.startDate && formik.values.endDate && (
+                <div className="mt-4 p-3 bg-neutral-700 rounded-lg">
+                  <p className="text-xs text-neutral-300 text-center">
+                    Rental calculated for{" "}
+                    {calculateRentalDays(formik.values.startDate, formik.values.endDate)}{" "}
+                    days
+                  </p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || formik.isSubmitting || !formik.isValid}
+                className="w-full mt-6 px-6 py-3 bg-lime-500 text-neutral-900 rounded-lg font-medium hover:bg-lime-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <CreditCard size={20} />
+                {loading || formik.isSubmitting ? "Processing..." : "Proceed to Payment"}
+              </button>
+
+              {formik.submitCount > 0 && !formik.isValid && (
+                <div className="mt-4 p-3 bg-red-900/20 border border-red-500/20 rounded-lg">
+                  <p className="text-red-400 text-sm font-medium mb-1">
+                    Please fix the following errors:
+                  </p>
+                  <ul className="text-red-400 text-xs space-y-1">
+                    {Object.values(formik.errors).map((error, index) => (
+                      <li key={index}>• {error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="mt-4 text-xs text-neutral-400 text-center">
+                <p>✓ Secure SSL Encryption</p>
+                <p>✓ Your information is safe with us</p>
+                <p>✓ {hasRentalItems ? "Rental" : "Sales"} Order</p>
+                {!isRentalOnly && <p>✓ Delivery Fee: LKR 450/=</p>}
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Checkout;
