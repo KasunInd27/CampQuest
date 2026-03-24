@@ -607,39 +607,51 @@ const AdminSupportTickets = () => {
         )}
       </div>
 
-      {/* Tickets Table */}
-      <div className="bg-neutral-900 rounded-lg overflow-hidden">
+      {/* === MOBILE CARD VIEW (visible on mobile, hidden on md+) === */}
+      <div className="md:hidden space-y-4">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-lime-500"></div>
+          </div>
+        ) : tickets.length === 0 ? (
+          <div className="text-center py-12 bg-neutral-900 rounded-xl border border-neutral-800">
+            <LifeBuoy className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
+            <p className="text-neutral-400">No support tickets found</p>
+          </div>
+        ) : (
+          tickets.map((ticket) => (
+            <TicketMobileCard
+              key={ticket._id}
+              ticket={ticket}
+              onView={() => handleViewTicket(ticket)}
+              onReply={() => handleReplyTicket(ticket)}
+              onDelete={() => handleDeleteTicket(ticket._id)}
+              getStatusColor={getStatusColor}
+              getPriorityColor={getPriorityColor}
+            />
+          ))
+        )}
+      </div>
+
+      {/* === DESKTOP TABLE VIEW (hidden on mobile, visible on md+) === */}
+      <div className="hidden md:block bg-neutral-900 rounded-lg overflow-hidden border border-neutral-800">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-neutral-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Ticket
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Priority
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Ticket</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Customer</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Priority</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Created</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-800">
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-8 text-center">
+                  <td colSpan="7" className="px-6 py-12 text-center">
                     <div className="flex justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-500"></div>
                     </div>
@@ -647,12 +659,9 @@ const AdminSupportTickets = () => {
                 </tr>
               ) : tickets.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-8 text-center">
+                  <td colSpan="7" className="px-6 py-12 text-center">
                     <LifeBuoy className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
                     <p className="text-neutral-400">No support tickets found</p>
-                    {(filters.status !== 'all' || filters.category !== 'all' || filters.priority !== 'all' || filters.search) && (
-                      <p className="text-neutral-500 text-sm mt-1">Try adjusting your filters</p>
-                    )}
                   </td>
                 </tr>
               ) : (
@@ -705,6 +714,65 @@ const AdminSupportTickets = () => {
     </div>
   );
 };
+
+// Ticket Mobile Card Component
+const TicketMobileCard = ({ ticket, onView, onReply, onDelete, getStatusColor, getPriorityColor }) => (
+  <div className="bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden shadow-sm">
+    <div className="p-4 border-b border-neutral-800 flex justify-between items-start">
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-lime-500 font-bold text-sm">#{ticket._id.slice(-6).toUpperCase()}</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${getPriorityColor(ticket.priority)}`}>
+            {ticket.priority}
+          </span>
+        </div>
+        <h4 className="text-white font-medium text-sm line-clamp-1">{ticket.subject}</h4>
+      </div>
+      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor(ticket.status)}`}>
+        {ticket.status}
+      </span>
+    </div>
+    
+    <div className="p-4 space-y-3">
+      <div className="flex justify-between text-xs">
+        <div>
+          <p className="text-neutral-500 mb-0.5">Customer</p>
+          <p className="text-neutral-200">{ticket.customerName || ticket.user?.name || 'Guest'}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-neutral-500 mb-0.5">Category</p>
+          <p className="text-neutral-200 capitalize">{ticket.category}</p>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-2 text-[10px] text-neutral-500 bg-neutral-800/50 rounded-lg p-2">
+        <Clock size={12} />
+        <span>Created: {new Date(ticket.createdAt).toLocaleDateString()}</span>
+      </div>
+    </div>
+
+    <div className="grid grid-cols-3 gap-px bg-neutral-800 border-t border-neutral-800">
+      <button
+        onClick={onView}
+        className="flex items-center justify-center gap-1.5 py-3 bg-neutral-900 text-neutral-300 hover:text-white transition-colors text-xs font-semibold"
+      >
+        <Eye size={14} className="text-blue-400" /> View
+      </button>
+      <button
+        onClick={onReply}
+        className="flex items-center justify-center gap-1.5 py-3 bg-neutral-900 text-neutral-300 hover:text-white transition-colors text-xs font-semibold"
+      >
+        <Reply size={14} className="text-lime-400" /> Reply
+      </button>
+      <button
+        onClick={onDelete}
+        className="flex items-center justify-center gap-1.5 py-3 bg-neutral-900 text-neutral-300 hover:text-red-400 transition-colors text-xs font-semibold"
+      >
+        <Trash2 size={14} className="text-red-400" /> Delete
+      </button>
+    </div>
+  </div>
+);
 
 // Stats Card Component
 const StatsCard = ({ title, value, icon }) => (
