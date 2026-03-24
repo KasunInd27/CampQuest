@@ -23,7 +23,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      <div className={`fixed top-0 h-96 left-0 bottom-0 z-50 w-64 bg-neutral-900 border-r border-neutral-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed top-0 h-full left-0 bottom-0 z-50 w-64 bg-neutral-900 border-r border-neutral-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
 
         <div className="py-4 overflow-y-auto">
