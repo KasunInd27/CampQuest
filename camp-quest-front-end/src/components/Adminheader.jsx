@@ -31,25 +31,31 @@ export function Header({ sidebarOpen, setSidebarOpen }) {
   }
 
   return (
-    <header className="bg-neutral-900 border-b border-neutral-700/50 h-16 flex items-center px-4 flex-shrink-0 gap-3">
+    <header className="bg-neutral-900 border-b border-neutral-700/50 h-14 sm:h-16 flex items-center px-4 flex-shrink-0 gap-2 sm:gap-3">
       {/* Hamburger — mobile only */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="p-2.5 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors lg:hidden flex-shrink-0"
+        className="p-2 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors lg:hidden flex-shrink-0"
         aria-label="Open navigation"
       >
-        <Menu size={22} />
+        <Menu size={20} className="sm:hidden" />
+        <Menu size={22} className="hidden sm:block" />
       </button>
 
       {/* Title */}
-      <h1 className="text-base sm:text-xl font-semibold text-white truncate flex-1">Admin Dashboard</h1>
+      <div className="flex-1 min-w-0 pr-2 sm:pr-0">
+        <h1 className="text-sm sm:text-lg font-bold text-white truncate">
+          Dashboard Overview
+        </h1>
+      </div>
 
       {/* Right actions */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         {/* Notification bell */}
-        <button className="relative p-2.5 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors" aria-label="Notifications">
-          <Bell size={20} />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-lime-500 rounded-full" />
+        <button className="relative p-2 sm:p-2.5 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors" aria-label="Notifications">
+          <Bell size={18} className="sm:hidden" />
+          <Bell size={20} className="hidden sm:block" />
+          <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-lime-500 rounded-full" />
         </button>
 
         {/* User menu */}
