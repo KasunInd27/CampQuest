@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShoppingCart, Star, Package } from 'lucide-react';
 import axios, { BASE_URL } from '../lib/axios';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { savePendingAction, getPendingAction, clearPendingAction } from '../utils/pendingActions';
 import toast from 'react-hot-toast';
 import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
 
@@ -15,6 +18,19 @@ const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState([]);
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const pending = getPendingAction();
+      if (pending && pending.type === 'cart' && pending.returnPath === location.pathname) {
+        addToCart(pending.product, 'sale');
+        clearPendingAction();
+      }
+    }
+  }, [isAuthenticated, location.pathname, addToCart]);
 
   useEffect(() => {
     fetchProducts();
@@ -48,6 +64,13 @@ const Shop = () => {
   );
 
   const handleAddToCart = (product) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to continue');
+      savePendingAction({ type: 'cart', product, returnPath: location.pathname });
+      navigate('/login');
+      return;
+    }
+
     if (product.stock <= 0) {
       toast.error('Product is out of stock');
       return;
