@@ -1,6 +1,6 @@
 // pages/UserDashboard.jsx
 import React, { useState } from 'react'
-import { User, Lock, Trash2, Save, AlertTriangle, Mail, Phone, MapPin, FileText, Calendar, Shield, Settings, Activity, Ticket, MessageSquare, Mountain, Edit, Key, UserX, Package } from 'lucide-react'
+import { User, Lock, Trash2, Save, AlertTriangle, Mail, Phone, MapPin, FileText, Calendar, Shield, Settings, Activity, Ticket, MessageSquare, Mountain, Edit, Key, UserX, Package, Menu, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import axios from '../lib/axios'
@@ -14,6 +14,7 @@ const UserDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview')
   const [loading, setLoading] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Validation Schemas
   const profileValidationSchema = Yup.object({
@@ -136,11 +137,35 @@ const UserDashboard = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-neutral-800">
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-neutral-900 min-h-screen p-6">
-          <div className="flex items-center mb-8">
+    <div className="min-h-screen bg-neutral-800 flex flex-col md:flex-row">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-neutral-900 border-b border-neutral-700 h-16 flex items-center justify-between px-4 sticky top-0 z-40">
+        <div className="flex items-center">
+          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-2">
+            <Mountain className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-lg font-bold text-white">CampQuest</h1>
+        </div>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 text-neutral-400 hover:text-white rounded-md transition-colors"
+        >
+          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Sidebar Overlay (Mobile) */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`fixed md:sticky top-0 left-0 h-full md:min-h-screen z-50 w-64 bg-neutral-900 border-r border-neutral-700 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 overflow-y-auto h-full">
+          <div className="hidden md:flex items-center mb-8">
             <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
               <Mountain className="w-6 h-6 text-white" />
             </div>
@@ -151,7 +176,10 @@ const UserDashboard = () => {
             {menuItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => {
+                  setActiveSection(item.id)
+                  setSidebarOpen(false)
+                }}
                 className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeSection === item.id
                   ? 'bg-lime-500 text-black'
                   : 'text-neutral-300 hover:bg-neutral-800 hover:text-white'
@@ -163,9 +191,11 @@ const UserDashboard = () => {
             ))}
           </nav>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-6">
+      {/* Main Content */}
+      <div className="flex-col flex-1 overflow-hidden min-w-0 w-full relative">
+        <main className="flex-1 overflow-y-auto w-full p-4 md:p-6 mb-16 md:mb-0">
           {activeSection === 'overview' && (
             <div className="space-y-6">
               <h1 className="text-2xl font-bold text-white">Welcome back, {user?.name}!</h1>
@@ -578,7 +608,7 @@ const UserDashboard = () => {
               </div>
             </div>
           )}
-        </div>
+        </main>
       </div>
 
       {/* Delete Confirmation Modal */}
