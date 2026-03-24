@@ -4,6 +4,8 @@ import axios from '../lib/axios';
 import { resolveImageUrl } from '../lib/imageHelper';
 import { Package, Check, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import { savePendingAction } from '../utils/pendingActions';
 
 // Utility function to normalize includes list to array of strings
 const normalizeIncludesList = (includes) => {
@@ -49,6 +51,7 @@ const normalizeIncludesList = (includes) => {
 const PackageDetails = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
     const [pkg, setPkg] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -79,6 +82,17 @@ const PackageDetails = () => {
 
     const handleOrderNow = () => {
         if (!pkg) return;
+
+        if (!isAuthenticated) {
+            toast.error('Please login to continue');
+            savePendingAction({ 
+                type: 'checkout', 
+                state: { package: pkg, orderType: 'package' }, 
+                returnPath: '/checkout' 
+            });
+            navigate('/login');
+            return;
+        }
 
         // Navigate to checkout with package state
         navigate('/checkout', {
