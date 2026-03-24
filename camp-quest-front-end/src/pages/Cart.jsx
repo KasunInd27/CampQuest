@@ -125,9 +125,9 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateRentalDays, onRemove }) => {
     : `/uploads/rental-products/${item.images?.[0]}`;
 
   return (
-    <div className="bg-neutral-800 rounded-lg p-4 flex gap-4">
+    <div className="bg-neutral-800 rounded-lg p-4 flex flex-col sm:flex-row gap-4">
       {/* Product Image */}
-      <div className="w-24 h-24 bg-neutral-700 rounded-lg overflow-hidden flex-shrink-0">
+      <div className="w-full sm:w-24 h-48 sm:h-24 bg-neutral-700 rounded-lg overflow-hidden flex-shrink-0">
         {item.images && item.images.length > 0 ? (
           <img
             src={item.images?.[0]?.startsWith('http') ? item.images[0] : `${BASE_URL}${imageUrl}`}
@@ -166,7 +166,7 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateRentalDays, onRemove }) => {
           </span>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-2 sm:mt-0">
           {/* Quantity Selector */}
           <div className="flex items-center gap-2">
             <button
