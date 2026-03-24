@@ -1,9 +1,11 @@
-// HomePage.jsx
+// Home.jsx
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios, { BASE_URL } from '../lib/axios';
 import toast from 'react-hot-toast';
 import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
+import { useAuth } from '../context/AuthContext';
+import { savePendingAction } from '../utils/pendingActions';
 
 // Hero Component
 function Hero() {
@@ -69,6 +71,8 @@ function SpecialPackages() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPackages();
@@ -100,6 +104,22 @@ function SpecialPackages() {
   };
 
   const filteredPackages = getFilteredPackages();
+
+  const handleOrderPackage = (pkg) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to continue');
+      savePendingAction({ 
+        type: 'checkout', 
+        state: { package: pkg, orderType: 'package' }, 
+        returnPath: '/checkout' 
+      });
+      navigate('/login');
+    } else {
+      navigate('/checkout', {
+        state: { package: pkg, orderType: 'package' }
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -185,13 +205,12 @@ function SpecialPackages() {
                     >
                       View Package Detail
                     </Link>
-                    <Link
-                      to="/checkout"
-                      state={{ package: pkg, orderType: 'package' }}
+                    <button
+                      onClick={() => handleOrderPackage(pkg)}
                       className="block w-full px-4 py-2 bg-lime-500 text-gray-900 font-semibold rounded-lg hover:bg-lime-400 transition-colors text-center"
                     >
                       Order Now
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
