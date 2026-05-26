@@ -24,27 +24,59 @@ export const googleLogin = async (req, res) => {
         const email = payload?.email;
         const name = payload?.name;
         const picture = payload?.picture;
+        const email_verified = payload?.email_verified;
+        const googleId = payload?.sub;
 
         if (!email) {
-            return res.status(401).json({ message: "Google token invalid" });
+            return res.status(401).json({ message: "Google token invalid: email missing" });
+        }
+        if (!googleId) {
+            return res.status(401).json({ message: "Google token invalid: sub identifier missing" });
         }
 
-        // 3️⃣ Check if user exists
-        let user = await User.findOne({ email });
-
-        // ✅ Optional: prevent mixing local + google on same email
-        if (user && user.authProvider === "local") {
-            return res.status(400).json({
-                message: "This email is registered with password login. Please use email & password.",
-            });
+        // ✅ Security: Ensure email is verified in Google to prevent hijacking
+        if (!email_verified) {
+            return res.status(400).json({ message: "Google account email is not verified" });
         }
 
-        // 4️⃣ If not, create user
+        // 3️⃣ Search by googleId (preferred index search)
+        let user = await User.findOne({ googleId });
+
+        if (!user) {
+            // Search by email to see if they registered via password or another provider
+            user = await User.findOne({ email });
+
+            if (user) {
+                // Scenario A / Lazy Migration: Email matches but googleId is not linked yet.
+                // We link the Google account to the existing user.
+                user.googleId = googleId;
+
+                // Sync profile avatar if not set
+                if (!user.avatar && picture) {
+                    user.avatar = picture;
+                }
+
+                await user.save();
+            }
+        } else {
+            // User found by googleId. Keep profile info synced if updated.
+            let updated = false;
+            if (picture && user.avatar !== picture) {
+                user.avatar = picture;
+                updated = true;
+            }
+            if (updated) {
+                await user.save();
+            }
+        }
+
+        // 4️⃣ If neither search matched, create new user (Scenario C)
         if (!user) {
             user = await User.create({
                 name: name || "User",
                 email,
                 avatar: picture || "",
+                googleId,
                 authProvider: "google",
             });
         }
@@ -73,7 +105,6 @@ export const googleLogin = async (req, res) => {
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
-
 
         return res.json({ token: appToken, user: safeUser });
     } catch (error) {
