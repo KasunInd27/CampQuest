@@ -16,7 +16,7 @@ export default function Footer() {
           {/* Company Info */}
           <div>
             <h3 className="text-2xl font-bold mb-6">
-              Camp<span className="text-[#8BE13B]">Quest</span>
+              <span className="text-[#8BE13B]">Camp</span>Quest
             </h3>
             <p className="mb-6 text-gray-300">
               Your trusted partner for camping equipment rental and sales.
