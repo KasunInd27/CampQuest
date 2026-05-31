@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
 import { useAuth } from '../context/AuthContext';
 import { savePendingAction } from '../utils/pendingActions';
+import { Helmet } from "react-helmet-async";
 
 // Hero Component
 function Hero() {
@@ -477,12 +478,51 @@ function BlogPreview() {
 // Main HomePage Component
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Hero />
-      <SpecialPackages />
-      <FeaturedCategories />
-      <CallToAction />
-      <BlogPreview />
-    </div>
+    <>
+      <Helmet>
+        <title>
+          CampQuest LK | Camping Equipment Rental & Outdoor Gear Store Sri Lanka
+        </title>
+
+        <meta
+          name="description"
+          content="Rent and buy premium camping equipment in Sri Lanka. CampQuest specializes in Hulangala Camping adventures, camping gear rental, tents, hiking equipment, outdoor accessories, and complete camping packages."
+        />
+
+        <meta
+          name="keywords"
+          content="camping sri lanka, camping equipment sri lanka, camping gear rental, tents sri lanka, outdoor equipment, hiking gear sri lanka, camping packages sri lanka, visiting places near hulangala, travelling places near hulangala, hulangala waterfall, බිසෝ ඇල්ල, Camping sites near hulangala, camping packages, camping packages hulangala, camping packages matale, budget camping packages, premium camping packages,
+          buy camping gear, rent camping equipment, Camp Quest, CAMPQUEST, camp quest, campquest, campquest lk, campquest sri lanka, camping store sri lanka, outdoor gear sri lanka, camping accessories sri lanka, hulangala matale,hulangala mini world's end, hulangala punchi lokanthaya, හුළංගල පුංචි ලෝකාන්තය, Hulangala Camping, Hulangala Sri Lanka, Hulangala Camping Sri Lanka, Hulangala Camping Matale, Hulangala Camping Packages, 
+          hulangala, hulangala camping, camping near me, best camping gear sri lanka, camping items for rent, camping equipment for sale, camping gear shop, camping essentials sri lanka, online camping store sri lanka, camping gear online sri lanka, camping equipment online sri lanka, camping gear delivery sri lanka, camping equipment delivery sri lanka,
+          camping supplies sri lanka, camping gear online sri lanka, biso ella, bisso ella, camping gear bisso ella, camping equipment bisso ella, හුලංගල, හුලංගල කැම්පිං, හුලන්ගල, camping items near hulangala, camping equipment near hulangala, camping gear near hulangala, camping store near hulangala, camping rental near hulangala, Camping near Hulangala,
+          one three hill camping, one three hill camping, one three hill, one three hill camping items,one three hill camping equipment, one three hill camping gear, one three hill camping rental, one three hill camping store, brandigala camping, brandigala, brandigala camping items, brandigala camping equipment, brandigala camping gear, brandigala camping rental, 
+          brandigala camping store, dolukanda, dolukanda camping, dolukanda camping items, dolukanda camping equipment, dolukanda camping gear, dolukanda camping rental, dolukanda camping store, wewathenna, wewathenna camping, wewathenna camping items, wewathenna camping equipment, wewathenna camping gear, wewathenna camping rental, wewathenna camping store, 
+          camping gear delivery sri lanka, camping equipment delivery sri lanka, camping gear delivery near me, camping equipment delivery near me, camp quest store, camp quest shop, camp quest rental, camp quest equipment, camp quest gear, camp quest tents, camp quest camping gear, camp quest outdoor gear, camp quest camping equipment, camp quest sri lanka, camp quest lk,
+          campquest store, campquest shop, campquest rental, campquest equipment, campquest gear, campquest tents, campquest camping gear, campquest outdoor gear, campquest camping equipment, campquest sri lanka, camping store near colombo, camping items near colombo, camping equipment near colombo, camping gear near colombo, camping rental near colombo, camping store near colombo, 
+          camping delivery near colombo, camping gear delivery near colombo, camping equipment delivery near colombo, camping items near kurunegala, camping equipment near kurunegala, camping gear near kurunegala, camping rental near kurunegala, camping store near kurunegala, camping delivery near kurunegala, camping gear delivery near kurunegala, camping equipment delivery near kurunegala,
+          camping items near matale, camping equipment near matale, camping gear near matale, camping rental near matale, camping store near matale, camping delivery near matale, camping gear delivery near matale, camping equipment delivery near matale, hulangala sri lanka, hulangala matale, hulangala selagama, hulangala camping sri lanka, hulangala camping matale, hulangala camping selagama, 
+          visiting area near kurunegala, visiting area near matale, camping sites near matale, camping sites near kurunegala, riverston, riverston camping, riverston camping areas, manigala, manigala camping, selagama, hulangala ticket price, hulangala entrance fee, hulangala camping price, windproof gas stove, camping gas stove, gas cartidge, camping gas cartridge, camping gas, 
+          raincoat, waterproof phone cover, camping cooking set, leech socks, camping chairs, folderble camping chairs, portable chairs, folderble tables, camping cookware items, camping lights, camping lanterns, headtorch, BBQ grill, BBQ machine, gas torch, flame gun, charcoal, charcoal sri lanka, camping charcoal, charcoal 2kg, camping cooking set packages"
+        />
+
+        <meta property="og:title" content="CampQuest LK" />
+        <meta
+          property="og:description"
+          content="Sri Lanka's camping equipment rental and outdoor gear platform."
+        />
+        <meta property="og:url" content="https://campquest.lk" />
+        <meta property="og:type" content="website" />
+
+        <link rel="canonical" href="https://campquest.lk/" />
+      </Helmet>
+
+      <div className="min-h-screen bg-white">
+        <Hero />
+        <SpecialPackages />
+        <FeaturedCategories />
+        <CallToAction />
+        <BlogPreview />
+      </div>
+    </> 
   );
 }
