@@ -5,53 +5,65 @@ import { useFormik } from 'formik';
 import { feedbackSchema, supportTicketSchema } from '../utils/validationSchemas';
 import axios from '../lib/axios';
 import toast from 'react-hot-toast';
+import { Helmet } from "react-helmet-async";
 
 const Support = () => {
   const [activeTab, setActiveTab] = useState('ticket');
 
   return (
-    <div className="min-h-screen bg-neutral-900 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            How can we help you?
-          </h1>
-          <p className="text-neutral-400 text-lg">
-            Submit a support ticket or share your feedback with us
-          </p>
-        </div>
+    <>
+      <Helmet>
+        <title>Support & Feedback | CampQuest LK</title>
+        <meta
+          name="description"
+          content="Get support, submit tickets, report issues, and share feedback about CampQuest camping equipment rentals and services."
+        />
+        <link rel="canonical" href="https://campquest.lk/support" />
+      </Helmet>
 
-        {/* Tab Navigation */}
-        <div className="flex bg-neutral-800 rounded-lg p-1 mb-8">
-          <button
-            onClick={() => setActiveTab('ticket')}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'ticket'
-                ? 'bg-lime-500 text-neutral-900'
-                : 'text-neutral-300 hover:text-white'
-              }`}
-          >
-            <LifeBuoy className="w-5 h-5 mr-2" />
-            Support Ticket
-          </button>
-          <button
-            onClick={() => setActiveTab('feedback')}
-            className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'feedback'
-                ? 'bg-lime-500 text-neutral-900'
-                : 'text-neutral-300 hover:text-white'
-              }`}
-          >
-            <MessageSquare className="w-5 h-5 mr-2" />
-            Feedback
-          </button>
-        </div>
+      <div className="min-h-screen bg-neutral-900 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-white mb-4">
+              How can we help you?
+            </h1>
+            <p className="text-neutral-400 text-lg">
+              Submit a support ticket or share your feedback with us
+            </p>
+          </div>
 
-        {/* Content */}
-        <div className="bg-neutral-800 rounded-xl border border-neutral-700">
-          {activeTab === 'ticket' ? <SupportTicketForm /> : <FeedbackForm />}
+          {/* Tab Navigation */}
+          <div className="flex bg-neutral-800 rounded-lg p-1 mb-8">
+            <button
+              onClick={() => setActiveTab('ticket')}
+              className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'ticket'
+                  ? 'bg-lime-500 text-neutral-900'
+                  : 'text-neutral-300 hover:text-white'
+                }`}
+            >
+              <LifeBuoy className="w-5 h-5 mr-2" />
+              Support Ticket
+            </button>
+            <button
+              onClick={() => setActiveTab('feedback')}
+              className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === 'feedback'
+                  ? 'bg-lime-500 text-neutral-900'
+                  : 'text-neutral-300 hover:text-white'
+                }`}
+            >
+              <MessageSquare className="w-5 h-5 mr-2" />
+              Feedback
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="bg-neutral-800 rounded-xl border border-neutral-700">
+            {activeTab === 'ticket' ? <SupportTicketForm /> : <FeedbackForm />}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

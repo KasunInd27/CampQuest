@@ -6,7 +6,7 @@ import kasunImg from "../assets/my_image1.jpeg";
 import shehanImg from "../assets/Shehan.jpeg";
 import thiliniImg from "../assets/Thilini.jpeg";
 import somiruwanImg from "../assets/Somiruwan.jpeg";
-
+import { Helmet } from "react-helmet-async";
 
 // Hero Section
 function AboutHero() {
@@ -381,14 +381,25 @@ function AboutCallToAction() {
 // Main About Us Component
 export default function AboutUs() {
   return (
-    <div className="min-h-screen bg-neutral-900">
-      <AboutHero />
-      <CompanyStory />
-      <MissionVisionValues />
-      <Statistics />
-      <TeamSection />
-      <SustainabilitySection />
-      <AboutCallToAction />
-    </div>
+    <>
+      <Helmet>
+        <title>About Us | CampQuest LK</title>
+        <meta
+          name="description"
+          content="Learn about CampQuest LK, our mission, team and passion for outdoor adventures in Sri Lanka."
+        />
+        <link rel="canonical" href="https://campquest.lk/about" />
+      </Helmet>
+
+      <div className="min-h-screen bg-neutral-900">
+        <AboutHero />
+        <CompanyStory />
+        <MissionVisionValues />
+        <Statistics />
+        <TeamSection />
+        <SustainabilitySection />
+        <AboutCallToAction />
+      </div>
+    </>
   );
 }
