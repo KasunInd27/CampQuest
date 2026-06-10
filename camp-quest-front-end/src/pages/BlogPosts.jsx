@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import axios, { BASE_URL } from '../lib/axios'; // Import the configured axios
 import toast from 'react-hot-toast';
+import { Helmet } from "react-helmet-async";
 
 const BlogPosts = () => {
   const [blogPosts, setBlogPosts] = useState([]);
@@ -144,129 +145,140 @@ const BlogPosts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">Our Blog</h1>
-          <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
-            Discover the latest tips, guides, and stories about camping and outdoor adventures
-          </p>
-        </div>
+    <>
+      <Helmet>
+        <title>Camping Blog | CampQuest LK</title>
+        <meta
+          name="description"
+          content="Camping tips, gear reviews, outdoor adventure guides, camping recipes and destination guides from CampQuest Sri Lanka."
+        />
+        <link rel="canonical" href="https://campquest.lk/blog" />
+      </Helmet>
 
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <form onSubmit={handleSearch} className="flex gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Enter keywords to search..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-80 pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={!searchTerm.trim()}
-                className="px-6 py-3 bg-lime-500 text-neutral-900 rounded-lg hover:bg-lime-400 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Search
-              </button>
-            </form>
-
-            <select
-              value={selectedCategory}
-              onChange={handleCategoryChange}
-              className="px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 min-w-48"
-            >
-              {categories.map((category) => (
-                <option key={category.value} value={category.value}>
-                  {category.label}
-                </option>
-              ))}
-            </select>
-
-            {(searchQuery || selectedCategory !== 'all') && (
-              <button
-                onClick={clearFilters}
-                className="px-4 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-colors text-sm"
-              >
-                Clear Filters
-              </button>
-            )}
+      <div className="min-h-screen bg-neutral-900 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-white mb-4">Our Blog</h1>
+            <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
+              Discover the latest tips, guides, and stories about camping and outdoor adventures
+            </p>
           </div>
-        </div>
 
-        {blogPosts.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="max-w-md mx-auto">
-              <div className="text-6xl mb-4">📝</div>
-              <p className="text-neutral-400 text-lg mb-4">
-                No blog posts available at the moment.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {blogPosts.map((post) => (
-                <BlogCard
-                  key={post._id}
-                  post={post}
-                  onRead={() => openModal(post._id)}
-                  formatDate={formatDate}
-                  truncateContent={truncateContent}
-                  getCategoryColor={getCategoryColor}
-                />
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="flex justify-center space-x-2">
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Enter keywords to search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-80 pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent"
+                  />
+                </div>
                 <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                  type="submit"
+                  disabled={!searchTerm.trim()}
+                  className="px-6 py-3 bg-lime-500 text-neutral-900 rounded-lg hover:bg-lime-400 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Previous
+                  Search
                 </button>
+              </form>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === page
-                      ? 'bg-lime-500 text-neutral-900'
-                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                      }`}
-                  >
-                    {page}
-                  </button>
+              <select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                className="px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-lime-500 min-w-48"
+              >
+                {categories.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
                 ))}
+              </select>
 
+              {(searchQuery || selectedCategory !== 'all') && (
                 <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                  onClick={clearFilters}
+                  className="px-4 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-colors text-sm"
                 >
-                  Next
+                  Clear Filters
                 </button>
-              </div>
-            )}
-          </>
-        )}
+              )}
+            </div>
+          </div>
 
-        {showModal && selectedPost && (
-          <BlogModal
-            post={selectedPost}
-            onClose={closeModal}
-            formatDate={formatDate}
-            getCategoryColor={getCategoryColor}
-          />
-        )}
+          {blogPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="max-w-md mx-auto">
+                <div className="text-6xl mb-4">📝</div>
+                <p className="text-neutral-400 text-lg mb-4">
+                  No blog posts available at the moment.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                {blogPosts.map((post) => (
+                  <BlogCard
+                    key={post._id}
+                    post={post}
+                    onRead={() => openModal(post._id)}
+                    formatDate={formatDate}
+                    truncateContent={truncateContent}
+                    getCategoryColor={getCategoryColor}
+                  />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center space-x-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                  >
+                    Previous
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === page
+                        ? 'bg-lime-500 text-neutral-900'
+                        : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                        }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {showModal && selectedPost && (
+            <BlogModal
+              post={selectedPost}
+              onClose={closeModal}
+              formatDate={formatDate}
+              getCategoryColor={getCategoryColor}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

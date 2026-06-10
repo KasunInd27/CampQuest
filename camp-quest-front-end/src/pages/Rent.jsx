@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
+import { Helmet } from "react-helmet-async";
+
 const Rent = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -122,78 +124,89 @@ const Rent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900">
-      {/* Header Section */}
-      <div className="bg-neutral-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-4">Rent Camping Equipment</h1>
-              <p className="text-neutral-400 text-lg">Affordable rentals for your next adventure</p>
+    <>
+      <Helmet>
+        <title>Camping Equipment Rental | CampQuest LK</title>
+        <meta
+          name="description"
+          content="Rent camping tents, sleeping bags, cooking equipment and outdoor gear in Sri Lanka."
+        />
+        <link rel="canonical" href="https://campquest.lk/rent" />
+      </Helmet>
+
+      <div className="min-h-screen bg-neutral-900">
+        {/* Header Section */}
+        <div className="bg-neutral-800 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-4xl font-bold text-white mb-4">Rent Camping Equipment</h1>
+                <p className="text-neutral-400 text-lg">Affordable rentals for your next adventure</p>
+              </div>
+              <button
+                onClick={exportToPDF}
+                className="flex items-center gap-2 px-4 py-2 bg-lime-500 text-neutral-900 rounded-lg hover:bg-lime-400 font-medium transition-colors"
+              >
+                <Download size={20} />
+                Export Catalog
+              </button>
             </div>
-            <button
-              onClick={exportToPDF}
-              className="flex items-center gap-2 px-4 py-2 bg-lime-500 text-neutral-900 rounded-lg hover:bg-lime-400 font-medium transition-colors"
-            >
-              <Download size={20} />
-              Export Catalog
-            </button>
           </div>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            {/* Search Bar */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search equipment..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <div className="relative">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="appearance-none px-4 py-3 pr-10 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-lime-500"
+              >
+                <option value="all">All Categories</option>
+                {categories.map(category => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={16} />
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <RentalProductCard
+                key={product._id}
+                product={product}
+              />
+            ))}
+          </div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <Package className="mx-auto h-16 w-16 text-neutral-600 mb-4" />
+              <h3 className="text-lg font-medium text-neutral-400">No equipment found</h3>
+              <p className="text-neutral-500">Try adjusting your search or filters</p>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Filters and Search */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          {/* Search Bar */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search equipment..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <div className="relative">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="appearance-none px-4 py-3 pr-10 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-lime-500"
-            >
-              <option value="all">All Categories</option>
-              {categories.map(category => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={16} />
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <RentalProductCard
-              key={product._id}
-              product={product}
-            />
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="mx-auto h-16 w-16 text-neutral-600 mb-4" />
-            <h3 className="text-lg font-medium text-neutral-400">No equipment found</h3>
-            <p className="text-neutral-500">Try adjusting your search or filters</p>
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 

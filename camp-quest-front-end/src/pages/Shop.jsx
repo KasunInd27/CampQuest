@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { savePendingAction, getPendingAction, clearPendingAction } from '../utils/pendingActions';
 import toast from 'react-hot-toast';
 import { getValidImageUrl, resolveImageUrl } from '../lib/imageHelper';
+import { Helmet } from "react-helmet-async";
 
 // (API_BASE_URL redundant, using BASE_URL directly for images)
 
@@ -87,68 +88,79 @@ const Shop = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900">
-      {/* Header Section */}
-      <div className="bg-neutral-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-white mb-4">Shop Camping Gear</h1>
-          <p className="text-neutral-400 text-lg">Find the perfect equipment for your outdoor adventures</p>
+    <>
+      <Helmet>
+        <title>Camping Gear Shop | CampQuest LK</title>
+        <meta
+          name="description"
+          content="Buy premium camping equipment, tents, hiking gear and outdoor accessories in Sri Lanka."
+        />
+        <link rel="canonical" href="https://campquest.lk/shop" />
+      </Helmet>
+
+      <div className="min-h-screen bg-neutral-900">
+        {/* Header Section */}
+        <div className="bg-neutral-800 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Shop Camping Gear</h1>
+            <p className="text-neutral-400 text-lg">Find the perfect equipment for your outdoor adventures</p>
+          </div>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            {/* Search Bar */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <div className="relative">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="appearance-none px-4 py-3 pr-10 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-lime-500"
+              >
+                <option value="all">All Categories</option>
+                {categories.map(category => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={16} />
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                onAddToCart={handleAddToCart}
+              />
+            ))}
+          </div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <Package className="mx-auto h-16 w-16 text-neutral-600 mb-4" />
+              <h3 className="text-lg font-medium text-neutral-400">No products found</h3>
+              <p className="text-neutral-500">Try adjusting your search or filters</p>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Filters and Search */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          {/* Search Bar */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-lime-500"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <div className="relative">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="appearance-none px-4 py-3 pr-10 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-lime-500"
-            >
-              <option value="all">All Categories</option>
-              {categories.map(category => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={16} />
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-              onAddToCart={handleAddToCart}
-            />
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="mx-auto h-16 w-16 text-neutral-600 mb-4" />
-            <h3 className="text-lg font-medium text-neutral-400">No products found</h3>
-            <p className="text-neutral-500">Try adjusting your search or filters</p>
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 
